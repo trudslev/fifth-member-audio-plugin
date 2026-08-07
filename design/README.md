@@ -550,3 +550,15 @@ Two defects were found while writing this document and are corrected in the incl
 
 Open any \`.dc.html\` file directly in a browser — no build step, no server. Drag any knob, click any
 button; the prototype is fully live and is the authority wherever this document is ambiguous.
+
+
+## Icon assets (rendered)
+
+Concept 1b — Repeat Train.
+
+| File | Size | Projucer slot |
+|---|---|---|
+| `icons/fifth-member-icon-1024.png` | 1024×1024 | Large Icon |
+| `icons/fifth-member-icon-256.png` | 256×256 | Small Icon |
+
+PNG with alpha; the rounded-square corners are transparent, so JUCE/macOS masking will not double-round it. Source of truth is `IconPulse.dc.html` (256px design) — re-render at any multiple from there. Below 24px, drop the `1/8D` / `5M` readout line per the simplification rule.

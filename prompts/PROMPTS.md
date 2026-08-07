@@ -45,12 +45,20 @@ painting over adjacent labels, tick marks reading as spokes, knob faces reading 
 "it looks about right" as insufficient. Known candidates: gradient weighting on the knob faces,
 corner-wear balance, nameplate marker weight, and text metrics throughout.
 
-PROMPT #3
+PROMPT #3 - PARTLY SHIPPED 2026-08-07
 
 Build the product icon. design/README.md Part 2 specifies it fully: concept 1b "repeat train", a
 256x256 master with six bars on a baseline inside an LCD window, exact heights 112/74/48/30/18/10,
 and a separate simplified master for 16/24/32 that drops the readout and the phosphor bloom.
 IconPulse.dc.html is the primary artifact. Wire the result to ICON_BIG/ICON_SMALL.
+
+Shipped: 1024 and 256 masters in design/icons/, wired to ICON_BIG/ICON_SMALL. The generated
+AppIcon.icns carries ic10 (1024) and ic08 (256).
+
+Outstanding: the simplified <=32px master. JUCE exposes only two icon slots and derives the Windows
+.ico's 16/32/48 entries by downscaling the 256, so the readout line survives into sizes the design
+explicitly says to drop it from. Honouring the rule means giving ICON_SMALL to the simplified art
+instead of the 256.
 
 PROMPT #4
 

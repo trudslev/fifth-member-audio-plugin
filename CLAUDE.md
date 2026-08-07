@@ -213,6 +213,20 @@ adjusting anything here by eye:
 Judge a texture by local mean and local contrast, not by per-pixel difference: a 2 px brush that is
 one pixel out of phase scores terribly and looks identical.
 
+**The icon, and the one slot JUCE does not give us.** `ICON_BIG`/`ICON_SMALL` are the only two inputs
+and every platform icon is derived from them: the macOS `.icns` takes one entry per file at the
+largest exact size of 16/32/64/128/256/512/1024 that fits (so a non-power-of-two source silently
+downgrades — 1000 px lands as 512), and the Windows `.ico` takes 16/32/48/256, each from the smallest
+supplied image still big enough, which means all four come from the 256.
+
+`design/README.md`'s "Small sizes" section asks for a **separate simplified master for 16/24/32** that
+drops the readout line and the phosphor bloom, "rather than downscaling the full artwork" — and it is
+right to. Downscaled, the six bars merge into a wedge and the `1/8D` / `5M` readout becomes a muddy
+band; at 16 px the mark stops reading, and it is the only one of the five suite icons that does. JUCE
+has no third slot for it, so honouring the rule means spending `ICON_SMALL` on the simplified art
+(say 64 px) and letting macOS derive 128/256 by downscaling the 1024. Currently unresolved: the pair
+is 1024 + 256, matching all four siblings, and the small end is knowingly compromised.
+
 ### Build system
 
 JUCE pinned to `8.0.14`, matching all four siblings. `PLUGIN_MANUFACTURER_CODE` (`Nfdy`),
@@ -237,6 +251,9 @@ passes while proving nothing.
 - **GUI**: complete, and measured against the prototype rendered in headless Chrome rather than
   judged by eye. Whole-panel tone difference is ~3.4 levels out of 255; every panel-box edge, both
   DELAY CHARACTER dividers and the scope's inner box land on the reference to within a pixel.
-- **Not done**: an app icon (`design/README.md` Part 2 specifies one, and `ICON_BIG`/`ICON_SMALL`
-  are unset), and registration in `../manifest/suite.toml`, which needs a tagged release first plus
-  a freshly generated `windows_appid` GUID.
+- **Icon**: concept 1b "repeat train", wired to `ICON_BIG` (1024) and `ICON_SMALL` (256) from
+  `design/icons/`. The **simplified ≤ 32 px master `design/README.md` asks for is still missing** —
+  see the note under GUI.
+- **Not done**: registration in `../manifest/suite.toml`, deliberately held until all six suite
+  plugins exist (Elmer, a bus glue plugin, is unbuilt). It will also need a tagged release and a
+  freshly generated `windows_appid` GUID.

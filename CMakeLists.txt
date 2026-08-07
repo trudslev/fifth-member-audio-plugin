@@ -89,6 +89,13 @@ juce_add_plugin(FifthMember
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     COPY_PLUGIN_AFTER_BUILD TRUE
+    # JUCE takes exactly two images and derives every platform icon from them. The macOS .icns gets
+    # one entry per file, at the largest of 16/32/64/128/256/512/1024 that fits - so these must be
+    # EXACTLY square at an exact valid size, or a 1000px source silently lands in the icns as 512.
+    # The Windows .ico takes 16/32/48/256, each from the smallest supplied image still big enough,
+    # which means all four come from the 256. 1024 + 256 matches all four siblings.
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/design/icons/fifth-member-icon-1024.png"
+    ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/design/icons/fifth-member-icon-256.png"
     ${FIFTHMEMBER_EXTRA_ARGS})
 
 target_sources(FifthMember PRIVATE
