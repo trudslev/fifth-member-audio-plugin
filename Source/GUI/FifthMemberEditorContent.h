@@ -14,7 +14,7 @@
 class FifthMemberAudioProcessor;
 
 /**
-    The fixed reference canvas, 1240 x 855.
+    The fixed reference canvas, 1240 x 848.
 
     Every child draws in untransformed canvas coordinates and never learns the window size -
     PluginEditor applies one uniform scale transform to this whole component, so there is

@@ -130,15 +130,24 @@ prototype is 100 % CSS with zero images, zero SVG and no assets at all — unlik
 CHORUS-60, whose designers supplied panel plates and 128-frame knob filmstrips — so there was
 nothing to pre-render from but the CSS itself.
 
-`FifthMemberTheme.h` holds every colour, coordinate and typographic constant.
+`PanelBackground` bakes at **2×**, not 1:1. The panel's two defining textures — the fascia's 3 px
+brush and the rack ears' 2 px one — sit at the resolution limit, so a 1:1 bake blitted to a Retina
+display resolves them to a flat wash and the metal stops reading as metal. ~17 MB, and it holds up
+across the 0.5×–2× resize range.
+
+`FifthMemberTheme.h` holds every colour, coordinate and typographic constant. **Every coordinate in
+`Layout` is absolute against the 1240 × 848 canvas.** The CSS they came from is nested — the fascia
+is a flex child after the 52 px left rack ear, and its own 18 px padding starts the content box — so
+the extracted figures were fascia-relative and have had `earWidth` folded in once. A fascia-relative
+number added later lands 52 px left of where it belongs, on top of the rack ear.
 
 **Three corrections to `design/README.md`, all load-bearing:**
 
 1. **The fascia is 1100 px, not the doc's 1084.** That figure subtracts one rack ear twice
    (1240 − 52 − 52 − 52). The unit is 52 + 1136 + 52, and the fascia's content box is 1136 − 36 px
    padding = 1100 at origin x = 18.
-2. **The panel is 1240 × 855.** The height is never stated in the doc; it resolves to ~854.5 from
-   the CSS.
+2. **The panel is 1240 × 848.** The height is never stated in the doc. Summing the CSS gives ~854.5,
+   but that over-counts every line box; measured off the rendered prototype it is 848.
 3. **Permanent Marker and Special Elite are Apache 2.0, not OFL** as the doc's type table claims.
    Both are vendored with `LICENSE.txt` accordingly.
 
@@ -167,11 +176,42 @@ mode, or the animation silently degrades to a snap; and a dragged knob tracks th
 On a Delay Character change the dials are held at minimum for ~40 ms and released, so all three
 visibly sweep up — the design calls this "the panel physically re-setting itself".
 
-**Rendering gotchas already paid for**: CSS `font-size` is an em size, so use JUCE 8's
-`FontOptions::withPointHeight()`, never `withHeight()`. `juce::String`'s `const char*` constructor
-decodes **Latin-1, not UTF-8**, so build `·` from its codepoint (`Text::middleDot()`). And CSS
-box-shadow blur radii are *not* gradient radii — drawn as discs of colour they wash over adjacent
-labels, which is what happened to REPEATS LIVE, NOTE DIVISION, CROSS-FEED and TIME.
+**CSS-to-JUCE traps this panel has already paid for.** Every one of these was caught by rendering
+`design/Fifth Member.dc.html` in headless Chrome and diffing region by region — do that before
+adjusting anything here by eye:
+
+```
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
+  --force-device-scale-factor=2 --window-size=1320,1300 --virtual-time-budget=8000 \
+  --screenshot=proto.png "file://$PWD/design/Fifth Member.dc.html"
+```
+
+- **`font-size` is an em size.** Use JUCE 8's `FontOptions::withPointHeight()`, never `withHeight()`.
+- **`juce::String`'s `const char*` constructor decodes Latin-1, not UTF-8.** Build `·` from its
+  codepoint (`Text::middleDot()`).
+- **`width` on a bordered, padded box is the CONTENT width** — the prototype has no `box-sizing`
+  reset. This bit twice: the fascia (1136 border box, 1100 content) and DELAY CHARACTER's right
+  column (`width:250px` + 26 px padding + 1 px border = 277 border box). The second one walked a
+  divider 27 px right and, because the middle column is `flex:1`, stretched the three dials onto a
+  pitch 9 px too wide.
+- **CSS interpolates translucent gradient stops in premultiplied space; JUCE does not.** A single
+  JUCE gradient from `rgba(255,255,255,.022)` to `rgba(0,0,0,.18)` carries a mid grey at partial
+  alpha and lightens the middle of the box by six levels. Draw light-fading-out and dark-fading-in
+  as two passes.
+- **A gradient is clipped by the element that carries it.** The corner wears are 120×70-ish boxes;
+  filled across the full fascia column instead they hazed the whole panel several levels lighter.
+- **Gradient stop percentages are of the gradient's own radius, not the box's.** The knob tick masks
+  quote 64 % and 76 % of the ring box's *farthest-corner* radius (`ringHalf × √2`) — read as
+  fractions of the box radius the marks come out a third short and read as spokes on the body.
+- **A `linear-gradient` angle is a direction, not a diagonal.** `96deg` on a 52 × 848 rack ear runs
+  across the 52 px width; drawn corner to corner it is almost vertical and every band of the brushed
+  figure disappears. `92deg` on the brush texture leans the marks 2° off vertical, which over 848 px
+  walks them 30 px sideways — that near-miss against the pixel grid is the shimmer.
+- **box-shadow blur radii are not gradient radii** — drawn as discs of colour they wash over adjacent
+  labels, which is what happened to REPEATS LIVE, NOTE DIVISION, CROSS-FEED and TIME.
+
+Judge a texture by local mean and local contrast, not by per-pixel difference: a 2 px brush that is
+one pixel out of phase scores terribly and looks identical.
 
 ### Build system
 
@@ -194,10 +234,9 @@ passes while proving nothing.
 - **DSP**: complete, no stubs. Delay tables, filter cutoffs and character ranges are a
   structurally-reasoned first pass, not a by-ear one. Build, load, listen, adjust.
 - **Programs**: 11 factory Programs with authored values; no by-ear pass.
-- **GUI**: implemented against the extracted geometry and corrected over two visual passes. It has
-  **not** had a true side-by-side against the prototype rendered in a browser — that is the pass
-  that catches gradient weighting, wear balance and text metrics, and it is the highest-value
-  outstanding GUI work.
+- **GUI**: complete, and measured against the prototype rendered in headless Chrome rather than
+  judged by eye. Whole-panel tone difference is ~3.4 levels out of 255; every panel-box edge, both
+  DELAY CHARACTER dividers and the scope's inner box land on the reference to within a pixel.
 - **Not done**: an app icon (`design/README.md` Part 2 specifies one, and `ICON_BIG`/`ICON_SMALL`
   are unset), and registration in `../manifest/suite.toml`, which needs a tagged release first plus
   a freshly generated `windows_appid` GUID.

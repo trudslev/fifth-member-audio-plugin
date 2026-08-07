@@ -20,7 +20,7 @@ void FifthMemberKnob::setCentrePosition (juce::Point<float> centre)
     // The hit area reaches the tick ring's outer edge plus a small click margin, so the whole
     // visible control is grabbable and the ring sits inside this component's own clip region.
     const auto& v = variant();
-    const float half = v.diameter * 0.5f - v.tickInset + 3.0f;
+    const float half = Geometry::tickAnnulus (v).outer + v.tickWidth + 2.0f;
 
     setBounds (juce::Rectangle<float> (centre.x - half, centre.y - half, half * 2.0f, half * 2.0f)
                    .getSmallestIntegerContainer());
@@ -54,21 +54,19 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
 
     // --- tick ring, outside the body, drawn first ----------------------------
     {
-        // The design masks the ring to a thin annulus in the outer band of the tick box, so the
-        // marks are a short stroke sitting just clear of the body - not a spoke reaching back to
-        // it. Measured off the prototype: roughly r+4 to r+10 on the standard sizes.
-        const float outer = r - v.tickInset;
-        const float inner = r + (outer - r) * 0.42f;
-        const float span = Layout::knobArcEndDegrees - Layout::knobArcStartDegrees;
-        const int steps = juce::jmax (1, juce::roundToInt (span / v.tickStepDegrees));
+        const auto ring = Geometry::tickAnnulus (v);
+        const int steps = juce::roundToInt (360.0f / v.tickStepDegrees);
 
         g.setColour (v.tickColour);
 
-        for (int i = 0; i <= steps; ++i)
+        // A full ring, not just the 270 degrees the pointer sweeps: the design's conic gradient
+        // repeats all the way round, so there are marks below the horizontal and one at six
+        // o'clock. Stopping at the arc ends left a bare bottom the prototype does not have.
+        for (int i = 0; i < steps; ++i)
         {
-            const float angle = Layout::knobArcStartDegrees + (float) i * (span / (float) steps);
-            g.drawLine ({ Geometry::pointOnCircle (centre, inner, angle),
-                          Geometry::pointOnCircle (centre, outer, angle) }, v.tickWidth);
+            const float angle = (float) i * v.tickStepDegrees;
+            g.drawLine ({ Geometry::pointOnCircle (centre, ring.inner, angle),
+                          Geometry::pointOnCircle (centre, ring.outer, angle) }, v.tickWidth);
         }
     }
 
@@ -97,17 +95,9 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
         g.fillEllipse (body);
     }
 
-    // The specular the CSS gets for free from its own radial's first stop: a soft bloom up and left
-    // of centre, which is what actually reads as "moulded" rather than "flat".
-    {
-        const float sheenR = r * 0.72f;
-        const juce::Point<float> sheenCentre { centre.x - r * 0.14f, centre.y - r * 0.26f };
-        juce::ColourGradient sheen { juce::Colours::white.withAlpha (0.10f), sheenCentre.x, sheenCentre.y,
-                                     juce::Colours::transparentWhite, sheenCentre.x + sheenR, sheenCentre.y, true };
-        sheen.addColour (0.55, juce::Colours::white.withAlpha (0.03f));
-        g.setGradientFill (sheen);
-        g.fillEllipse (body);
-    }
+    // No separate specular pass. `Paint::radial` already sizes to the farthest corner the way CSS
+    // does, so the body gradient's own off-centre first stop IS the highlight; adding a bloom on
+    // top of it double-counted the light and hazed the upper left.
 
     // inset 0 1px 1px rgba(255,255,255,.16-.18): the lit upper lip
     g.setColour (juce::Colours::white.withAlpha (0.18f));

@@ -22,7 +22,9 @@
        the fascia's content box is 1136 - 36 px padding = 1100 at origin x = 18. Every horizontal
        number here derives from that.
 
-    2. The panel height is never stated. It resolves to ~854.5 px from the CSS; 855 is used.
+    2. The panel height is never stated. Summing the CSS gives ~854.5, but that over-counts every
+       line box; measured off the rendered prototype it is **848**, and the interior landmarks that
+       drifted with it (row A's and row B's heights, the whole foot block) are corrected to match.
 
     Nothing on this panel is content-box in the CSS sense by accident - the prototype has no
     box-sizing reset, so every declared width/height excludes its border. That is already folded
@@ -265,41 +267,47 @@ namespace Text
 namespace Layout
 {
     inline constexpr float canvasWidth = 1240.0f;
-    inline constexpr float canvasHeight = 855.0f;
+    inline constexpr float canvasHeight = 848.0f;
     inline constexpr float unitRadius = 5.0f;
 
+    /** EVERY coordinate below is absolute against the 1240 x 848 canvas.
+
+        The CSS they came from is nested - the fascia is a flex child sitting after the 52 px left
+        rack ear, and its own 18 px padding starts the content box - so the extracted figures were
+        all fascia-relative and have had `earWidth` folded in once, here. Anything added later must
+        be absolute too: a fascia-relative number lands 52 px left of where it belongs, on top of
+        the rack ear, which is exactly the bug this comment exists to prevent recurring. */
     inline constexpr float earWidth = 52.0f;
-    inline constexpr float fasciaX = earWidth;
-    inline constexpr float fasciaContentX = 18.0f;      // fascia padding is 18px horizontally
+    inline constexpr float fasciaContentX = 70.0f;      // earWidth + the fascia's own 18px padding
     inline constexpr float fasciaContentW = 1100.0f;    // NOT the doc's 1084 - see the file comment
 
     inline constexpr float screwDiameter = 24.0f;
     inline constexpr std::array<juce::Point<float>, 4> screwCentres { {
-        { 26.0f, 34.0f }, { 26.0f, 821.0f }, { 1214.0f, 34.0f }, { 1214.0f, 821.0f } } };
+        { 26.0f, 34.0f }, { 26.0f, 814.0f }, { 1214.0f, 34.0f }, { 1214.0f, 814.0f } } };
     /** Kept distinct on purpose: four identical screws read as CG. */
     inline constexpr std::array<float, 4> screwSlotAngles { { 28.0f, -14.0f, 52.0f, 9.0f } };
 
     // --- header --------------------------------------------------------------
-    inline constexpr float headerContentX = 22.0f;
+    inline constexpr float headerContentX = 74.0f;
     inline constexpr float headerContentW = 1092.0f;
     inline constexpr float headerRuleY = 127.34f;
 
-    inline constexpr float nameplateX = 22.0f;
+    inline constexpr float nameplateX = 74.0f;
     inline constexpr float nameplateY = 16.0f;
     inline constexpr float nameplateW = 326.0f;
     inline constexpr float nameplateH = 52.34f;
     inline constexpr float nameplateRotationDegrees = -1.2f;
     inline constexpr float nameplateTextSize = 33.0f;
 
-    inline constexpr float taglineX = 26.0f;
+    inline constexpr float taglineX = 78.0f;
     inline constexpr float taglineY1 = 80.34f;
     inline constexpr float taglineY2 = 98.34f;
     inline constexpr float taglineSize = 12.0f;
     inline constexpr float taglineLineHeight = 15.0f;
 
-    inline constexpr float programLabelX = 376.0f;
+    inline constexpr float programLabelX = 428.0f;
     inline constexpr float programLabelY = 32.42f;
-    inline constexpr float lcdX = 374.0f;
+    inline constexpr float lcdX = 426.0f;
     inline constexpr float lcdY = 50.92f;
     inline constexpr float lcdW = 391.0f;
     inline constexpr float lcdH = 46.0f;
@@ -307,9 +315,9 @@ namespace Layout
     inline constexpr float bankTagW = 61.0f;
     inline constexpr float caretW = 36.0f;
 
-    inline constexpr float saveX = 775.0f;
+    inline constexpr float saveX = 827.0f;
     inline constexpr float saveW = 68.0f;
-    inline constexpr float deleteX = 850.0f;
+    inline constexpr float deleteX = 902.0f;
     inline constexpr float deleteW = 76.0f;
     inline constexpr float headerButtonY = 50.92f;
     inline constexpr float headerButtonH = 46.0f;
@@ -318,17 +326,17 @@ namespace Layout
     inline constexpr float meterBoxY = 56.42f;
     inline constexpr float meterBoxW = 76.0f;
     inline constexpr float meterBoxH = 34.0f;
-    inline constexpr float meterInX = 952.0f;
-    inline constexpr float meterOutX = 1038.0f;
+    inline constexpr float meterInX = 1004.0f;
+    inline constexpr float meterOutX = 1090.0f;
 
     // --- scope ---------------------------------------------------------------
     inline constexpr float scopeCaptionY = 142.34f;
     inline constexpr float scopeCaptionH = 15.0f;
-    inline constexpr juce::Point<float> lampCentre { 28.5f, 149.84f };
+    inline constexpr juce::Point<float> lampCentre { 80.5f, 149.84f };
     inline constexpr float lampDiameter = 13.0f;
-    inline constexpr float lampLabelX = 49.0f;   // 11px clear of the lamp AND its halo
+    inline constexpr float lampLabelX = 98.0f;      // lamp right edge (87) + the 11px flex gap
 
-    inline constexpr float scopeX = 22.0f;
+    inline constexpr float scopeX = 74.0f;
     inline constexpr float scopeY = 165.34f;
     inline constexpr float scopeW = 1092.0f;
     inline constexpr float scopeH = 98.0f;
@@ -337,7 +345,7 @@ namespace Layout
         strip, in Share Tech Mono - the same face as the PROGRAM LCD - and never in the plot. That
         combination of placement and typeface is what makes changing text read as a screen rather
         than a printed label. */
-    inline constexpr float scopeInnerX = 23.0f;
+    inline constexpr float scopeInnerX = 75.0f;
     inline constexpr float scopeInnerY = 166.34f;
     inline constexpr float scopeInnerW = 1090.0f;
     inline constexpr float readoutStripH = 22.0f;
@@ -358,82 +366,89 @@ namespace Layout
 
     // --- control row A -------------------------------------------------------
     inline constexpr float rowAY = 285.34f;
-    inline constexpr float rowAH = 244.0f;
+    inline constexpr float rowAH = 242.0f;
     inline constexpr float legendTextSize = 10.0f;
     inline constexpr float legendTracking = 0.28f;
 
-    inline constexpr float timingX = 22.0f;
+    inline constexpr float timingX = 74.0f;
     inline constexpr float timingW = 296.0f;
-    inline constexpr float repeatsX = 334.0f;
+    inline constexpr float repeatsX = 386.0f;
     inline constexpr float repeatsW = 464.0f;
-    inline constexpr float outputX = 814.0f;
+    inline constexpr float outputX = 866.0f;
     inline constexpr float outputW = 300.0f;
 
-    inline constexpr float syncSwitchX = 39.0f;
+    inline constexpr float syncSwitchX = 91.0f;
     inline constexpr float syncSwitchY = 306.34f;
     inline constexpr float syncSwitchW = 54.0f;
     inline constexpr float syncSwitchH = 26.0f;
-    inline constexpr float syncThumbOffX = 42.0f;
-    inline constexpr float syncThumbOnX = 67.0f;
+    inline constexpr float syncThumbOffX = 94.0f;
+    inline constexpr float syncThumbOnX = 119.0f;
     inline constexpr float syncThumbY = 309.34f;
     inline constexpr float syncThumbW = 23.0f;
     inline constexpr float syncThumbH = 20.0f;
     inline constexpr float syncThumbAnimMs = 180.0f;
-    inline constexpr float syncCaptionX = 105.0f;
+    inline constexpr float syncCaptionX = 157.0f;
     inline constexpr float syncCaptionY = 312.465f;
 
-    inline constexpr juce::Point<float> divisionLedCentre { 42.5f, 352.59f };
-    inline constexpr float divisionLabelX = 53.0f;
+    inline constexpr juce::Point<float> divisionLedCentre { 94.5f, 352.59f };
+    inline constexpr float divisionLabelX = 105.0f;
     inline constexpr float divisionLabelY = 346.34f;
     inline constexpr float divisionButtonY = 365.84f;
     inline constexpr float divisionButtonW = 48.4f;
     inline constexpr float divisionButtonH = 32.0f;
     inline constexpr float divisionButtonPitch = 53.4f;
-    inline constexpr float divisionButtonX0 = 39.0f;
+    inline constexpr float divisionButtonX0 = 91.0f;
 
-    inline constexpr juce::Point<float> timeKnobCentre { 170.0f, 447.84f };
+    inline constexpr juce::Point<float> timeKnobCentre { 222.0f, 447.84f };
     inline constexpr float timeLabelY = 495.84f;
-    inline constexpr juce::Point<float> timeLedCentre { 154.0f, 502.09f };
+    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 502.09f };
 
-    inline constexpr juce::Point<float> feedbackKnobCentre { 458.0f, 351.34f };
-    inline constexpr juce::Point<float> crossFeedKnobCentre { 678.0f, 363.34f };
+    inline constexpr juce::Point<float> feedbackKnobCentre { 510.0f, 351.34f };
+    inline constexpr juce::Point<float> crossFeedKnobCentre { 730.0f, 363.34f };
     inline constexpr float repeatsLabelY = 409.34f;
-    inline constexpr juce::Point<float> crossFeedLedCentre { 642.0f, 415.59f };
+    inline constexpr juce::Point<float> crossFeedLedCentre { 694.0f, 415.59f };
 
-    inline constexpr float stereoLabelX = 351.0f;
+    inline constexpr float stereoLabelX = 403.0f;
     inline constexpr float stereoLabelY = 437.84f;
     inline constexpr float stereoButtonY = 457.34f;
     inline constexpr float stereoButtonW = 140.0f;
     inline constexpr float stereoButtonH = 34.0f;
-    inline constexpr std::array<float, 3> stereoButtonX { { 351.0f, 496.0f, 641.0f } };
+    inline constexpr std::array<float, 3> stereoButtonX { { 403.0f, 548.0f, 693.0f } };
 
-    inline constexpr juce::Point<float> mixKnobCentre { 909.85f, 395.59f };
-    inline constexpr juce::Point<float> trimKnobCentre { 1025.0f, 406.59f };
+    inline constexpr juce::Point<float> mixKnobCentre { 961.85f, 395.59f };
+    inline constexpr juce::Point<float> trimKnobCentre { 1077.0f, 406.59f };
     inline constexpr float outputLabelY = 452.59f;
 
     // --- control row B: DELAY CHARACTER --------------------------------------
-    inline constexpr float rowBY = 551.34f;
-    inline constexpr float rowBH = 242.0f;
+    inline constexpr float rowBY = 549.34f;
+    inline constexpr float rowBH = 241.0f;
 
-    inline constexpr float modeButtonX = 43.0f;
+    inline constexpr float modeButtonX = 95.0f;
     inline constexpr float modeButtonW = 168.0f;
     inline constexpr float modeButtonH = 56.0f;
     inline constexpr float modeButtonPitch = 68.0f;
-    inline constexpr float modeButtonY0 = 578.34f;
-    inline constexpr float modeLedX = 63.0f;
+    inline constexpr float modeButtonY0 = 576.34f;
+    inline constexpr float modeLedX = 115.0f;
     inline constexpr float modeLedDiameter = 10.0f;
-    inline constexpr float modeLabelX = 80.0f;
+    inline constexpr float modeLabelX = 132.0f;
     inline constexpr float modeLabelSize = 13.0f;
 
-    inline constexpr float dialsDividerX = 237.0f;
-    inline constexpr float sharedDividerX = 843.0f;
-    inline constexpr float rowBDividerY = 578.34f;
+    /** DELAY CHARACTER's three flex columns.
+
+        The right-hand one declares `width:250px` alongside `border-left:1px; padding-left:26px`,
+        and with no box-sizing reset that 250 is its CONTENT width - its border box is 277. Reading
+        it as the border box (which is what the first extraction did) walks the divider 27px right
+        and, because the middle column is `flex:1`, stretches it by the same 27, spreading the three
+        dials on a pitch 9px too wide. Both dividers are measured off the prototype at 289 and 868.  */
+    inline constexpr float dialsDividerX = 289.0f;
+    inline constexpr float sharedDividerX = 868.0f;
+    inline constexpr float rowBDividerY = 576.34f;
     inline constexpr float rowBDividerH = 192.0f;
 
-    inline constexpr std::array<float, 3> dialCentreX { { 356.833f, 540.5f, 724.167f } };
-    inline constexpr float dialCentreY = 643.34f;
-    inline constexpr float dialLabelStackTop = 697.34f;
-    inline constexpr float dialLabelRowPitch = 17.5f;
+    inline constexpr std::array<float, 3> dialCentreX { { 404.333f, 579.0f, 753.667f } };
+    inline constexpr float dialCentreY = 641.34f;
+    inline constexpr float dialLabelStackTop = 695.34f;
+    inline constexpr float dialLabelRowPitch = 17.0f;
     inline constexpr float dialLabelSize = 10.0f;
     inline constexpr float dialLabelTracking = 0.18f;
     inline constexpr float dialLedDiameter = 6.0f;
@@ -441,21 +456,21 @@ namespace Layout
     inline constexpr float dialLedOffsetY = 6.25f;
     inline constexpr float dialLabelTextOffsetX = 13.0f;
 
-    inline constexpr float sharedHeadingX = 870.0f;
-    inline constexpr float sharedHeadingY = 568.34f;
-    inline constexpr juce::Point<float> dampingKnobCentre { 923.25f, 649.84f };
-    inline constexpr juce::Point<float> saturationKnobCentre { 1039.75f, 649.84f };
-    inline constexpr float sharedLabelY = 697.84f;
+    inline constexpr float sharedHeadingX = 895.0f;
+    inline constexpr float sharedHeadingY = 566.34f;
+    inline constexpr juce::Point<float> dampingKnobCentre { 955.0f, 647.84f };
+    inline constexpr juce::Point<float> saturationKnobCentre { 1085.0f, 647.84f };
+    inline constexpr float sharedLabelY = 695.84f;
 
     // --- foot ----------------------------------------------------------------
-    inline constexpr float footRuleY = 805.34f;
-    inline constexpr float footWindowX = 22.0f;
-    inline constexpr float footWindowY = 816.34f;
-    inline constexpr float footWindowH = 26.2f;
-    inline constexpr float footWindowTextX = 35.0f;
-    inline constexpr float footWindowTextY = 821.34f;
-    inline constexpr float footSpecX = 216.0f;
-    inline constexpr float footTextY = 823.19f;
+    inline constexpr float footRuleY = 803.0f;
+    inline constexpr float footWindowX = 74.0f;
+    inline constexpr float footWindowY = 814.0f;
+    inline constexpr float footWindowH = 23.0f;
+    inline constexpr float footWindowTextX = 87.0f;
+    inline constexpr float footWindowTextY = 819.0f;
+    inline constexpr float footSpecX = 268.0f;
+    inline constexpr float footTextY = 820.85f;
 
     // --- knobs ---------------------------------------------------------------
     inline constexpr float knobArcStartDegrees = -135.0f;
@@ -472,6 +487,8 @@ namespace Layout
         float pointerLength;
         float pointerTopOffset;
         float tickInset;        // negative: the ring sits outside the body
+        float tickMaskInner;    // the design's mask stops, as fractions of the ring box's
+        float tickMaskOuter;    // FARTHEST-CORNER radius - not of the box radius
         float tickStepDegrees;
         float tickWidth;
         juce::Colour faceTop, faceMid, faceBottom;
@@ -479,19 +496,19 @@ namespace Layout
         float slewMs;           // the character dials re-set more slowly than the rest
     };
 
-    inline const KnobVariant knob62 { 62.0f, 2.0f, 24.0f, 6.0f, -10.0f, 27.0f, 1.4f,
+    inline const KnobVariant knob62 { 62.0f, 2.0f, 24.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
                                       juce::Colour (0xFF121110), Colour::tickMark, 620.0f };
-    inline const KnobVariant knob66 { 66.0f, 2.0f, 26.0f, 6.0f, -10.0f, 27.0f, 1.4f,
+    inline const KnobVariant knob66 { 66.0f, 2.0f, 26.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
                                       juce::Colour (0xFF121110), Colour::tickMark, 620.0f };
-    inline const KnobVariant knob76 { 76.0f, 2.5f, 30.0f, 7.0f, -11.0f, 24.0f, 1.3f,
+    inline const KnobVariant knob76 { 76.0f, 2.5f, 30.0f, 7.0f, -11.0f, 0.64f, 0.76f, 24.0f, 1.3f,
                                       juce::Colour (0xFF514E46), juce::Colour (0xFF282621),
                                       juce::Colour (0xFF121110), Colour::tickMarkMid, 660.0f };
-    inline const KnobVariant knob82 { 82.0f, 3.0f, 32.0f, 7.0f, -11.0f, 22.5f, 1.2f,
+    inline const KnobVariant knob82 { 82.0f, 3.0f, 32.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
                                       juce::Colour (0xFF131210), Colour::tickMarkLarge, 620.0f };
-    inline const KnobVariant knob84 { 84.0f, 3.0f, 33.0f, 7.0f, -11.0f, 22.5f, 1.2f,
+    inline const KnobVariant knob84 { 84.0f, 3.0f, 33.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
                                       juce::Colour (0xFF131210), Colour::tickMarkLarge, 620.0f };
 
@@ -545,6 +562,23 @@ namespace Geometry
     inline juce::Point<float> pointOnCircle (juce::Point<float> centre, float radius, float degrees) noexcept
     {
         return centre + directionFor (degrees) * radius;
+    }
+
+    struct TickAnnulus { float inner, outer; };
+
+    /** Where the tick marks actually start and stop.
+
+        The design draws them as a conic gradient filling a box inset -10/-11px from the body, then
+        masks it with `radial-gradient(circle, transparent, #000 <inner>% <outer>%, transparent)`.
+        The two opaque stops are what matter, and they are percentages of that box's
+        FARTHEST-CORNER radius - `ringHalf * sqrt(2)`, not `ringHalf`. Read as fractions of the box
+        radius instead, the marks come out a third too short and stop well inside where the design
+        puts them, which reads as a spoke on the body rather than a mark clear of it. */
+    inline TickAnnulus tickAnnulus (const Layout::KnobVariant& v) noexcept
+    {
+        const float ringHalf = v.diameter * 0.5f - v.tickInset;   // tickInset is negative: outset
+        const float farthestCorner = ringHalf * juce::MathConstants<float>::sqrt2;
+        return { farthestCorner * v.tickMaskInner, farthestCorner * v.tickMaskOuter };
     }
 }
 
