@@ -54,8 +54,11 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
 
     // --- tick ring, outside the body, drawn first ----------------------------
     {
+        // The design masks the ring to a thin annulus in the outer band of the tick box, so the
+        // marks are a short stroke sitting just clear of the body - not a spoke reaching back to
+        // it. Measured off the prototype: roughly r+4 to r+10 on the standard sizes.
         const float outer = r - v.tickInset;
-        const float inner = outer - outer * 0.16f;
+        const float inner = r + (outer - r) * 0.42f;
         const float span = Layout::knobArcEndDegrees - Layout::knobArcStartDegrees;
         const int steps = juce::jmax (1, juce::roundToInt (span / v.tickStepDegrees));
 

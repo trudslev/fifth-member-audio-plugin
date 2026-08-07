@@ -583,12 +583,15 @@ namespace Paint
 
         if (lit)
         {
-            // Glow scales with the LED, so a 6 px label lamp does not get a 10 px button's halo.
-            const float glow = diameter * (diameter >= Layout::ledLarge ? 2.2f : 2.5f);
-            juce::ColourGradient halo { Colour::ledOnMid.withAlpha (0.75f), centre.x, centre.y,
+            // Glow scales with the LED, so a 6 px label lamp does not get a 10 px button's halo -
+            // and it stays tight. The design quotes these as blur radii on a small lamp; drawn as
+            // wide discs of light they wash over the label sitting a few pixels away, which is
+            // exactly what happened to NOTE DIVISION, CROSS-FEED and TIME.
+            const float glow = diameter * 1.45f;
+            juce::ColourGradient halo { Colour::ledOnMid.withAlpha (0.55f), centre.x, centre.y,
                                         Colour::ledOnMid.withAlpha (0.0f), centre.x + glow, centre.y, true };
-            halo.addColour (0.35, Colour::ledOnMid.withAlpha (0.35f));
-            halo.addColour (0.70, Colour::ledOnMid.withAlpha (0.10f));
+            halo.addColour (0.40, Colour::ledOnMid.withAlpha (0.22f));
+            halo.addColour (0.75, Colour::ledOnMid.withAlpha (0.06f));
             g.setGradientFill (halo);
             g.fillEllipse (centre.x - glow, centre.y - glow, glow * 2.0f, glow * 2.0f);
 

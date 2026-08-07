@@ -85,10 +85,13 @@ void RepeatTimelineScope::paint (juce::Graphics& g)
         const auto centre = Layout::lampCentre;
         const float r = Layout::lampDiameter * 0.5f;
 
-        const float glow = 22.0f;
-        juce::ColourGradient halo { Colour::accent.withAlpha (0.45f * breathe), centre.x, centre.y,
+        // Tight, and low-alpha at its edge. The design's "0 0 22px" is a blur radius on a 13 px
+        // lamp, not a 22 px disc of colour - drawn as the latter it washed straight over the
+        // REPEATS LIVE caption 17 px to its right.
+        const float glow = 14.0f;
+        juce::ColourGradient halo { Colour::accent.withAlpha (0.40f * breathe), centre.x, centre.y,
                                     Colour::accent.withAlpha (0.0f), centre.x + glow, centre.y, true };
-        halo.addColour (0.35, Colour::accent.withAlpha (0.22f * breathe));
+        halo.addColour (0.45, Colour::accent.withAlpha (0.12f * breathe));
         g.setGradientFill (halo);
         g.fillEllipse (centre.x - glow, centre.y - glow, glow * 2.0f, glow * 2.0f);
 
@@ -274,16 +277,8 @@ void RepeatTimelineScope::paintPlot (juce::Graphics& g, juce::Rectangle<float> p
         }
     }
 
-    // --- corner legends -------------------------------------------------------
-    // The only text allowed near the plot, and both are fixed strings rather than values.
-    const auto font = Font::mono (9.0f);
-    const float tracking = Font::trackingPx (0.20f, 9.0f);
-
-    Text::drawTracked (g, "RPT", font, tracking,
-                       { plot.getX() + 4.0f, plot.getY() + 2.0f, 60.0f, 12.0f },
-                       juce::Justification::left, Colour::scopeReadout.withAlpha (0.5f));
-
-    Text::drawTracked (g, "0 dB", font, tracking,
-                       { plot.getRight() - 64.0f, plot.getY() + 2.0f, 60.0f, 12.0f },
-                       juce::Justification::right, Colour::scopeReadout.withAlpha (0.5f));
+    // Deliberately NO text in the plot zone. Every variable readout - and the "RPT ENV" and
+    // "0 dB" legends with them - lives in the strip above, in Share Tech Mono. Repeating them down
+    // here was the one thing the brief rules out: variable text among the pulses reads as a
+    // printed label rather than as a screen.
 }

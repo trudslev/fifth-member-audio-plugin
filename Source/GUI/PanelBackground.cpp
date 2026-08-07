@@ -157,9 +157,9 @@ void PanelBackground::paintFascia (juce::Graphics& g)
         g.fillRect (x, y, w, h);
     };
 
-    scuff (Layout::earWidth + 300.0f, 8.0f, 210.0f, 5.0f, -0.6f, juce::Colour (0xFFCDC7BA).withAlpha (0.30f));
+    scuff (Layout::earWidth + 300.0f, 8.0f, 210.0f, 5.0f, -0.6f, juce::Colour (0xFFCDC7BA).withAlpha (0.16f));
     scuff (Layout::canvasWidth - Layout::earWidth - 180.0f - 260.0f, Layout::canvasHeight - 34.0f,
-           260.0f, 3.0f, 0.5f, juce::Colour (0xFFBEB8AC).withAlpha (0.22f));
+           260.0f, 3.0f, 0.5f, juce::Colour (0xFFBEB8AC).withAlpha (0.13f));
 }
 
 void PanelBackground::paintRackEars (juce::Graphics& g)
