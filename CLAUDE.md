@@ -219,13 +219,17 @@ largest exact size of 16/32/64/128/256/512/1024 that fits (so a non-power-of-two
 downgrades — 1000 px lands as 512), and the Windows `.ico` takes 16/32/48/256, each from the smallest
 supplied image still big enough, which means all four come from the 256.
 
-`design/README.md`'s "Small sizes" section asks for a **separate simplified master for 16/24/32** that
-drops the readout line and the phosphor bloom, "rather than downscaling the full artwork" — and it is
-right to. Downscaled, the six bars merge into a wedge and the `1/8D` / `5M` readout becomes a muddy
-band; at 16 px the mark stops reading, and it is the only one of the five suite icons that does. JUCE
-has no third slot for it, so honouring the rule means spending `ICON_SMALL` on the simplified art
-(say 64 px) and letting macOS derive 128/256 by downscaling the 1024. Currently unresolved: the pair
-is 1024 + 256, matching all four siblings, and the small end is knowingly compromised.
+`design/README.md`'s "Small sizes" section asks for a separate simplified master for 16/24/32 that
+drops the readout line, because downscaled it turns into a muddy band across the bottom. JUCE has no
+third icon slot, so that was settled the other way: **both masters are the readout-free "delay only"
+art**, six decaying bars on a baseline and nothing else. 24 / 32 / 48 all resolve cleanly now. 16 px
+still collapses to a wedge — six bars and five gaps cannot survive eleven usable pixels at any
+weight — and Fifth Member is the softest of the five suite icons at that size. That is accepted, not
+outstanding; it shows up only in Windows Explorer's small-icon view and the taskbar.
+
+**Re-run configure after touching the artwork.** JUCE builds the `.icns` and `.ico` at *configure*
+time and the PNGs are not configure dependencies, so `cmake --build` alone ships the previous icon
+silently. See BUILDING.md for the check that reads back what the bundle actually carries.
 
 ### Build system
 
@@ -251,9 +255,9 @@ passes while proving nothing.
 - **GUI**: complete, and measured against the prototype rendered in headless Chrome rather than
   judged by eye. Whole-panel tone difference is ~3.4 levels out of 255; every panel-box edge, both
   DELAY CHARACTER dividers and the scope's inner box land on the reference to within a pixel.
-- **Icon**: concept 1b "repeat train", wired to `ICON_BIG` (1024) and `ICON_SMALL` (256) from
-  `design/icons/`. The **simplified ≤ 32 px master `design/README.md` asks for is still missing** —
-  see the note under GUI.
+- **Icon**: concept 1b "repeat train" in its readout-free "delay only" form, wired to `ICON_BIG`
+  (1024) and `ICON_SMALL` (256) from `design/icons/`. Verified out of the shipped bundle, not just
+  off disk.
 - **Not done**: registration in `../manifest/suite.toml`, deliberately held until all six suite
   plugins exist (Elmer, a bus glue plugin, is unbuilt). It will also need a tagged release and a
   freshly generated `windows_appid` GUID.

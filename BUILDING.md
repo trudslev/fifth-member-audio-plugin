@@ -57,6 +57,29 @@ The universal macOS build produces arm64 + x86_64. If a CI-published package eve
 single-architecture, the cause is almost certainly `CMAKE_OSX_ARCHITECTURES` having drifted below
 `project()` in `CMakeLists.txt`, where it is a silent no-op.
 
+**After changing the icon artwork, re-run configure.** JUCE turns `ICON_BIG`/`ICON_SMALL` into
+`AppIcon.icns` and the Windows `.ico` at *configure* time, and the PNGs are not configure
+dependencies — so `cmake --build` alone happily rebuilds everything else and ships the previous
+icon, with no warning and no changed file in the source tree. `cmake -B build ...` again, then
+build. To confirm what actually shipped:
+
+```sh
+python3 - <<'EOF'
+import struct
+d = open('build/FifthMember_artefacts/Release/Standalone/Fifth Member.app'
+         '/Contents/Resources/AppIcon.icns', 'rb').read()
+names = {'icp4':16,'icp5':32,'icp6':64,'ic07':128,'ic08':256,'ic09':512,'ic10':1024}
+i = 8
+while i < len(d):
+    t, ln = struct.unpack('>4sI', d[i:i+8])
+    print(names.get(t.decode('latin-1'), '?'), 'px', ln - 8, 'bytes')
+    i += ln
+EOF
+```
+
+Each entry is a PNG stored verbatim, so slicing `d[i+8:i+ln]` out to a file gives you the exact
+image the bundle carries.
+
 ## Tests
 
 ```sh
