@@ -1,0 +1,30 @@
+juce_add_console_app(FifthMemberTests PRODUCT_NAME "FifthMemberTests")
+
+target_sources(FifthMemberTests PRIVATE
+    TestMain.cpp
+    ProgramModelTests.cpp
+    FactoryProgramsTests.cpp
+    TimingEngineTests.cpp
+    DelayCoreTests.cpp
+    ../Source/DSP/TimingEngine.cpp
+    ../Source/DSP/DelayCore.cpp
+    ../Source/DSP/CharacterEngine.cpp
+    ../Source/DSP/ProgramManager.cpp)
+
+# NF_COMPANY_NAME/NF_PRODUCT_NAME come from the parent CMakeLists and must match what the plugin
+# target gets - ProgramManager.cpp is compiled into both and builds the user-Programs path from
+# them. Inherited from the parent scope rather than restated, so there is nothing to re-sync.
+target_compile_definitions(FifthMemberTests PRIVATE
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    NF_COMPANY_NAME="${FIFTHMEMBER_COMPANY_NAME}"
+    NF_PRODUCT_NAME="${FIFTHMEMBER_PRODUCT_NAME}")
+
+target_link_libraries(FifthMemberTests PRIVATE
+    juce::juce_dsp
+    juce::juce_audio_basics
+    juce::juce_audio_processors
+    juce::juce_gui_basics
+    juce::juce_core
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags)
