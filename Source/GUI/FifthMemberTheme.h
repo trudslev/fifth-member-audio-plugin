@@ -326,7 +326,7 @@ namespace Layout
     inline constexpr float scopeCaptionH = 15.0f;
     inline constexpr juce::Point<float> lampCentre { 28.5f, 149.84f };
     inline constexpr float lampDiameter = 13.0f;
-    inline constexpr float lampLabelX = 46.0f;
+    inline constexpr float lampLabelX = 49.0f;   // 11px clear of the lamp AND its halo
 
     inline constexpr float scopeX = 22.0f;
     inline constexpr float scopeY = 165.34f;

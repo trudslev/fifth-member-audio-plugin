@@ -138,11 +138,18 @@ void PanelBackground::paintFascia (juce::Graphics& g)
 
     for (const auto& w : wear)
     {
+        // JUCE's radial gradients are circular, so the ellipse the design asks for (120x70 and
+        // friends) comes from squashing the fill vertically about the corner it is anchored to.
+        // Drawn as a circle it was both the wrong shape and too diffuse to read as wear at all.
+        juce::Graphics::ScopedSaveState state { g };
+        g.addTransform (juce::AffineTransform::scale (1.0f, w.h / w.w, w.x, w.y));
+
         juce::ColourGradient rub { Colour::wearMetal.withAlpha (w.peak), w.x, w.y,
-                                   Colour::wearMetal.withAlpha (0.0f), w.x + w.w, w.y + w.h, true };
-        rub.addColour (0.45, Colour::wearMetal.withAlpha (w.peak * 0.35f));
+                                   Colour::wearMetal.withAlpha (0.0f), w.x + w.w, w.y, true };
+        rub.addColour (0.35, Colour::wearMetal.withAlpha (w.peak * 0.55f));
+        rub.addColour (0.70, Colour::wearMetal.withAlpha (w.peak * 0.18f));
         g.setGradientFill (rub);
-        g.fillRect (fascia);
+        g.fillRect (fascia.expanded (0.0f, Layout::canvasHeight));
     }
 
     // Two scuffs, at different lengths, positions and angles.

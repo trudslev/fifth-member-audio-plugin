@@ -88,7 +88,7 @@ void RepeatTimelineScope::paint (juce::Graphics& g)
         // Tight, and low-alpha at its edge. The design's "0 0 22px" is a blur radius on a 13 px
         // lamp, not a 22 px disc of colour - drawn as the latter it washed straight over the
         // REPEATS LIVE caption 17 px to its right.
-        const float glow = 14.0f;
+        const float glow = 10.0f;
         juce::ColourGradient halo { Colour::accent.withAlpha (0.40f * breathe), centre.x, centre.y,
                                     Colour::accent.withAlpha (0.0f), centre.x + glow, centre.y, true };
         halo.addColour (0.45, Colour::accent.withAlpha (0.12f * breathe));

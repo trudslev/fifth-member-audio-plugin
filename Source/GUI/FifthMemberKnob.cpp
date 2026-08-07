@@ -86,17 +86,31 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
     g.setGradientFill (Paint::radial (body, 0.38f, 0.28f, v.faceTop, v.faceMid, 0.55f, v.faceBottom));
     g.fillEllipse (body);
 
-    // inset 0 -Npx rgba(0,0,0,.65-.70): the underside falls away
+    // inset 0 -6px 12px rgba(0,0,0,.65) - a BAND along the bottom lip, not a wash over the whole
+    // lower half. Spread across half the face it flattened the dome into a dark disc and swallowed
+    // the top-left light the radial gradient exists to provide.
     {
-        juce::ColourGradient inner { juce::Colours::transparentBlack, centre.x, centre.y - r,
-                                     juce::Colours::black.withAlpha (0.55f), centre.x, centre.y + r, false };
-        inner.addColour (0.55, juce::Colours::transparentBlack);
+        const float band = v.diameter * 0.26f;
+        juce::ColourGradient inner { juce::Colours::transparentBlack, centre.x, centre.y + r - band,
+                                     juce::Colours::black.withAlpha (0.62f), centre.x, centre.y + r, false };
         g.setGradientFill (inner);
         g.fillEllipse (body);
     }
 
+    // The specular the CSS gets for free from its own radial's first stop: a soft bloom up and left
+    // of centre, which is what actually reads as "moulded" rather than "flat".
+    {
+        const float sheenR = r * 0.72f;
+        const juce::Point<float> sheenCentre { centre.x - r * 0.14f, centre.y - r * 0.26f };
+        juce::ColourGradient sheen { juce::Colours::white.withAlpha (0.10f), sheenCentre.x, sheenCentre.y,
+                                     juce::Colours::transparentWhite, sheenCentre.x + sheenR, sheenCentre.y, true };
+        sheen.addColour (0.55, juce::Colours::white.withAlpha (0.03f));
+        g.setGradientFill (sheen);
+        g.fillEllipse (body);
+    }
+
     // inset 0 1px 1px rgba(255,255,255,.16-.18): the lit upper lip
-    g.setColour (juce::Colours::white.withAlpha (0.17f));
+    g.setColour (juce::Colours::white.withAlpha (0.18f));
     g.drawEllipse (body.reduced (0.5f).translated (0.0f, 0.5f), 1.0f);
 
     g.setColour (juce::Colour (0xFF090908));
