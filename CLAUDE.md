@@ -297,17 +297,23 @@ passes while proving nothing.
   the prototype's DOM rather than adjusted by eye. Printed scales replace the value tooltip as the
   at-rest reference; live values appear in the PROGRAM LCD while a control is moved and nowhere
   else. `auval` and `pluginval --strictness-level 8` pass on AU and VST3.
-- **The composite diff is not yet a clean acceptance signal.** It runs and aligns (the build's panel
-  sits 1 px right of the prototype's), but a raw comparison is dominated by *state* rather than by
-  geometry: the two are on different Delay Character modes, different meter readings and a different
-  scope frame, which puts the header at ~14 levels of 255 almost entirely on the LCD string and the
-  IN/OUT numerals. To be meaningful it needs the plugin driven to the prototype's exact state first —
-  Tape, sync on, 1/8., program 01 — and then re-run region by region. The individual regions were
-  each checked visually during the pass; this is the outstanding piece.
-- **The plate has not been delivered.** Handoff section 1 makes one exported PNG the contract, but
-  the bundle ships icons and prototypes only. The build draws everything, which is what it already
-  did; `KnobScale::bakedInPlate` is the switch that stops it drawing a ring once the plate carries
-  it. Logged in `prompts/PROMPTS.md` along with three spec corrections.
+- **The composite diff is against the plate now, which is the better target** — it removes the state
+  problem entirely, since the plate has no live elements to differ on. The build paints **3.4 %** of
+  the panel, and the regions are the knob bodies, the dials and the header text, i.e. section 1.2's
+  runtime list.
+
+  **Capture the window at exactly 1240 wide or the numbers lie.** The standalone gives 1239, and a
+  1239/1240 scale drifts progressively across the width — enough that the rack ears' 2 px brush and
+  the marker-ink tape elements diff hard at the edges and look like double-drawing. The tell is that
+  the left ear's difference falls from 17.05 to 2.67 under a +2 px shift while the whole-panel figure
+  does not improve under any uniform shift: that is scale, not translation, and not a drawing error.
+- **The plate is delivered and integrated.** `design/plate/fifth-member-plate-2x.png`, 2480 x 1864.
+  `PanelBackground` is a blit now; the ~500 lines that rasterised the fascia, wear, ears, screws,
+  tape elements, section frames and silkscreen are gone with it. Every ring except dial 1's two is
+  `bakedInPlate`, verified by measuring ink in each tick annulus rather than read off the manifest -
+  handoff section 1 lists seven knobs, but the plate also bakes dials 2 and 3, and only dial 1's two
+  measure zero. **If something static looks wrong, it is wrong in the plate and gets re-cut, not
+  patched in code.**
 - **Icon**: concept 1b "repeat train" in its readout-free "delay only" form, wired to `ICON_BIG`
   (1024) and `ICON_SMALL` (256) from `design/icons/`. Verified out of the shipped bundle, not just
   off disk.

@@ -39,8 +39,13 @@ FetchContent_MakeAvailable(JUCE)
 # NOTE on JUCE's name mangling: it STRIPS non-alphanumeric characters rather than converting them to
 # underscores, so BarlowCondensed-SemiBold.ttf becomes BinaryData::BarlowCondensedSemiBold_ttf.
 # Check the generated BinaryData.h before assuming a symbol name.
+# The plate, delivered with the revision-2 handoff. 2x only, per BRAND.md: a 1:1 blit to a Retina
+# display resolves the fascia's 3px brush and the ears' 2px one to a flat wash and the metal stops
+# reading as metal - the same reason PanelBackground used to bake at 2x. The 1x and 3x exports stay
+# in design/plate/ unembedded.
 juce_add_binary_data(FifthMemberBinaryData
     SOURCES
+        design/plate/fifth-member-plate-2x.png
         design/fonts/barlow-condensed/BarlowCondensed-Medium.ttf
         design/fonts/barlow-condensed/BarlowCondensed-SemiBold.ttf
         design/fonts/barlow-condensed/BarlowCondensed-Bold.ttf

@@ -21,7 +21,7 @@
 </helmet>
 
 <div style="display:flex;justify-content:center;padding:36px 24px;background:#171716;font-family:'Barlow Condensed',sans-serif">
-<div style="width:1240px;flex:none;display:flex;border-radius:5px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.7), 0 2px 0 rgba(255,255,255,.05) inset;background:#0c0c0b">
+<div data-plate-root="1" style="width:1240px;flex:none;display:flex;border-radius:5px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.7), 0 2px 0 rgba(255,255,255,.05) inset;background:#0c0c0b">
 
   <!-- LEFT RACK EAR -->
   <div style="position:relative;width:52px;flex:none;background:linear-gradient(96deg,#8e8a82 0%,#c2beb4 18%,#9d998f 40%,#75726b 62%,#a9a49a 84%,#807c75 100%)">
@@ -66,12 +66,12 @@
         <div style="flex:1">
           <div style="font:600 11px 'Barlow Condensed';letter-spacing:.28em;color:#a8a294;margin:0 0 6px 2px">PROGRAM</div>
           <div style="position:relative;display:flex;align-items:stretch;height:32px;border-radius:3px;background:linear-gradient(180deg,#071009,#040806);border:1px solid #2a2823;box-shadow:inset 0 2px 10px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05)">
-            <div style="display:flex;align-items:center;padding:0 12px;border-right:1px solid rgba(255,255,255,.09);font:19px 'Share Tech Mono';letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ bankTag }}</div>
-            <div onClick="{{ toggleList }}" style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap;font-family:'Share Tech Mono';font-size:{{ lcdSize }};letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ lcdText }}</div>
+            <div data-plate="blank" style="display:flex;align-items:center;padding:0 12px;border-right:1px solid rgba(255,255,255,.09);font:19px 'Share Tech Mono';letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ bankTag }}</div>
+            <div data-plate="blank" onClick="{{ toggleList }}" style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap;font-family:'Share Tech Mono';font-size:{{ lcdSize }};letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ lcdText }}</div>
             <sc-if value="{{ naming }}" hint-placeholder-val="{{ false }}">
               <input value="{{ draftName }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="NAME PROGRAM" style="position:absolute;left:68px;right:34px;top:3px;bottom:3px;background:#0a1410;border:1px solid rgba(190,220,195,.35);color:#d7e2d6;font:17px 'Share Tech Mono';letter-spacing:.10em;text-align:center;outline:none;text-transform:uppercase"></input>
             </sc-if>
-            <div onClick="{{ toggleList }}" style="display:flex;align-items:center;padding:0 11px;cursor:pointer">
+            <div data-plate="off" onClick="{{ toggleList }}" style="display:flex;align-items:center;padding:0 11px;cursor:pointer">
               <svg width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1.6 L7 6.4 L13 1.6" stroke="#a9bda9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
             </div>
             <sc-if value="{{ listOpen }}" hint-placeholder-val="{{ false }}">
@@ -87,8 +87,8 @@
           </div>
         </div>
         <div style="display:flex;gap:7px">
-          <div onClick="{{ onSave }}" style="width:66px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2a2823,#161512);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:#d3ccbe" style-hover="background:linear-gradient(180deg,#35322b,#1c1a16)">SAVE</div>
-          <div onClick="{{ onDelete }}" style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:{{ delCursor }};background:linear-gradient(180deg,#242219,#141310);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:{{ delColor }}">DELETE</div>
+          <div data-plate="off" onClick="{{ onSave }}" style="width:66px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2a2823,#161512);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:#d3ccbe" style-hover="background:linear-gradient(180deg,#35322b,#1c1a16)">SAVE</div>
+          <div data-plate="off" onClick="{{ onDelete }}" style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:{{ delCursor }};background:linear-gradient(180deg,#242219,#141310);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:{{ delColor }}">DELETE</div>
         </div>
       </div>
 
@@ -96,11 +96,11 @@
       <div style="display:flex;gap:10px;flex:none">
         <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:5px">
           <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294">IN</div>
-          <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8">{{ inMeter }}</div>
+          <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8" data-plate="blank">{{ inMeter }}</div>
         </div>
         <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:5px">
           <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294">OUT</div>
-          <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8">{{ outMeter }}</div>
+          <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8" data-plate="blank">{{ outMeter }}</div>
         </div>
       </div>
     </div>
@@ -108,20 +108,20 @@
     <!-- REPEAT TIMELINE SCOPE -->
     <div style="position:relative;margin:14px 4px 0">
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:8px">
-        <div style="width:13px;height:13px;border-radius:50%;background:{{ lampColor }};box-shadow:{{ lampGlow }};animation:fmLamp 1.6s ease-in-out infinite"></div>
+        <div data-plate="off" style="width:13px;height:13px;border-radius:50%;background:{{ lampColor }};box-shadow:{{ lampGlow }};animation:fmLamp 1.6s ease-in-out infinite"></div>
         <div style="font:600 12px 'Barlow Condensed';letter-spacing:.26em;color:#c3bcae">REPEATS LIVE</div>
         <div style="flex:1"></div>
         <div style="font:600 11px 'Barlow Condensed';letter-spacing:.24em;color:#a8a294">REPEAT TIMELINE</div>
       </div>
       <div style="position:relative;height:96px;border-radius:2px;background:#04060a;border:1px solid #23221e;box-shadow:inset 0 3px 14px rgba(0,0,0,.9)">
-        <div style="position:absolute;left:0;right:0;top:0;height:22px;display:flex;align-items:center;gap:16px;padding:0 9px;border-bottom:1px solid rgba(150,175,155,.13);font:11px 'Share Tech Mono';letter-spacing:.12em;color:#93a894;white-space:nowrap;overflow:hidden">
+        <div data-plate="blank" style="position:absolute;left:0;right:0;top:0;height:22px;display:flex;align-items:center;gap:16px;padding:0 9px;border-bottom:1px solid rgba(150,175,155,.13);font:11px 'Share Tech Mono';letter-spacing:.12em;color:#93a894;white-space:nowrap;overflow:hidden">
           <div>RPT ENV</div>
           <div style="color:#a9bda9">{{ scopeFoot }}</div>
           <div style="flex:1"></div>
           <div>{{ scopeInfo }}</div>
           <div>0 dB</div>
         </div>
-        <canvas ref="{{ scopeRef }}" style="position:absolute;left:0;right:0;top:22px;bottom:0;width:100%;height:74px"></canvas>
+        <canvas data-plate="off" ref="{{ scopeRef }}" style="position:absolute;left:0;right:0;top:22px;bottom:0;width:100%;height:74px"></canvas>
       </div>
     </div>
 
@@ -131,16 +131,16 @@
         <div style="position:relative;flex:1;padding:20px 16px 16px;border:1px solid rgba(255,255,255,.075);border-radius:3px;background:linear-gradient(180deg,rgba(255,255,255,.022),rgba(0,0,0,.18))">
           <div style="position:absolute;top:-7px;left:12px;padding:0 7px;background:#131211;font:600 11px 'Barlow Condensed';letter-spacing:.28em;color:#a8a294">TIMING</div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-            <div onClick="{{ toggleSync }}" style="position:relative;width:52px;height:24px;border-radius:2px;cursor:pointer;background:#0b0a09;border:1px solid #2b2924;box-shadow:inset 0 2px 5px rgba(0,0,0,.8)">
+            <div data-plate="off" onClick="{{ toggleSync }}" style="position:relative;width:52px;height:24px;border-radius:2px;cursor:pointer;background:#0b0a09;border:1px solid #2b2924;box-shadow:inset 0 2px 5px rgba(0,0,0,.8)">
               <div style="position:absolute;top:2px;bottom:2px;width:23px;border-radius:1px;left:{{ syncKnobLeft }};background:linear-gradient(180deg,#cfc9bb,#8d887d);box-shadow:0 1px 3px rgba(0,0,0,.7);transition:left 180ms ease"></div>
             </div>
             <div style="font:600 12px 'Barlow Condensed';letter-spacing:.22em;color:#a8a294">SYNC {{ syncText }}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ divLed }};box-shadow:{{ divGlow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.24em;color:#a8a294">NOTE DIVISION</div></div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div data-plate="off" style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ divLed }};box-shadow:{{ divGlow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.24em;color:#a8a294">NOTE DIVISION</div></div>
           <div style="display:flex;gap:5px;margin-bottom:6px">
             <sc-for list="{{ divisions }}" as="d" hint-placeholder-count="5">
-              <div onClick="{{ d.onPick }}" style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ d.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
-                <div style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ d.ledBg }};box-shadow:{{ d.ledGlow }}"></div>
+              <div data-plate="off" onClick="{{ d.onPick }}" style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ d.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
+                <div data-plate="off" style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ d.ledBg }};box-shadow:{{ d.ledGlow }}"></div>
                 <div style="font:12px 'Share Tech Mono';color:{{ d.color }}">{{ d.label }}</div>
               </div>
             </sc-for>
@@ -158,11 +158,11 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="5">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:66px;height:66px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:66px;height:66px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:6px;width:2px;height:26px;margin-left:-1px;border-radius:1px;background:linear-gradient(#f4efe4,#b6afa1);transform-origin:50% 27px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ k.led }};box-shadow:{{ k.glow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.20em;color:#c3bcae">{{ k.label }}</div></div>
+                <div style="display:flex;align-items:center;gap:7px"><div data-plate="off" style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ k.led }};box-shadow:{{ k.glow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.20em;color:#c3bcae">{{ k.label }}</div></div>
               </div>
             </sc-for>
           </div>
@@ -185,7 +185,7 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="6">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:84px;height:84px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #55524a 0%, #2a2823 55%, #131210 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.18), inset 0 -8px 16px rgba(0,0,0,.7), 0 8px 16px rgba(0,0,0,.55);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:84px;height:84px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #55524a 0%, #2a2823 55%, #131210 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.18), inset 0 -8px 16px rgba(0,0,0,.7), 0 8px 16px rgba(0,0,0,.55);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:7px;width:3px;height:33px;margin-left:-1.5px;border-radius:1px;background:linear-gradient(#f6f1e6,#b8b1a2);transform-origin:50% 35px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
@@ -204,19 +204,19 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="3">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:62px;height:62px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:62px;height:62px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:6px;width:2px;height:24px;margin-left:-1px;border-radius:1px;background:linear-gradient(#f4efe4,#b6afa1);transform-origin:50% 25px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ k.led }};box-shadow:{{ k.glow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.20em;color:#c3bcae">{{ k.label }}</div></div>
+                <div style="display:flex;align-items:center;gap:7px"><div data-plate="off" style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ k.led }};box-shadow:{{ k.glow }}"></div><div style="font:600 11px 'Barlow Condensed';letter-spacing:.20em;color:#c3bcae">{{ k.label }}</div></div>
               </div>
             </sc-for>
           </div>
           <div style="font:600 11px 'Barlow Condensed';letter-spacing:.24em;color:#a8a294;margin:10px 0 7px">STEREO MODE</div>
           <div style="display:flex;gap:5px">
             <sc-for list="{{ stereoModes }}" as="s" hint-placeholder-count="3">
-              <div onClick="{{ s.onPick }}" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ s.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
-                <div style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ s.ledBg }};box-shadow:{{ s.ledGlow }}"></div>
+              <div data-plate="off" onClick="{{ s.onPick }}" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ s.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
+                <div data-plate="off" style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ s.ledBg }};box-shadow:{{ s.ledGlow }}"></div>
                 <div style="font:600 12px 'Barlow Condensed';letter-spacing:.18em;color:{{ s.color }}">{{ s.label }}</div>
               </div>
             </sc-for>
@@ -237,7 +237,7 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="5">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:82px;height:82px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #55524a 0%, #2a2823 55%, #131210 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.18), inset 0 -8px 16px rgba(0,0,0,.7), 0 8px 16px rgba(0,0,0,.55);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:82px;height:82px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #55524a 0%, #2a2823 55%, #131210 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.18), inset 0 -8px 16px rgba(0,0,0,.7), 0 8px 16px rgba(0,0,0,.55);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:7px;width:3px;height:32px;margin-left:-1.5px;border-radius:1px;background:linear-gradient(#f6f1e6,#b8b1a2);transform-origin:50% 34px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
@@ -256,7 +256,7 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="4">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:62px;height:62px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:62px;height:62px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:6px;width:2px;height:24px;margin-left:-1px;border-radius:1px;background:linear-gradient(#f4efe4,#b6afa1);transform-origin:50% 25px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
@@ -274,8 +274,8 @@
       <div style="display:flex;gap:22px;align-items:stretch">
         <div style="width:158px;flex:none;display:flex;flex-direction:column;gap:12px">
           <sc-for list="{{ charModes }}" as="m" hint-placeholder-count="3">
-            <div onClick="{{ m.onPick }}" style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ m.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
-              <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ m.ledBg }};box-shadow:{{ m.ledGlow }}"></div>
+            <div data-plate="off" onClick="{{ m.onPick }}" style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2b2924,#171613);border:1px solid #0a0a08;box-shadow:{{ m.shadow }}" style-hover="background:linear-gradient(180deg,#332f29,#1b1a16)">
+              <div data-plate="off" style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ m.ledBg }};box-shadow:{{ m.ledGlow }}"></div>
               <div style="font:600 13px 'Barlow Condensed';letter-spacing:.24em;color:{{ m.color }}">{{ m.label }}</div>
             </div>
           </sc-for>
@@ -286,32 +286,32 @@
               <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:232px;flex:none">
                 <div style="position:relative;width:232px;height:220px;flex:none">
                   <sc-for list="{{ k.minors2 }}" as="t" hint-placeholder-count="3">
-                    <div style="position:absolute;left:50%;top:25px;width:1.5px;height:5px;margin-left:-0.75px;background:{{ k.minor2Color }};transform-origin:50% 91px;transform:rotate({{ t.a }}deg)"></div>
+                    <div data-plate="off" style="position:absolute;left:50%;top:25px;width:1.5px;height:5px;margin-left:-0.75px;background:{{ k.minor2Color }};transform-origin:50% 91px;transform:rotate({{ t.a }}deg)"></div>
                   </sc-for>
                   <sc-for list="{{ k.ticks2 }}" as="t" hint-placeholder-count="6">
-                    <div style="position:absolute;left:50%;top:25px;width:2px;height:9px;margin-left:-1px;background:{{ k.tick2Color }};transform-origin:50% 91px;transform:rotate({{ t.a }}deg)"></div>
+                    <div data-plate="off" style="position:absolute;left:50%;top:25px;width:2px;height:9px;margin-left:-1px;background:{{ k.tick2Color }};transform-origin:50% 91px;transform:rotate({{ t.a }}deg)"></div>
                   </sc-for>
                   <sc-for list="{{ k.nums2 }}" as="n" hint-placeholder-count="6">
-                    <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:{{ k.num2Color }};white-space:nowrap">{{ n.t }}</div>
+                    <div data-plate="off" style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:{{ k.num2Color }};white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
                   <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="2">
-                    <div style="position:absolute;left:50%;top:61px;width:1.5px;height:5px;margin-left:-0.75px;background:{{ k.minorColor }};transform-origin:50% 55px;transform:rotate({{ t.a }}deg)"></div>
+                    <div data-plate="off" style="position:absolute;left:50%;top:61px;width:1.5px;height:5px;margin-left:-0.75px;background:{{ k.minorColor }};transform-origin:50% 55px;transform:rotate({{ t.a }}deg)"></div>
                   </sc-for>
                   <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="5">
-                    <div style="position:absolute;left:50%;top:61px;width:2px;height:9px;margin-left:-1px;background:{{ k.tickColor }};transform-origin:50% 55px;transform:rotate({{ t.a }}deg)"></div>
+                    <div data-plate="off" style="position:absolute;left:50%;top:61px;width:2px;height:9px;margin-left:-1px;background:{{ k.tickColor }};transform-origin:50% 55px;transform:rotate({{ t.a }}deg)"></div>
                   </sc-for>
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="5">
-                    <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:{{ k.numColor }};white-space:nowrap">{{ n.t }}</div>
+                    <div data-plate="off" style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:{{ k.numColor }};white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:78px;top:78px;width:76px;height:76px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #514e46 0%, #282621 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:78px;top:78px;width:76px;height:76px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #514e46 0%, #282621 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:7px;width:2.5px;height:30px;margin-left:-1.25px;border-radius:1px;background:linear-gradient(#f5f0e5,#b7b0a1);transform-origin:50% 31px;transform:rotate({{ k.angle }}deg);transition:transform 660ms cubic-bezier(.16,.86,.24,1)"></div>
                   </div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;margin-top:-10px">
                   <sc-for list="{{ k.labels }}" as="l" hint-placeholder-count="3">
                     <div style="display:flex;align-items:center;gap:7px">
-                      <div style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ l.led }};box-shadow:{{ l.glow }}"></div>
-                      <div style="font:600 11px 'Barlow Condensed';letter-spacing:.18em;color:{{ l.color }}">{{ l.text }}</div>
+                      <div data-plate="off" style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ l.led }};box-shadow:{{ l.glow }}"></div>
+                      <div data-plate="off" style="font:600 11px 'Barlow Condensed';letter-spacing:.18em;color:{{ l.color }}">{{ l.text }}</div>
                     </div>
                   </sc-for>
                 </div>
@@ -330,7 +330,7 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="5">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:76px;height:76px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #514e46 0%, #282621 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:76px;height:76px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #514e46 0%, #282621 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:7px;width:2.5px;height:30px;margin-left:-1.25px;border-radius:1px;background:linear-gradient(#f5f0e5,#b7b0a1);transform-origin:50% 31px;transform:rotate({{ k.angle }}deg);transition:transform 660ms cubic-bezier(.16,.86,.24,1)"></div>
                   </div>
                 </div>
@@ -338,8 +338,8 @@
                 <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;margin-top:-10px">
                   <sc-for list="{{ k.labels }}" as="l" hint-placeholder-count="3">
                     <div style="display:flex;align-items:center;gap:7px">
-                      <div style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ l.led }};box-shadow:{{ l.glow }}"></div>
-                      <div style="font:600 11px 'Barlow Condensed';letter-spacing:.18em;color:{{ l.color }}">{{ l.text }}</div>
+                      <div data-plate="off" style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ l.led }};box-shadow:{{ l.glow }}"></div>
+                      <div data-plate="off" style="font:600 11px 'Barlow Condensed';letter-spacing:.18em;color:{{ l.color }}">{{ l.text }}</div>
                     </div>
                   </sc-for>
                 </div>
@@ -362,7 +362,7 @@
                   <sc-for list="{{ k.nums }}" as="n" hint-placeholder-count="3">
                     <div style="position:absolute;left:{{ n.x }}px;top:{{ n.y }}px;transform:translate(-50%,-50%);font:600 10px 'Barlow Condensed';letter-spacing:.06em;color:#a8a294;white-space:nowrap">{{ n.t }}</div>
                   </sc-for>
-                  <div onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:66px;height:66px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
+                  <div data-plate="off" onPointerDown="{{ k.onDown }}" style="position:absolute;left:34px;top:34px;width:66px;height:66px;border-radius:50%;cursor:ns-resize;background:radial-gradient(circle at 38% 28%, #4c4942 0%, #262420 55%, #121110 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.5);border:1px solid #090908">
                     <div style="position:absolute;left:50%;top:6px;width:2px;height:26px;margin-left:-1px;border-radius:1px;background:linear-gradient(#f4efe4,#b6afa1);transform-origin:50% 27px;transform:rotate({{ k.angle }}deg);transition:transform 620ms cubic-bezier(.18,.9,.2,1)"></div>
                   </div>
                 </div>
@@ -723,7 +723,7 @@ class Component extends DCLogic {
       [{ a: -21.63 }, { a: 33.22 }, { a: 101.24 }]);
 
     const fbScale = this.linRing(76, 42, 17, 0, 110, [0, 20, 40, 60, 80, 100], [110]);
-    const trimScale = this.linRing(65, 31, 17, -24, 12, [-24, -12, 0, 12], [-18, -6, 6],
+    const trimScale = this.linRing(65, 31, 17, -24, 24, [-24, -12, 0, 12, 24], [-18, -6, 6, 18],
       v => (v > 0 ? '+' : '') + v);
     const crossScale = this.linRing(65, 31, 17, 0, 100, [0, 50, 100], [25, 75]);
     const mixScale = this.linRing(75, 41, 17, 0, 100, [0, 25, 50, 75, 100]);
@@ -733,7 +733,7 @@ class Component extends DCLogic {
     const crossK = this.knob('cross', 'CROSS-FEED', 0, 100, pct, { off: s.stereo !== 2 });
     const dampK = this.knob('damping', 'DAMPING · Hz', 1000, 16000, khz);
     const satK = this.knob('saturation', 'SATURATION', 0, 100, pct);
-    const trimK = this.knob('trim', 'OUTPUT TRIM', -24, 12, v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' dB');
+    const trimK = this.knob('trim', 'OUTPUT TRIM', -24, 24, v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' dB');
 
     return {
       lcdText: s.live || this.progName(),

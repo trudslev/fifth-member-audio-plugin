@@ -669,6 +669,10 @@ inline constexpr float nameplateTextSize = 29.0f;
     template <int N>
     inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N]) { return { m, N, 0.0f, 0.0f, 1.0f, false }; }
 
+    /** Marks this ring as carried by the plate, so the build stops drawing it. Everything except
+        dial 1's two rings is baked; those two change ink per mode and baked pixels cannot. */
+    inline constexpr KnobScale baked (KnobScale s) { s.bakedInPlate = true; return s; }
+
     /** For a ring whose range is not the bound parameter's - see KnobScale::lo. */
     template <int N>
     inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N], float lo, float hi, float skew)

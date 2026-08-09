@@ -203,7 +203,7 @@ Angles are given to 0.1°. **These are the contract**; the exported plate must m
 | 75 | 0.75 | +67.5 | major, "75" | minor |
 | 100 | 1.00 | +135.0 | major, "100" | major, "100" |
 
-**OUTPUT TRIM** — 62px, −24…+12 dB, linear.
+**OUTPUT TRIM** — 62px, −24…+12 dB, linear. **Superseded — the parameter is −24…+24.** This table was cut against the wrong range and put 0 dB at +45°. It is kept here as the record of the pass; BUILD-HANDOFF §4.4 carries the correct nine marks.
 
 | Value | f | Angle | Type |
 |---|---|---|---|
@@ -323,7 +323,7 @@ Both strips are baked into the plate — neither carries a live value.
 
 Vector / code-drawn, as before. Specifically:
 
-- **Baked into the plate:** fascia, wear, nameplate, all four tape strips, rack ears, rack-ear stencil, section frames, all printed labels, all tick marks, all scale numerals.
+- **Baked into the plate:** fascia, wear, nameplate, all four tape strips, rack ears, rack-ear stencil, section frames, all printed labels, all tick marks, all scale numerals — **except Dial 1's two rings and the three Delay Character multi-label stacks**, both of which change ink with the selected mode and are therefore drawn at runtime (BUILD-HANDOFF §1 carve-out).
 - **Drawn at runtime:** pointer lines, LEDs, button pressed/raised states, DELETE enabled/disabled face, LCD text, scope canvas, meter values, chevron.
 - Nothing carrying a live value is baked.
 
@@ -347,6 +347,8 @@ Explicitly untouched by this pass:
 ---
 
 ## 8. Still outstanding
+
+**The plate has since been cut** — `plate/fifth-member-plate-{1,2,3}x.png`, 1240 × 932 at 1×. The parameter inventory that blocked it arrived and every ring in BUILD-HANDOFF §4 was recut against it.
 
 - Read-only parameter inventory from the build to confirm every range, taper and skew in §5 — in particular **MOD RATE** and **TIME**. The TIME skew of 0.300 is a proposal chosen to put 200 ms at half rotation; if the build already has a different exponent, its marks must be recomputed before the plate is cut.
 - By-ear tuning of the six factory Programs.

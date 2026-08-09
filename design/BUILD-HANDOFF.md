@@ -3,7 +3,7 @@
 Model **DL-88**, tempo-synced stereo delay. Neon Foundry suite.
 Panel approved 2026-08-09. This document is **authoritative for the build** and supersedes any conflicting figure in `README.md` or `GUI-SPEC.md`.
 
-Canvas **1240 × 996 px** at 1×, fixed aspect, proportional scaling only. Left ear 52px, fascia 1136px, right ear 52px. Fascia padding 16px top / 18px sides / 12px bottom.
+Canvas **1240 × 932 px** at 1×, fixed aspect, proportional scaling only. Left ear 52px, fascia 1136px, right ear 52px. Fascia padding 16px top / 18px sides / 12px bottom.
 
 ---
 
@@ -13,7 +13,11 @@ Canvas **1240 × 996 px** at 1×, fixed aspect, proportional scaling only. Left 
 
 ### Exported bitmap — the plate
 
-One PNG, 1240 × 996 at 1× / 2× / 3×, alpha, sRGB. It contains:
+One PNG, 1240 × 932 at 1× / 2× / 3×, alpha, sRGB.
+
+**Delivered** — `plate/fifth-member-plate-1x.png` (1240 × 932), `-2x.png` (2480 × 1864), `-3x.png` (3720 × 2796). Cut from the approved prototype with every runtime layer suppressed. In the prototype source each such layer carries `data-plate="off"` (hidden entirely) or `data-plate="blank"` (well kept, contents dropped) — that attribute is the machine-readable form of the two tables below, so a recut stays in step with the panel.
+
+It contains:
 
 | Element | In the plate |
 |---|---|
@@ -22,10 +26,25 @@ One PNG, 1240 × 996 at 1× / 2× / 3×, alpha, sRGB. It contains:
 | RACK 4 · MON WORLD stencil | yes |
 | All four tape elements, including their lettering | yes |
 | Section frames, their labels, the header rule and foot rule | yes |
-| All panel typography — function line, model line, section headings, knob names, multi-labels, foot strip, IN/OUT captions, PROGRAM caption | yes |
+| Panel typography — function line, model line, section headings, knob names, foot strip, IN/OUT captions, PROGRAM caption | yes |
+| **Delay Character multi-label text (WOW / MOD RATE / REPEAT DEGRADE, etc.)** | **no** — see the carve-out below |
 | Every printed tick mark and scale numeral | yes |
 | Empty wells and frames: PROGRAM LCD recess, IN/OUT meter wells, scope well and its 1px border | yes — **frames only, never contents** |
 | Knob bodies, LEDs, buttons, switch | **no** |
+| **Dial 1's two scale rings — ticks and numerals** | **no** — see the carve-out below |
+
+#### Carve-out: what changes ink is not in the plate
+
+**Baked pixels cannot change ink.** Two things on this panel change ink with the mode, and neither is in the plate — the same wall Gatecrasher hit with its §0.4 labels and resolved the same way:
+
+1. **Dial 1's inner and outer rings.** §4.5 requires each to light with its mode and dim when the other is live. Both are drawn at runtime in full — ticks, minors and numerals, at §4.5's angles, in the lit or dimmed ink of §8.3.
+2. **All three Delay Character multi-label stacks** — the *text* only; the LED beside each entry was already runtime. The lit entry is `#e7e1d4` and the unlit ones `#615c54`, and which is which follows the selected mode. Baking them would freeze one mode's lighting into the bitmap: the plate would print WOW lit while the pointer drove MOD RATE.
+
+So "all panel typography is baked" is **false** in exactly one place — those three stacks. Every other printed word on the panel, including the knob names under dials 4–8 and the CHARACTER · ALL MODES heading, is in the plate.
+
+The other five dials keep their rings in the plate — none of them changes ink.
+
+`KnobScale::bakedInPlate` is `true` for TIME, FEEDBACK, CROSS-FEED, MIX, OUTPUT TRIM, DAMPING and SATURATION, and `false` for Dial 1's two rings. One table describes where every mark sits either way.
 
 ### Runtime-drawn
 
@@ -37,6 +56,8 @@ One PNG, 1240 × 996 at 1× / 2× / 3×, alpha, sRGB. It contains:
 | SAVE / DELETE | vector, per §1.3 |
 | Sync switch | vector, per §1.4 |
 | REPEATS LIVE lamp | vector, accent, 1.6s pulse |
+| Dial 1's two scale rings (ticks, minors, numerals) | vector + text, per §4.5 — `bakedInPlate = false` |
+| Delay Character multi-label stack text (3 stacks) | text, lit `#e7e1d4` / unlit `#615c54` per selected mode, per §4.5 |
 | Scope trace and grid | canvas / `Graphics` per §5 |
 | PROGRAM LCD text, bank tag, chevron, dropdown | vector + text, per §6 |
 | IN/OUT numerals | text |
@@ -351,19 +372,23 @@ Printed subset chosen for legibility at this diameter; every mark sits at the bu
 | — | 0.75 | +67.5° | minor |
 | 100 | 1.00 | +135.0° | major |
 
-**OUTPUT TRIM** — 62px body, −24…+12 dB, linear
+**OUTPUT TRIM** — 62px body, −24…+24 dB, linear
+
+The earlier table was cut against −24…+12, which is not the parameter. On the real range it put 0 dB at +45° where the pointer reaches it at 0°, and every other numeral was wrong by a similar amount. Recut and in the build:
 
 | Value | Printed | Angle | Type |
 |---|---|---|---|
 | −24 dB | `-24` | −135.00° | major |
-| −18 dB | — | −90.00° | minor |
-| −12 dB | `-12` | −45.00° | major |
-| −6 dB | — | 0.00° | minor |
-| 0 dB | `0` | +45.00° | major |
-| +6 dB | — | +90.00° | minor |
-| +12 dB | `+12` | +135.00° | major |
+| −18 dB | — | −101.25° | minor |
+| −12 dB | `-12` | −67.50° | major |
+| −6 dB | — | −33.75° | minor |
+| 0 dB | `0` | 0.00° | major |
+| +6 dB | — | +33.75° | minor |
+| +12 dB | `+12` | +67.50° | major |
+| +18 dB | — | +101.25° | minor |
+| +24 dB | `+24` | +135.00° | major |
 
-**The printed `+12` keeps its leading plus.** It is a bipolar dB scale and the sign is the convention; the LCD formats the same parameter as `+2.5 dB`, so a ring printing a bare `12` contradicts its own readout. Labels on this ring are explicit strings, not derived from the value — deriving them drops the plus.
+**The printed `+12` and `+24` keep their leading plus.** It is a bipolar dB scale and the sign is the convention; the LCD formats the same parameter as `+2.5 dB`, so a ring printing a bare `12` contradicts its own readout. Labels on this ring are explicit strings, not derived from the value — deriving them drops the plus.
 
 ### 4.5 The three Delay Character dials
 
@@ -402,7 +427,7 @@ Dials 2 and 3 are therefore drawn in a **144 × 232 registration box** with thei
 
 ```
 all three dials   pivot on one Y     label stack top on one Y
-                  body centre 774    stack top 895        (as built)
+                  body centre 706    stack top 810        (as built, from the panel's top edge)
 ```
 
 Uneven *horizontal* pitch between the pivots is correct and expected — the dials genuinely differ in how much printed scale they carry. Uneven vertical registration is not.
@@ -745,7 +770,8 @@ The scope trace should freeze rather than continue running, and the REPEATS LIVE
 
 ## 11. Outstanding before the plate is cut
 
-1. ~~Read-only parameter inventory from the build.~~ **Received and applied.** TIME, MOD RATE and DAMPING are all skewed; DAMPING is a frequency, not a percentage; every printed scale in §4 has been recut against the build's angles and the normalised 0–10 legend retired. No open question remains here.
-2. **A bypass decision** per §9. Still the one substantive gap.
-3. **By-ear tuning of the six factory Programs.** The names are authored; the values are not final.
-4. **Confirm the printed subsets.** §4.4's TIME ring labels 6 of its 13 marks and §4.5's Hz ring labels 6 of 9 — chosen for legibility at those diameters. Every mark sits at the build's angle either way, so promoting a minor to a labelled major is a free change if the build wants more of them.
+1. ~~The plate.~~ **Cut and delivered** at 1×/2×/3× in `plate/`, without Dial 1's two rings per the §1 carve-out.
+2. ~~Read-only parameter inventory from the build.~~ **Received and applied.** TIME, MOD RATE and DAMPING are all skewed; DAMPING is a frequency, not a percentage; every printed scale in §4 has been recut against the build's angles and the normalised 0–10 legend retired. No open question remains here.
+3. **A bypass decision** per §9. Still the one substantive gap.
+4. **By-ear tuning of the six factory Programs.** The names are authored; the values are not final.
+5. **Confirm the printed subsets.** §4.4's TIME ring labels 6 of its 13 marks and §4.5's Hz ring labels 6 of 9 — chosen for legibility at those diameters. Every mark sits at the build's angle either way, so promoting a minor to a labelled major is a free change if the build wants more of them.

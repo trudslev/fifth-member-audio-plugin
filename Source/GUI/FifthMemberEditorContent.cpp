@@ -22,12 +22,19 @@ namespace
 const FifthMemberTheme::Layout::KnobScale* scaleForParameter (const juce::String& id)
 {
     using namespace FifthMemberTheme::Layout;
-    static const KnobScale time    = scaleOf (timeMarks);
-    static const KnobScale damping = scaleOf (dampingMarks);
-    static const KnobScale sparse  = scaleOf (percentSparseMarks);
-    static const KnobScale full    = scaleOf (percentFullMarks);
-    static const KnobScale fb      = scaleOf (feedbackMarks);
-    static const KnobScale trim    = scaleOf (trimMarks);
+    // bakedInPlate on all of these: the plate carries their rings. Verified by measuring ink in
+    // each tick annulus rather than taken from the manifest - handoff section 1 lists seven knobs
+    // but the plate also bakes dials 2 and 3, and only dial 1's two rings measure zero.
+    //
+    // They keep their tables anyway. The tables are what PrintedScaleTests asserts against, and
+    // what a re-cut plate has to be checked against; dropping them would leave the panel's only
+    // description of where a mark sits inside a PNG.
+    static const KnobScale time    = baked (scaleOf (timeMarks));
+    static const KnobScale damping = baked (scaleOf (dampingMarks));
+    static const KnobScale sparse  = baked (scaleOf (percentSparseMarks));
+    static const KnobScale full    = baked (scaleOf (percentFullMarks));
+    static const KnobScale fb      = baked (scaleOf (feedbackMarks));
+    static const KnobScale trim    = baked (scaleOf (trimMarks));
 
     if (id == ParamIDs::timeMs)     return &time;
     if (id == ParamIDs::damping)    return &damping;
@@ -123,7 +130,7 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
                                                                        0.0f, 100.0f, 1.0f);
         static const Layout::KnobScale dialHz      = Layout::scaleOf (Layout::modRateMarks,
                                                                        0.1f, 5.0f, 0.4090339496f);
-        static const Layout::KnobScale dialPlain   = Layout::scaleOf (Layout::percentFullMarks);
+        static const Layout::KnobScale dialPlain   = Layout::baked (Layout::scaleOf (Layout::percentFullMarks));
         dial->setScale (i == 0 ? &dialPercent : &dialPlain);
         if (i == 0)
             dial->setOuterScaleAndResize (&dialHz, { Layout::dialCentreX[i], Layout::dialCentreY });
