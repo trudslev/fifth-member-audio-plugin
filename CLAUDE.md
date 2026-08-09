@@ -8,11 +8,11 @@ shared [Neon Foundry](../BRAND.md) umbrella, and those repos are read purely as 
 reference. Read `../BRAND.md` first for the cross-plugin design system (naming, "Program" not
 "Preset", the one-accent-colour rule, component grammar), then this file.
 
-`design/README.md` is the authoritative GUI spec and `design/Fifth Member.dc.html` is the live
-prototype — per the doc, "the authority wherever this document is ambiguous". Both were written
-before implementation and are meant to be implemented as-is, not redesigned. **Three errors in that
-document are corrected in this build and documented below; do not "fix" the code back to match
-them.**
+`design/BUILD-HANDOFF.md` and `design/GUI-SPEC.md` are the authoritative spec, and
+`design/Fifth Member.dc.html` is the live prototype — **authoritative for pixel geometry, where the
+spec documents are authoritative for values.** `design/README.md` is the earlier revision and is
+superseded wherever they disagree. **Errors in those documents that this build corrects are listed
+below; do not "fix" the code back to match them.**
 
 ## Commands
 
@@ -141,15 +141,24 @@ is a flex child after the 52 px left rack ear, and its own 18 px padding starts 
 the extracted figures were fascia-relative and have had `earWidth` folded in once. A fascia-relative
 number added later lands 52 px left of where it belongs, on top of the rack ear.
 
-**Three corrections to `design/README.md`, all load-bearing:**
+**Corrections this build carries, all load-bearing:**
 
-1. **The fascia is 1100 px, not the doc's 1084.** That figure subtracts one rack ear twice
+1. **The fascia is 1100 px, not 1084.** That figure subtracts one rack ear twice
    (1240 − 52 − 52 − 52). The unit is 52 + 1136 + 52, and the fascia's content box is 1136 − 36 px
    padding = 1100 at origin x = 18.
-2. **The panel is 1240 × 848.** The height is never stated in the doc. Summing the CSS gives ~854.5,
-   but that over-counts every line box; measured off the rendered prototype it is 848.
-3. **Permanent Marker and Special Elite are Apache 2.0, not OFL** as the doc's type table claims.
-   Both are vendored with `LICENSE.txt` accordingly.
+2. **The panel is 1240 × 932**, not the build handoff's stated 996 and not the old 848. Measured by
+   instrumenting the prototype's own DOM: the chassis renders at 1240 × 931.45. Every other figure
+   the handoff states checks out against that render — ears 52, LCD 449 × 34, the text-driven bank
+   cell at 75.17 against a stated 75.2, TIMING 296, OUTPUT 322, the 232 and 144 dial wrappers, the
+   536 dial row — so only the height disagrees, and section 4.5's own absolute Ys are off by two
+   *different* amounts (774 vs 704.45, 895 vs 802.45), which says they come from a different layout
+   rather than a taller one. Raised with the designers. **Re-measure rather than trusting either
+   number** if a corrected prototype arrives.
+3. **Output Trim is −24…+24 dB**, and handoff section 4.4 prints a −24…+12 ring. On the real range
+   that ring puts 0 dB at +45° where the pointer reaches it at 0. The parameter is right; the table
+   is recut in `Layout::trimMarks` and flagged.
+4. **Permanent Marker and Special Elite are Apache 2.0, not OFL.** Both are vendored with
+   `LICENSE.txt` accordingly.
 
 Two absolutes:
 
@@ -157,15 +166,42 @@ Two absolutes:
   The body renders identically at all times; only LEDs change. CHORUS-60's `dimFactor` is
   deliberately not ported. (The prototype agrees: it computes an `op: 0.32` for "off" knobs and
   never binds it. Dead code.)
-- **No variable text in the scope's plot zone.** Every readout lives in the 22 px strip at the top
+- **No variable text in the scope's plot zone.** Every readout lives in the 23 px strip at the top
   of the dark box, in Share Tech Mono — the same face as the PROGRAM LCD. That combination of
   placement and typeface is what makes changing text read as a screen rather than a printed label.
 
+**Printed scales, and the two things about them that are easy to break.** Every knob carries a
+`ScaleMark` table and a tick is drawn at every printed numeral and nowhere else. What that replaced
+was a fixed-pitch decorative ring — `roundToInt(360/27)` = 13 marks at 27° from 12 o'clock — which
+put marks below the horizontal at both ends of the arc, printed one at +135° with no twin at −135°,
+and left a 36° seam under the pointer at centre value.
+
+  - **Angles are not stored.** They are computed from the bound parameter's own `NormalisableRange`
+    at draw time, the same call the pointer uses, so a ring cannot drift from the taper it legends.
+    `Tests/PrintedScaleTests.cpp` asserts every mark against the handoff's published angle and that
+    no mark falls outside its ring's range.
+  - **A knob is sized to its WRAPPER, not its tick tips.** Numerals live outside the ring and a
+    component clips its own paint, so bounds taken from the tick annulus cut them off — and the
+    failure is silent, because the ring still draws and the numerals simply vanish, which reads as
+    the designer having omitted them. Section 4.2's 2R + 68, or the 232 box for dial 1.
+
 **The fixed three-dial mechanic.** Three positions, always present, never appearing, disappearing or
 moving. Each carries every label it could ever have, permanently printed and stacked, each with its
-own 6 px LED. A dial with no label in the current mode keeps editing its own parameter — Dial 3
-always drives Generation Loss — rather than falling back to the current mode's first parameter,
-which would make it a duplicate of Dial 1.
+own 6 px LED.
+
+**A dial with no label in the current mode drives NOTHING.** Dial 2 in Digital and Dial 3 in
+BBD/Digital used to fall through to `flutter` and `genLoss`, so a Digital Program silently carried
+tape values nothing on the panel named. They now bind to no parameter at all: the knob still turns —
+a real control cannot lock, and section 2.2 forbids dimming it — but it turns a value stored
+nowhere, and re-binding on the next mode change pulls it to that parameter's real value, which the
+slew then animates.
+
+**Dial 1 carries two concentric rings**, a percentage and a frequency, because it binds to Wow in
+Tape, Mod Rate in BBD and Repeat Degrade in Digital and those cannot share numerals — 1 Hz sits at
+0° where the percent ring prints 50. Both are permanently printed at different radii and each lights
+or dims with the mode, exactly as the stacked labels do. **Each ring carries its own lo/hi/skew**:
+only one matches the bound parameter at a time, and asking the Slider to map both put every percent
+mark through the Hz range, clamping 25/50/75/100 onto a single stacked pile at +135°.
 
 **Knob animation.** `SliderAttachment` still sets parameters instantly; a `setDisplayProportion()`
 override is slewed by the editor's 60 Hz timer using `1 − 0.002^(dt/settle)`. Three traps CHORUS-60
@@ -251,10 +287,22 @@ passes while proving nothing.
 
 - **DSP**: complete, no stubs. Delay tables, filter cutoffs and character ranges are a
   structurally-reasoned first pass, not a by-ear one. Build, load, listen, adjust.
-- **Programs**: 11 factory Programs with authored values; no by-ear pass.
-- **GUI**: complete, and measured against the prototype rendered in headless Chrome rather than
-  judged by eye. Whole-panel tone difference is ~3.4 levels out of 255; every panel-box edge, both
-  DELAY CHARACTER dividers and the scope's inner box land on the reference to within a pixel.
+- **Programs**: 11 factory Programs with authored values. Program browsing, naming, saving and
+  deleting follow TapeRot's paradigm, with two deliberate divergences where Fifth Member is the
+  better implementation: `getNonexistentSibling()` so a name collision never overwrites, and
+  cancel-on-focus-loss. The dropdown is additionally suppressed while naming — TapeRot opens it
+  regardless, which applies a Program underneath a half-typed name.
+- **GUI**: conformant to the revision-2 handoff. Every coordinate was re-measured by instrumenting
+  the prototype's DOM rather than adjusted by eye. Printed scales replace the value tooltip as the
+  at-rest reference; live values appear in the PROGRAM LCD while a control is moved and nowhere
+  else. `auval` and `pluginval --strictness-level 8` pass on AU and VST3.
+- **Not yet done on the GUI**: a composite diff of the assembled panel against the prototype render,
+  region by region, in the manner the CSS-trap list above prescribes. The individual regions were
+  checked during the pass; the whole-panel diff has not been re-run since the canvas changed.
+- **The plate has not been delivered.** Handoff section 1 makes one exported PNG the contract, but
+  the bundle ships icons and prototypes only. The build draws everything, which is what it already
+  did; `KnobScale::bakedInPlate` is the switch that stops it drawing a ring once the plate carries
+  it. Logged in `prompts/PROMPTS.md` along with three spec corrections.
 - **Icon**: concept 1b "repeat train" in its readout-free "delay only" form, wired to `ICON_BIG`
   (1024) and `ICON_SMALL` (256) from `design/icons/`. Verified out of the shipped bundle, not just
   off disk.
