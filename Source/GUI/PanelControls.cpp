@@ -379,17 +379,12 @@ void PanelControls::paintConditionalLeds (juce::Graphics& g, bool sync, int ster
     Paint::drawLed (g, Layout::crossFeedLedCentre, Layout::ledStandard,
                     stereoMode == (int) StereoMode::pingPong);
 
-    // Their captions sit beside the lamps rather than in the baked layer, because the two timing
-    // labels brighten with their own LED.
-    const auto font = Font::label (10.0f);
-    const float tracking = Font::trackingPx (0.20f, 10.0f);
-
-    Text::drawTracked (g, "TIME", font, tracking,
-                       { Layout::timeLedCentre.x + 7.0f, Layout::timeLabelY, 120.0f, 12.5f },
-                       juce::Justification::left, sync ? Colour::label : Colour::labelBright);
-
-    Text::drawTracked (g, "CROSS-FEED", font, tracking,
-                       { Layout::crossFeedLedCentre.x + 7.0f, Layout::repeatsLabelY, 140.0f, 12.5f },
-                       juce::Justification::left,
-                       stereoMode == (int) StereoMode::pingPong ? Colour::labelBright : Colour::label);
+    // The TIME and CROSS-FEED captions are NOT drawn here. They used to be, so they could brighten
+    // with their own lamp - but revision 2's plate bakes every knob name (handoff section 1), and
+    // drawing them again double-printed both at a one-pixel offset. It is visible on CROSS-FEED,
+    // where the live and baked copies sit ~11px apart.
+    //
+    // Section 2.4 lists what changes with these two states and it is the LED, nothing else. So the
+    // lamp above carries it and the printed name stays put, which is also what section 2.2 asks of
+    // every other control on the panel.
 }

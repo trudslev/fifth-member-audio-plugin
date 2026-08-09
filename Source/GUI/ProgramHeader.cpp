@@ -221,9 +221,18 @@ void ProgramHeader::showProgramMenu()
 
     const juce::Component::SafePointer<ProgramHeader> safeThis { this };
 
+    // The list hangs off the LCD and has to read as an extension of it, so it takes the glass's
+    // width rather than sizing itself to the longest Program name - section 6.5 gives it the "full
+    // LCD border-box width". localAreaToGlobal already carries the editor's scale transform, so this
+    // stays right at every window size. withMaximumNumColumns(1) because JUCE otherwise wraps a long
+    // bank into columns and the list stops matching the bar it drops from.
+    const auto glassOnScreen = localAreaToGlobal (displayArea().getSmallestIntegerContainer());
+
     menu.showMenuAsync (juce::PopupMenu::Options()
                             .withTargetComponent (this)
-                            .withTargetScreenArea (localAreaToGlobal (displayArea().getSmallestIntegerContainer())),
+                            .withTargetScreenArea (glassOnScreen)
+                            .withMinimumWidth (glassOnScreen.getWidth())
+                            .withMaximumNumColumns (1),
                         [safeThis] (int result)
                         {
                             if (safeThis != nullptr && result != 0)
@@ -354,7 +363,12 @@ juce::String ProgramHeader::currentLcdString() const
     if (liveReadout.isNotEmpty())
         return liveReadout;
 
-    return juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName;
+    // A trailing " *" while the loaded Program has been edited, matching every other casting. It
+    // clears on store, on delete and on loading another Program - all three reset displayedIsModified
+    // through refreshFromProcessor, so nothing extra is needed here. Worst case is the 26-character
+    // name cap plus "NN " and the marker, 31, which is inside the 16px guard's own 31.
+    return juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName
+         + (displayedIsModified ? " *" : "");
 }
 
 void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)

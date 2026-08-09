@@ -482,12 +482,18 @@ inline constexpr float nameplateTextSize = 29.0f;
 
     inline constexpr juce::Point<float> timeKnobCentre { 222.0f, 462.45f };
     inline constexpr float timeLabelY = 535.45f;
-    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 541.7f };
+    // Measured off the plate's own ink, not derived from the label's box: the caption is baked now,
+    // so its printed cap-height band is the only thing the lamp can be centred against. TIME's
+    // glyph run spans y 539.0..546.5 at 2x, centre 542.75.
+    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 542.75f };
 
     inline constexpr juce::Point<float> feedbackKnobCentre { 508.0f, 375.45f };
     inline constexpr juce::Point<float> crossFeedKnobCentre { 717.0f, 375.45f };
     inline constexpr float repeatsLabelY = 457.45f;
-    inline constexpr juce::Point<float> crossFeedLedCentre { 681.0f, 463.7f };
+    // Likewise measured: CROSS-FEED's baked ink spans y 450.0..466.5, centre 458.25. The 463.7 this
+    // replaces was computed from repeatsLabelY plus a half-line, which put the lamp below the
+    // caption's baseline rather than on its optical centre.
+    inline constexpr juce::Point<float> crossFeedLedCentre { 681.0f, 458.25f };
 
     inline constexpr float stereoLabelX = 403.0f;
     inline constexpr float stereoLabelY = 480.45f;
