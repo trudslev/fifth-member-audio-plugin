@@ -136,7 +136,8 @@ display resolves them to a flat wash and the metal stops reading as metal. ~17 M
 across the 0.5×–2× resize range.
 
 `FifthMemberTheme.h` holds every colour, coordinate and typographic constant. **Every coordinate in
-`Layout` is absolute against the 1240 × 848 canvas.** The CSS they came from is nested — the fascia
+`Layout` is absolute against the 1240 × 932 canvas**, and every one of them was measured by
+instrumenting the prototype's own DOM rather than summed from the CSS. The CSS they came from is nested — the fascia
 is a flex child after the 52 px left rack ear, and its own 18 px padding starts the content box — so
 the extracted figures were fascia-relative and have had `earWidth` folded in once. A fascia-relative
 number added later lands 52 px left of where it belongs, on top of the rack ear.
@@ -296,9 +297,13 @@ passes while proving nothing.
   the prototype's DOM rather than adjusted by eye. Printed scales replace the value tooltip as the
   at-rest reference; live values appear in the PROGRAM LCD while a control is moved and nowhere
   else. `auval` and `pluginval --strictness-level 8` pass on AU and VST3.
-- **Not yet done on the GUI**: a composite diff of the assembled panel against the prototype render,
-  region by region, in the manner the CSS-trap list above prescribes. The individual regions were
-  checked during the pass; the whole-panel diff has not been re-run since the canvas changed.
+- **The composite diff is not yet a clean acceptance signal.** It runs and aligns (the build's panel
+  sits 1 px right of the prototype's), but a raw comparison is dominated by *state* rather than by
+  geometry: the two are on different Delay Character modes, different meter readings and a different
+  scope frame, which puts the header at ~14 levels of 255 almost entirely on the LCD string and the
+  IN/OUT numerals. To be meaningful it needs the plugin driven to the prototype's exact state first —
+  Tape, sync on, 1/8., program 01 — and then re-run region by region. The individual regions were
+  each checked visually during the pass; this is the outstanding piece.
 - **The plate has not been delivered.** Handoff section 1 makes one exported PNG the contract, but
   the bundle ships icons and prototypes only. The build draws everything, which is what it already
   did; `KnobScale::bakedInPlate` is the switch that stops it drawing a ring once the plate carries
