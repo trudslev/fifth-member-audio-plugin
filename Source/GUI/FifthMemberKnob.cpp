@@ -17,10 +17,16 @@ FifthMemberKnob::FifthMemberKnob (Layout::KnobSize size)
 
 void FifthMemberKnob::setCentrePosition (juce::Point<float> centre)
 {
-    // The hit area reaches the tick ring's outer edge plus a small click margin, so the whole
-    // visible control is grabbable and the ring sits inside this component's own clip region.
+    // Sized to the WRAPPER, not to the body or the tick tips, because the numerals live outside
+    // both and a component clips its own paint. Section 4.2 gives the wrapper as 2R + 68 for a
+    // single ring; dial 1 carries the outer Hz arc whose numerals reach much further, so it takes
+    // the 232 box that section 4.5 sizes against the widest label's OUTER extent.
+    //
+    // Getting this wrong is silent: the ring still draws, the numerals just vanish at the edge of
+    // the component, which reads as a designer having omitted them.
     const auto& v = variant();
-    const float half = Geometry::tickAnnulus (v).outer + v.tickWidth + 2.0f;
+    const float wrapper = outerScale != nullptr ? Layout::dialWrapper1 : v.diameter + 68.0f;
+    const float half = wrapper * 0.5f;
 
     setBounds (juce::Rectangle<float> (centre.x - half, centre.y - half, half * 2.0f, half * 2.0f)
                    .getSmallestIntegerContainer());
@@ -51,24 +57,6 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
 {
     const float r = v.diameter * 0.5f;
     const juce::Rectangle<float> body { centre.x - r, centre.y - r, v.diameter, v.diameter };
-
-    // --- tick ring, outside the body, drawn first ----------------------------
-    {
-        const auto ring = Geometry::tickAnnulus (v);
-        const int steps = juce::roundToInt (360.0f / v.tickStepDegrees);
-
-        g.setColour (v.tickColour);
-
-        // A full ring, not just the 270 degrees the pointer sweeps: the design's conic gradient
-        // repeats all the way round, so there are marks below the horizontal and one at six
-        // o'clock. Stopping at the arc ends left a bare bottom the prototype does not have.
-        for (int i = 0; i < steps; ++i)
-        {
-            const float angle = (float) i * v.tickStepDegrees;
-            g.drawLine ({ Geometry::pointOnCircle (centre, ring.inner, angle),
-                          Geometry::pointOnCircle (centre, ring.outer, angle) }, v.tickWidth);
-        }
-    }
 
     // --- cast shadow ---------------------------------------------------------
     {
@@ -125,5 +113,85 @@ void FifthMemberKnob::paintBody (juce::Graphics& g, juce::Point<float> centre,
 void FifthMemberKnob::paint (juce::Graphics& g)
 {
     const auto centre = getLocalBounds().toFloat().getCentre();
+    const float radius = variant().diameter * 0.5f;
+
+    // --- printed scale, outside the body, drawn first -------------------------
+    //
+    // A tick at every printed numeral and nowhere else (section 4.2a). The angle of each mark comes
+    // from the Slider's own NormalisableRange - the same call the pointer uses - so a skewed
+    // parameter's marks come out unevenly spaced, which is correct, and no table of angles can
+    // drift away from the taper it legends.
+    if (scale != nullptr && ! scale->bakedInPlate)
+        drawScale (g, centre, radius, *scale,
+                    Layout::tickMajorInner, Layout::tickMajorOuter, Layout::numeralClearance,
+                    outerScale == nullptr || ! outerLit);
+
+    if (outerScale != nullptr && ! outerScale->bakedInPlate)
+        drawScale (g, centre, radius, *outerScale,
+                    Layout::outerTickInner, Layout::outerTickOuter, Layout::outerNumeralClearance,
+                    outerLit);
+
     paintBody (g, centre, variant(), getDrawnProportion());
+}
+
+void FifthMemberKnob::setOuterScaleAndResize (const Layout::KnobScale* s, juce::Point<float> centre)
+{
+    outerScale = s;
+    setCentrePosition (centre);
+}
+
+void FifthMemberKnob::setOuterRingLit (bool shouldBeLit) noexcept
+{
+    if (outerLit == shouldBeLit)
+        return;
+    outerLit = shouldBeLit;
+    repaint();
+}
+
+void FifthMemberKnob::drawScale (juce::Graphics& g, juce::Point<float> centre, float radius,
+                                  const Layout::KnobScale& s,
+                                  float tickInner, float tickOuter, float numeralClear, bool lit)
+{
+    using namespace FifthMemberTheme;
+
+    const auto tickCol  = lit ? Colour::scaleTick      : Colour::scaleTickDim;
+    const auto minorCol = lit ? Colour::scaleTickMinor : Colour::scaleTickMinorDim;
+    const auto inkCol   = lit ? Colour::scaleNumeral   : Colour::scaleNumeralDim;
+
+    const auto font = Font::label (Layout::numeralSize);
+    const float tracking = Font::trackingPx (Layout::numeralTracking, Layout::numeralSize);
+
+    for (int i = 0; i < s.count; ++i)
+    {
+        const auto& m = s.marks[i];
+
+        // The knob's own mapping, so this is exact for skewed parameters rather than assumed linear.
+        const float p = (float) valueToProportionOfLength ((double) m.value);
+        const float angle = Layout::knobArcStartDegrees
+                          + p * (Layout::knobArcEndDegrees - Layout::knobArcStartDegrees);
+
+        const float innerR = m.major ? tickInner : tickInner + (Layout::tickMinorInner - Layout::tickMajorInner);
+        g.setColour (m.major ? tickCol : minorCol);
+        g.drawLine ({ Geometry::pointOnCircle (centre, radius + innerR, angle),
+                       Geometry::pointOnCircle (centre, radius + tickOuter, angle) },
+                     m.major ? Layout::tickMajorWidth : Layout::tickMinorWidth);
+
+        if (m.printed == nullptr)
+            continue;
+
+        // Section 4.2a: numerals are anchored by the box edge FACING THE DIAL, not by their centre,
+        // so a one-character and a three-character label clear the tick tip by the same 4px. A fixed
+        // radius instead leaves wide labels visibly tighter to the arc than narrow ones.
+        const juce::String text (m.printed);
+        const float halfWidth = 0.5f * Text::trackedWidth (text, font, tracking);
+        const float rad = juce::degreesToRadians (angle);
+        const float r = radius + numeralClear
+                      + halfWidth * std::abs (std::sin (rad))
+                      + Layout::numeralHalfCap * std::abs (std::cos (rad));
+
+        const auto at = Geometry::pointOnCircle (centre, r, angle);
+        Text::drawTracked (g, text, font, tracking,
+                            { at.x - 40.0f, at.y - 8.0f, 80.0f, 16.0f },
+                            juce::Justification::centred, inkCol);
+    }
 }

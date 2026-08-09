@@ -128,13 +128,21 @@ namespace Colour
     inline const juce::Colour switchThumbTop  { 0xFFCFC9BB };
     inline const juce::Colour switchThumbBot  { 0xFF8D887D };
 
-    inline const juce::Colour tooltipBg       { 0xFF0B0A09 };
-    inline const juce::Colour tooltipBorder   { 0xFF35322B };
-    inline const juce::Colour tooltipText     { 0xFFECE6D8 };
 
-    inline const juce::Colour tickMark        { 0xFF7D786E };
-    inline const juce::Colour tickMarkMid     { 0xFF827D72 };
-    inline const juce::Colour tickMarkLarge   { 0xFF85806F };
+    /** Printed scales, section 8.2. These are FUNCTIONAL text at 7.36:1 - they replaced the value
+        tooltip as the at-rest reference for what a knob is set to, so they are not decoration and
+        do not take a decorative grey. One ink for ticks and numerals alike; minors sit one step
+        back only so a labelled mark reads as the primary one.
+
+        The dim set is for dial 1's idle ring (section 4.5) - printed legend for a mode that is not
+        live, with an LED and a lit companion ring carrying the current state. Section 8.3 lists it
+        as a third instance of the documented multi-label exception, not a new one. */
+    inline const juce::Colour scaleTick        { 0xFFA8A294 };
+    inline const juce::Colour scaleTickMinor   { 0xFF8A857A };
+    inline const juce::Colour scaleNumeral     { 0xFFA8A294 };
+    inline const juce::Colour scaleTickDim     { 0xFF5A564E };
+    inline const juce::Colour scaleTickMinorDim{ 0xFF4A463F };
+    inline const juce::Colour scaleNumeralDim  { 0xFF615C54 };
 }
 
 //==============================================================================
@@ -267,7 +275,21 @@ namespace Text
 namespace Layout
 {
     inline constexpr float canvasWidth = 1240.0f;
-    inline constexpr float canvasHeight = 848.0f;
+
+    /** 932, measured off the rendered prototype - NOT the build handoff's stated 996.
+
+        The handoff calls the prototype "authoritative for behaviour and pixel geometry" and the
+        spec documents authoritative for values, and every geometric figure the handoff states does
+        check out against the render: rack ears 52, LCD 449 x 34, bank cell 75.17 against a stated
+        75.2, TIMING 296, OUTPUT 322, the 232 and 144 dial wrappers, the 536 dial row. Only the
+        canvas height disagrees, and its own section 4.5 quotes absolute Ys ("body centre 774,
+        stack top 895") that are 69.6 and 92.6 px off the render - two different offsets, so those
+        figures come from a different layout rather than from a taller version of this one.
+
+        Measured, the chassis is 1240 x 931.45; 932 is that rounded up to a whole pixel. Raised
+        with the designers; if a corrected prototype lands, re-measure rather than trusting either
+        number. The previous 848 came from the same method on the pre-conformance panel. */
+    inline constexpr float canvasHeight = 932.0f;
     inline constexpr float unitRadius = 5.0f;
 
     /** EVERY coordinate below is absolute against the 1240 x 848 canvas.
@@ -283,61 +305,84 @@ namespace Layout
 
     inline constexpr float screwDiameter = 24.0f;
     inline constexpr std::array<juce::Point<float>, 4> screwCentres { {
-        { 26.0f, 34.0f }, { 26.0f, 814.0f }, { 1214.0f, 34.0f }, { 1214.0f, 814.0f } } };
+        { 26.0f, 34.0f }, { 26.0f, 898.0f }, { 1214.0f, 34.0f }, { 1214.0f, 898.0f } } };
     /** Kept distinct on purpose: four identical screws read as CG. */
     inline constexpr std::array<float, 4> screwSlotAngles { { 28.0f, -14.0f, 52.0f, 9.0f } };
 
     // --- header --------------------------------------------------------------
     inline constexpr float headerContentX = 74.0f;
     inline constexpr float headerContentW = 1092.0f;
-    inline constexpr float headerRuleY = 127.34f;
+    inline constexpr float headerRuleY = 126.45f;
 
-    inline constexpr float nameplateX = 74.0f;
-    inline constexpr float nameplateY = 16.0f;
-    inline constexpr float nameplateW = 326.0f;
-    inline constexpr float nameplateH = 52.34f;
+    inline constexpr float nameplateX = 73.56f;
+    inline constexpr float nameplateY = 13.2f;
+    inline constexpr float nameplateW = 268.87f;   // section 7.1 narrowed this column to widen the LCD
+    inline constexpr float nameplateH = 50.06f;
     inline constexpr float nameplateRotationDegrees = -1.2f;
-    inline constexpr float nameplateTextSize = 33.0f;
+        /** 29, not 33. Section 7.1 narrowed this column from 326 to 268.87 to buy the LCD its extra
+        width, and the old size no longer fits - it clipped the wordmark to "FIFTH MEMB". Measured
+        off the prototype the rendered text box is 234.5 wide inside a 268.87 tape. */
+inline constexpr float nameplateTextSize = 29.0f;
 
     inline constexpr float taglineX = 78.0f;
-    inline constexpr float taglineY1 = 80.34f;
-    inline constexpr float taglineY2 = 98.34f;
+    inline constexpr float taglineY1 = 72.45f;
+    inline constexpr float taglineY2 = 91.45f;
     inline constexpr float taglineSize = 12.0f;
     inline constexpr float taglineLineHeight = 15.0f;
 
-    inline constexpr float programLabelX = 428.0f;
-    inline constexpr float programLabelY = 32.42f;
-    inline constexpr float lcdX = 426.0f;
-    inline constexpr float lcdY = 50.92f;
-    inline constexpr float lcdW = 391.0f;
-    inline constexpr float lcdH = 46.0f;
+    inline constexpr float programLabelX = 370.0f;
+    inline constexpr float programLabelY = 34.22f;
+
+    /** Section 6.1's LCD, and every figure here is BORDER-BOX to match the rest of this file.
+
+        The header came down from 46 px to 34 so the LCD, SAVE, DELETE and the two meter boxes all
+        share one height - section 6.1's 447 x 32 content plus its 1 px border. Section 7.1 bought
+        the extra width by narrowing the wordmark column: at the old 326 px column the name cell was
+        278 px and the two longest live readouts overflowed it, which would have forced a size
+        step-down on every readout.
+
+        Cell widths are the render's, and they agree with the spec to a rounding: bank 75.17 against
+        a stated 75.2, name 335.83 against 335.8, leaving 36.0 for the chevron. */
+    inline constexpr float lcdX = 368.0f;
+    inline constexpr float lcdY = 53.22f;
+    inline constexpr float lcdW = 449.0f;
+    inline constexpr float lcdH = 34.0f;
     inline constexpr float lcdRadius = 3.0f;
-    inline constexpr float bankTagW = 61.0f;
+    inline constexpr float bankTagW = 75.17f;
+    inline constexpr float lcdNameCellX = 444.17f;
+    inline constexpr float lcdNameCellW = 335.83f;
     inline constexpr float caretW = 36.0f;
+
+    /** Section 6.4's chevron, drawn as a Path rather than a glyph so it renders identically across
+        platforms and font fallbacks. viewBox 0 0 14 8, "M1 1.6 L7 6.4 L13 1.6". */
+    inline constexpr float chevronW = 14.0f;
+    inline constexpr float chevronH = 8.0f;
+    inline constexpr float chevronStroke = 1.6f;
+    inline constexpr float chevronPadX = 11.0f;
 
     inline constexpr float saveX = 827.0f;
     inline constexpr float saveW = 68.0f;
     inline constexpr float deleteX = 902.0f;
     inline constexpr float deleteW = 76.0f;
-    inline constexpr float headerButtonY = 50.92f;
-    inline constexpr float headerButtonH = 46.0f;
+    inline constexpr float headerButtonY = 53.22f;
+    inline constexpr float headerButtonH = 34.0f;
 
-    inline constexpr float meterCaptionY = 38.92f;
-    inline constexpr float meterBoxY = 56.42f;
+    inline constexpr float meterCaptionY = 34.72f;
+    inline constexpr float meterBoxY = 52.72f;
     inline constexpr float meterBoxW = 76.0f;
     inline constexpr float meterBoxH = 34.0f;
     inline constexpr float meterInX = 1004.0f;
     inline constexpr float meterOutX = 1090.0f;
 
     // --- scope ---------------------------------------------------------------
-    inline constexpr float scopeCaptionY = 142.34f;
-    inline constexpr float scopeCaptionH = 15.0f;
-    inline constexpr juce::Point<float> lampCentre { 80.5f, 149.84f };
+    inline constexpr float scopeCaptionY = 134.45f;
+    inline constexpr float scopeCaptionH = 14.0f;
+    inline constexpr juce::Point<float> lampCentre { 80.5f, 141.45f };
     inline constexpr float lampDiameter = 13.0f;
     inline constexpr float lampLabelX = 98.0f;      // lamp right edge (87) + the 11px flex gap
 
     inline constexpr float scopeX = 74.0f;
-    inline constexpr float scopeY = 165.34f;
+    inline constexpr float scopeY = 156.45f;
     inline constexpr float scopeW = 1092.0f;
     inline constexpr float scopeH = 98.0f;
 
@@ -346,10 +391,10 @@ namespace Layout
         combination of placement and typeface is what makes changing text read as a screen rather
         than a printed label. */
     inline constexpr float scopeInnerX = 75.0f;
-    inline constexpr float scopeInnerY = 166.34f;
+    inline constexpr float scopeInnerY = 157.45f;
     inline constexpr float scopeInnerW = 1090.0f;
-    inline constexpr float readoutStripH = 22.0f;
-    inline constexpr float plotY = 188.34f;
+    inline constexpr float readoutStripH = 23.0f;
+    inline constexpr float plotY = 180.45f;
     inline constexpr float plotH = 74.0f;
     inline constexpr float readoutTextSize = 11.0f;
     inline constexpr float readoutTracking = 0.12f;
@@ -365,69 +410,69 @@ namespace Layout
     inline constexpr int   gridDivisions = 8;
 
     // --- control row A -------------------------------------------------------
-    inline constexpr float rowAY = 285.34f;
-    inline constexpr float rowAH = 242.0f;
+    inline constexpr float rowAY = 276.45f;
+    inline constexpr float rowAH = 289.0f;
     inline constexpr float legendTextSize = 10.0f;
     inline constexpr float legendTracking = 0.28f;
 
     inline constexpr float timingX = 74.0f;
     inline constexpr float timingW = 296.0f;
     inline constexpr float repeatsX = 386.0f;
-    inline constexpr float repeatsW = 464.0f;
-    inline constexpr float outputX = 866.0f;
-    inline constexpr float outputW = 300.0f;
+    inline constexpr float repeatsW = 442.0f;
+    inline constexpr float outputX = 844.0f;
+    inline constexpr float outputW = 322.0f;   // section 4.1: a 300 box overflows by 22
 
     inline constexpr float syncSwitchX = 91.0f;
-    inline constexpr float syncSwitchY = 306.34f;
+    inline constexpr float syncSwitchY = 297.45f;
     inline constexpr float syncSwitchW = 54.0f;
     inline constexpr float syncSwitchH = 26.0f;
     inline constexpr float syncThumbOffX = 94.0f;
     inline constexpr float syncThumbOnX = 119.0f;
-    inline constexpr float syncThumbY = 309.34f;
+    inline constexpr float syncThumbY = 300.45f;
     inline constexpr float syncThumbW = 23.0f;
     inline constexpr float syncThumbH = 20.0f;
     inline constexpr float syncThumbAnimMs = 180.0f;
     inline constexpr float syncCaptionX = 157.0f;
-    inline constexpr float syncCaptionY = 312.465f;
+    inline constexpr float syncCaptionY = 303.45f;
 
-    inline constexpr juce::Point<float> divisionLedCentre { 94.5f, 352.59f };
+    inline constexpr juce::Point<float> divisionLedCentre { 94.5f, 343.95f };
     inline constexpr float divisionLabelX = 105.0f;
-    inline constexpr float divisionLabelY = 346.34f;
-    inline constexpr float divisionButtonY = 365.84f;
+    inline constexpr float divisionLabelY = 337.45f;
+    inline constexpr float divisionButtonY = 357.45f;
     inline constexpr float divisionButtonW = 48.4f;
     inline constexpr float divisionButtonH = 32.0f;
     inline constexpr float divisionButtonPitch = 53.4f;
     inline constexpr float divisionButtonX0 = 91.0f;
 
-    inline constexpr juce::Point<float> timeKnobCentre { 222.0f, 447.84f };
-    inline constexpr float timeLabelY = 495.84f;
-    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 502.09f };
+    inline constexpr juce::Point<float> timeKnobCentre { 222.0f, 462.45f };
+    inline constexpr float timeLabelY = 535.45f;
+    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 541.7f };
 
-    inline constexpr juce::Point<float> feedbackKnobCentre { 510.0f, 351.34f };
-    inline constexpr juce::Point<float> crossFeedKnobCentre { 730.0f, 363.34f };
-    inline constexpr float repeatsLabelY = 409.34f;
-    inline constexpr juce::Point<float> crossFeedLedCentre { 694.0f, 415.59f };
+    inline constexpr juce::Point<float> feedbackKnobCentre { 508.0f, 375.45f };
+    inline constexpr juce::Point<float> crossFeedKnobCentre { 717.0f, 375.45f };
+    inline constexpr float repeatsLabelY = 457.45f;
+    inline constexpr juce::Point<float> crossFeedLedCentre { 681.0f, 463.7f };
 
     inline constexpr float stereoLabelX = 403.0f;
-    inline constexpr float stereoLabelY = 437.84f;
-    inline constexpr float stereoButtonY = 457.34f;
-    inline constexpr float stereoButtonW = 140.0f;
+    inline constexpr float stereoLabelY = 480.45f;
+    inline constexpr float stereoButtonY = 500.45f;
+    inline constexpr float stereoButtonW = 132.66f;
     inline constexpr float stereoButtonH = 34.0f;
-    inline constexpr std::array<float, 3> stereoButtonX { { 403.0f, 548.0f, 693.0f } };
+    inline constexpr std::array<float, 3> stereoButtonX { { 403.0f, 540.66f, 678.33f } };
 
-    inline constexpr juce::Point<float> mixKnobCentre { 961.85f, 395.59f };
-    inline constexpr juce::Point<float> trimKnobCentre { 1077.0f, 406.59f };
-    inline constexpr float outputLabelY = 452.59f;
+    inline constexpr juce::Point<float> mixKnobCentre { 936.0f, 414.45f };
+    inline constexpr juce::Point<float> trimKnobCentre { 1084.0f, 414.45f };
+    inline constexpr float outputLabelY = 485.45f;
 
     // --- control row B: DELAY CHARACTER --------------------------------------
-    inline constexpr float rowBY = 549.34f;
-    inline constexpr float rowBH = 241.0f;
+    inline constexpr float rowBY = 579.45f;
+    inline constexpr float rowBH = 283.0f;
 
     inline constexpr float modeButtonX = 95.0f;
-    inline constexpr float modeButtonW = 168.0f;
+    inline constexpr float modeButtonW = 158.0f;
     inline constexpr float modeButtonH = 56.0f;
     inline constexpr float modeButtonPitch = 68.0f;
-    inline constexpr float modeButtonY0 = 576.34f;
+    inline constexpr float modeButtonY0 = 598.45f;
     inline constexpr float modeLedX = 115.0f;
     inline constexpr float modeLedDiameter = 10.0f;
     inline constexpr float modeLabelX = 132.0f;
@@ -440,14 +485,26 @@ namespace Layout
         it as the border box (which is what the first extraction did) walks the divider 27px right
         and, because the middle column is `flex:1`, stretches it by the same 27, spreading the three
         dials on a pitch 9px too wide. Both dividers are measured off the prototype at 289 and 868.  */
-    inline constexpr float dialsDividerX = 289.0f;
-    inline constexpr float sharedDividerX = 868.0f;
-    inline constexpr float rowBDividerY = 576.34f;
-    inline constexpr float rowBDividerH = 192.0f;
+    inline constexpr float dialsDividerX = 275.0f;
+    inline constexpr float sharedDividerX = 856.0f;
+    inline constexpr float rowBDividerY = 598.45f;
+    inline constexpr float rowBDividerH = 253.0f;
 
-    inline constexpr std::array<float, 3> dialCentreX { { 404.333f, 579.0f, 753.667f } };
-    inline constexpr float dialCentreY = 641.34f;
-    inline constexpr float dialLabelStackTop = 695.34f;
+    /** Section 4.5: the three dials do NOT share a wrapper width. Dial 1 carries the outer Hz arc
+        and needs a 232 box; dials 2 and 3 carry one ring each and stay 144. Giving all three the
+        232 box costs 176 px the fascia does not have and clips both rack ears off the panel.
+
+        They DO share a pivot Y and a label-stack Y. Dials 2 and 3 are drawn in a 144 x 232
+        registration box with their 144 ring inset 44 px from its top, so a row of wrappers
+        differing by 88 px in height still lands every pivot and every stack on one line - a matched
+        row at three different heights reads as a build error. Uneven horizontal pitch between the
+        pivots is correct and expected: the dials genuinely carry different amounts of scale. */
+    inline constexpr std::array<float, 3> dialCentreX { { 415.33f, 610.0f, 760.66f } };
+    inline constexpr float dialCentreY = 704.45f;
+    inline constexpr float dialWrapper1 = 232.0f;      // dial 1, two rings
+    inline constexpr float dialWrapper23 = 144.0f;     // dials 2 and 3, one ring
+    inline constexpr float dialRingInsetY = 44.0f;     // dials 2/3 ring top inside the 232 box
+    inline constexpr float dialLabelStackTop = 802.45f;
     inline constexpr float dialLabelRowPitch = 17.0f;
     inline constexpr float dialLabelSize = 10.0f;
     inline constexpr float dialLabelTracking = 0.18f;
@@ -456,21 +513,130 @@ namespace Layout
     inline constexpr float dialLedOffsetY = 6.25f;
     inline constexpr float dialLabelTextOffsetX = 13.0f;
 
-    inline constexpr float sharedHeadingX = 895.0f;
-    inline constexpr float sharedHeadingY = 566.34f;
-    inline constexpr juce::Point<float> dampingKnobCentre { 955.0f, 647.84f };
-    inline constexpr juce::Point<float> saturationKnobCentre { 1085.0f, 647.84f };
-    inline constexpr float sharedLabelY = 695.84f;
+    inline constexpr float sharedHeadingX = 877.0f;
+    inline constexpr float sharedHeadingY = 588.45f;
+    inline constexpr juce::Point<float> dampingKnobCentre { 944.0f, 680.45f };
+    inline constexpr juce::Point<float> saturationKnobCentre { 1078.0f, 680.45f };
+    inline constexpr float sharedLabelY = 753.45f;
 
     // --- foot ----------------------------------------------------------------
-    inline constexpr float footRuleY = 803.0f;
-    inline constexpr float footWindowX = 74.0f;
-    inline constexpr float footWindowY = 814.0f;
-    inline constexpr float footWindowH = 23.0f;
-    inline constexpr float footWindowTextX = 87.0f;
-    inline constexpr float footWindowTextY = 819.0f;
-    inline constexpr float footSpecX = 268.0f;
-    inline constexpr float footTextY = 820.85f;
+    inline constexpr float footRuleY = 874.45f;
+    inline constexpr float footWindowX = 262.65f;
+    inline constexpr float footWindowY = 883.19f;
+    inline constexpr float footWindowH = 38.52f;
+    inline constexpr float footWindowTextX = 275.0f;
+    inline constexpr float footWindowTextY = 893.0f;
+    inline constexpr float footSpecX = 74.0f;
+    inline constexpr float footTextY = 895.95f;
+    inline constexpr float footSerialRight = 1166.0f;   // right-aligned: 1075.5 + 90.5
+
+    /** Section 9. The foot used to read "BYPASS · v…", borrowed from Chorus-60 where the footer is a
+        live readout that flips between ENGAGED and BYPASS. Fifth Member has no bypass parameter and
+        no disengaged state, so the word permanently announced a state that does not exist on a unit
+        passing audio. It is a static serial now. **Do not add a bypass to justify a caption** - if
+        one is ever added it gets BRAND.md's lighting treatment, not a printed word. */
+    inline constexpr const char* footSerial = "SN 0417";
+
+    // --- printed scales ------------------------------------------------------
+    //
+    // A tick is drawn at every printed numeral AND NOWHERE ELSE, and minors fall on real values too
+    // (section 4.2a). What this replaced was a fixed-pitch decorative ring: a full 360 degrees at
+    // 27 degree pitch, unrelated to the 270 the pointer sweeps, which put marks below the horizontal
+    // at both ends of the arc, left a 36 degree seam sitting under the pointer at centre value on
+    // the 62 and 66 px knobs, and printed a mark at +135 with no twin at -135.
+    //
+    // ANGLES ARE NOT STORED HERE. They are computed from the bound parameter's own
+    // NormalisableRange at draw time - the same call the pointer uses - so a ring cannot drift from
+    // the taper it legends, and changing a range moves its scale with it. Three of these are skewed
+    // (TIME, MOD RATE, DAMPING) and their marks are therefore visibly uneven, which is correct.
+
+    struct ScaleMark
+    {
+        float value;
+        const char* printed;   // nullptr = a minor tick with no numeral
+        bool major;
+    };
+
+    struct KnobScale
+    {
+        const ScaleMark* marks;
+        int count;
+
+        /** True once the plate bakes this ring, at which point the build must stop drawing it or it
+            double-prints at a one-pixel offset. False for every ring today: the plate specified in
+            build-handoff section 1 has not been delivered, so the build draws all of them. Dial 1's
+            two rings stay false permanently - they light and dim per mode, and baked pixels cannot
+            change ink. */
+        bool bakedInPlate = false;
+    };
+
+    inline constexpr ScaleMark timeMarks[] {
+        {    1.0f, "1",    true }, {    5.0f, nullptr, false }, {   10.0f, "10",  true },
+        {   20.0f, nullptr, false }, {   50.0f, nullptr, false }, {  100.0f, "100", true },
+        {  200.0f, nullptr, false }, {  375.0f, "375", true }, {  500.0f, nullptr, false },
+        {  750.0f, nullptr, false }, { 1000.0f, "1K",  true }, { 1500.0f, nullptr, false },
+        { 2000.0f, "2K",   true } };
+
+    inline constexpr ScaleMark dampingMarks[] {
+        {  1000.0f, "1K",  true }, {  2000.0f, "2K", true }, {  3000.0f, nullptr, false },
+        {  4000.0f, "4K",  true }, {  6000.0f, nullptr, false }, {  8000.0f, "8K", true },
+        { 12000.0f, nullptr, false }, { 16000.0f, "16K", true } };
+
+    /** 0 / 50 / 100 labelled, 25 and 75 as minors - used where the body is too small to carry five
+        numerals without them touching (SATURATION, CROSS-FEED, section 4.4). */
+    inline constexpr ScaleMark percentSparseMarks[] {
+        { 0.0f, "0", true }, { 25.0f, nullptr, false }, { 50.0f, "50", true },
+        { 75.0f, nullptr, false }, { 100.0f, "100", true } };
+
+    /** All five labelled - MIX, and the three Delay Character dials' percent rings. */
+    inline constexpr ScaleMark percentFullMarks[] {
+        { 0.0f, "0", true }, { 25.0f, "25", true }, { 50.0f, "50", true },
+        { 75.0f, "75", true }, { 100.0f, "100", true } };
+
+    /** Feedback runs to 110 %, which is what makes it self-oscillate. The end stop is a minor with
+        no numeral: it is a real value the knob reaches, but printing "110" next to "100" on an 84 px
+        body crowds both. */
+    inline constexpr ScaleMark feedbackMarks[] {
+        {   0.0f, "0",   true }, {  20.0f, "20",  true }, {  40.0f, "40",  true },
+        {  60.0f, "60",  true }, {  80.0f, "80",  true }, { 100.0f, "100", true },
+        { 110.0f, nullptr, false } };
+
+    /** OUTPUT TRIM is recut against the BUILD's range, -24..+24 dB, not the handoff section 4.4
+        table's -24..+12. Printing that table would put 0 dB at +45 degrees where the pointer reaches
+        it at 0 - every numeral on the ring would name a rotation the knob does not have. Raised with
+        the designers; the parameter is unchanged.
+     
+        Labels are explicit strings so "+12" and "+24" keep their leading plus: it is a bipolar dB
+        scale, the sign is the convention, and the LCD formats the same parameter as "+2.5 dB". */
+    inline constexpr ScaleMark trimMarks[] {
+        { -24.0f, "-24", true }, { -18.0f, nullptr, false }, { -12.0f, "-12", true },
+        {  -6.0f, nullptr, false }, {   0.0f, "0",  true }, {   6.0f, nullptr, false },
+        {  12.0f, "+12", true }, {  18.0f, nullptr, false }, {  24.0f, "+24", true } };
+
+    /** Dial 1's outer arc in BBD - Mod Rate, skewed, so these are visibly uneven (section 4.5). */
+    inline constexpr ScaleMark modRateMarks[] {
+        { 0.1f, "0.1", true }, { 0.25f, nullptr, false }, { 0.5f, "0.5", true },
+        { 1.0f, "1",   true }, { 1.5f, nullptr, false }, { 2.0f, "2",   true },
+        { 3.0f, "3",   true }, { 4.0f, nullptr, false }, { 5.0f, "5",   true } };
+
+    template <int N>
+    inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N]) { return { m, N, false }; }
+
+    /** Section 4.2a geometry. Both rings end on a common outer tip so the eye reads one arc. */
+    inline constexpr float tickMajorInner = 8.0f, tickMajorOuter = 17.0f, tickMajorWidth = 2.0f;
+    inline constexpr float tickMinorInner = 12.0f, tickMinorOuter = 17.0f, tickMinorWidth = 1.5f;
+    inline constexpr float numeralClearance = 21.0f;   // inner edge of every numeral box
+    inline constexpr float numeralHalfCap = 5.0f;
+    inline constexpr float numeralSize = 10.0f, numeralTracking = 0.06f;
+
+    /** Dial 1's outer Hz arc. It clears the INNER ring's numerals by their outer extent, not by
+        their inner edge - numerals are anchored by the edge facing the dial, so a three-character
+        label reaches much further out than its anchor suggests. At R=38 the widest inner label,
+        "100", reaches radius 77.3, so the outer ticks cannot begin before ~R+43; they begin at R+44
+        (radius 82), clearing by 4.7 px. An earlier revision placed them at R+30 and drove a
+        7.7 x 6.9 px collision between "100" and an outer tick. */
+    inline constexpr float outerTickInner = 44.0f, outerTickOuter = 53.0f;
+    inline constexpr float outerNumeralClearance = 57.0f;
 
     // --- knobs ---------------------------------------------------------------
     inline constexpr float knobArcStartDegrees = -135.0f;
@@ -498,19 +664,19 @@ namespace Layout
 
     inline const KnobVariant knob62 { 62.0f, 2.0f, 24.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
-                                      juce::Colour (0xFF121110), Colour::tickMark, 620.0f };
+                                      juce::Colour (0xFF121110), Colour::scaleTick, 620.0f };
     inline const KnobVariant knob66 { 66.0f, 2.0f, 26.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
-                                      juce::Colour (0xFF121110), Colour::tickMark, 620.0f };
+                                      juce::Colour (0xFF121110), Colour::scaleTick, 620.0f };
     inline const KnobVariant knob76 { 76.0f, 2.5f, 30.0f, 7.0f, -11.0f, 0.64f, 0.76f, 24.0f, 1.3f,
                                       juce::Colour (0xFF514E46), juce::Colour (0xFF282621),
-                                      juce::Colour (0xFF121110), Colour::tickMarkMid, 660.0f };
+                                      juce::Colour (0xFF121110), Colour::scaleTick, 660.0f };
     inline const KnobVariant knob82 { 82.0f, 3.0f, 32.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
-                                      juce::Colour (0xFF131210), Colour::tickMarkLarge, 620.0f };
+                                      juce::Colour (0xFF131210), Colour::scaleTick, 620.0f };
     inline const KnobVariant knob84 { 84.0f, 3.0f, 33.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
-                                      juce::Colour (0xFF131210), Colour::tickMarkLarge, 620.0f };
+                                      juce::Colour (0xFF131210), Colour::scaleTick, 620.0f };
 
     inline const KnobVariant& variantFor (KnobSize s)
     {

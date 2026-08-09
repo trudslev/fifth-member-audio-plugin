@@ -1,5 +1,9 @@
 # Handoff: Fifth Member — Tempo-Synced Delay (plugin panel + product icon)
 
+> **Build handoff — start at `BUILD-HANDOFF.md`.** It is authoritative for the build and supersedes any conflicting figure here or in `GUI-SPEC.md`: per-element asset format, LED and multi-label state tables, the three Delay Character pages, per-knob mark and tick tables, scope plot-vs-display bounds, the PROGRAM LCD character budget, the four tape elements, the full palette with measured ratios, bypass, and what stays unchanged.
+>
+> `GUI-SPEC.md` remains as the record of the conformance pass and its reasoning.
+
 ## Overview
 **Fifth Member** is a tempo-synced stereo delay plugin, model **DL-88**, part of the Neon Foundry suite
 (alongside Gatecrasher, Chorus-60, and Reflect-84). This bundle covers two deliverables:
@@ -249,7 +253,7 @@ behind their own rule.
 ## Foot strip
 - **Recessed label window** — padding \`4px 12px 5px\`, background \`linear-gradient(180deg,#0a0a09,#141312)\`, border \`1px solid #33312b\`, inset \`0 2px 6px rgba(0,0,0,.8)\` + \`0 1px 0 rgba(255,255,255,.06)\`. Text in **Special Elite** 11 px, letter-spacing .10em, \`#a09883\`: \`CH 4 — GTR / STAGE LEFT\`.
 - \`DL-88 · TOURING SPEC · 5U\` — Barlow Condensed 600, 10 px, letter-spacing .26em, \`#57534c\`.
-- Right-aligned \`BYPASS · v1.0\` — same style.
+- Right-aligned \`SN 0417 · v1.0\` — same style. Serial number, static; **not** a state readout. Fifth Member has no bypass control, so no state word is printed here.
 
 ---
 
@@ -561,4 +565,4 @@ Concept 1b — Repeat Train.
 | `icons/fifth-member-icon-1024.png` | 1024×1024 | Large Icon |
 | `icons/fifth-member-icon-256.png` | 256×256 | Small Icon |
 
-PNG with alpha; the rounded-square corners are transparent, so JUCE/macOS masking will not double-round it. Source of truth is `IconPulse.dc.html` (256px design) — re-render at any multiple from there. Below 24px, drop the `1/8D` / `5M` readout line per the simplification rule.
+PNG with alpha; the rounded-square corners are transparent, so JUCE/macOS masking will not double-round it. Source of truth is `IconPulse.dc.html` (256px design) — re-render at any multiple from there. The readout text has been removed; the decay train is vertically centred, so the mark reads cleanly at every size with no simplification variant needed.

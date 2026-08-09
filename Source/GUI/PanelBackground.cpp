@@ -567,7 +567,11 @@ void PanelBackground::paintFoot (juce::Graphics& g)
                        { Layout::footSpecX, Layout::footTextY, 400.0f, 12.5f },
                        juce::Justification::left, Colour::labelFaintest);
 
-    Text::drawTracked (g, "BYPASS " + dot + " v" NF_VERSION_SHORT, footFont, footTracking,
+    // Section 9: a static serial, not a state. NF_VERSION_SHORT rather than the spec's literal
+    // "v1.0" - the project is at 0.1.0, so hard-coding 1.0 would print a version that does not
+    // exist, and the macro reaches 1.0 on its own when the project does.
+    Text::drawTracked (g, juce::String (Layout::footSerial) + " " + dot + " v" NF_VERSION_SHORT,
+                       footFont, footTracking,
                        { Layout::headerContentX, Layout::footTextY, Layout::headerContentW, 12.5f },
                        juce::Justification::right, Colour::labelFaintest);
 }

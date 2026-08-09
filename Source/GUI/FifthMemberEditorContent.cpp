@@ -16,7 +16,31 @@ namespace
         duplicating Dial 1, and duplicate controls on a hardware panel read as a fault. Keeping its
         own parameter also matches the persistence model: turning it edits the value that will be
         in effect when that mode comes back. */
-    const char* dialParameterFor (int dial, int character)
+    /** The printed scale each fixed knob carries. Kept beside the knob table rather than inside
+    KnobVariant because a variant is a SIZE - two knobs can share a body and print different rings,
+    as TIME and DAMPING do at 66px. */
+const FifthMemberTheme::Layout::KnobScale* scaleForParameter (const juce::String& id)
+{
+    using namespace FifthMemberTheme::Layout;
+    static const KnobScale time    = scaleOf (timeMarks);
+    static const KnobScale damping = scaleOf (dampingMarks);
+    static const KnobScale sparse  = scaleOf (percentSparseMarks);
+    static const KnobScale full    = scaleOf (percentFullMarks);
+    static const KnobScale fb      = scaleOf (feedbackMarks);
+    static const KnobScale trim    = scaleOf (trimMarks);
+
+    if (id == ParamIDs::timeMs)     return &time;
+    if (id == ParamIDs::damping)    return &damping;
+    if (id == ParamIDs::feedback)   return &fb;
+    if (id == ParamIDs::outputTrim) return &trim;
+    if (id == ParamIDs::mix)        return &full;
+    // SATURATION and CROSS-FEED sit on smaller bodies, so 25 and 75 stay unlabelled to keep the
+    // numerals off each other (section 4.4).
+    if (id == ParamIDs::saturation || id == ParamIDs::crossFeed) return &sparse;
+    return nullptr;
+}
+
+const char* dialParameterFor (int dial, int character)
     {
         switch (dial)
         {
@@ -65,6 +89,7 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
     {
         auto knob = std::make_unique<FifthMemberKnob> (specs[i].size);
         knob->setCentrePosition (specs[i].centre);
+        knob->setScale (scaleForParameter (specs[i].paramID));
 
         if (auto* param = processorRef.apvts.getParameter (specs[i].paramID))
             knob->setDoubleClickReturnValue (true, param->convertFrom0to1 (param->getDefaultValue()));
@@ -83,6 +108,17 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
     {
         auto dial = std::make_unique<FifthMemberKnob> (Layout::KnobSize::dial76);
         dial->setCentrePosition ({ Layout::dialCentreX[i], Layout::dialCentreY });
+
+        // Dial 1 alone carries a second ring. Its inner arc legends a percentage (Wow in Tape,
+        // Repeat Degrade in Digital) and its outer one a frequency (Mod Rate in BBD); a percentage
+        // and a frequency cannot share numerals - 1 Hz sits at 0 degrees where the percent ring
+        // prints 50 - so both are permanently printed at different radii and each lights or dims
+        // with the mode, exactly as the stacked labels do. Section 4.5.
+        static const Layout::KnobScale dialPercent = Layout::scaleOf (Layout::percentFullMarks);
+        static const Layout::KnobScale dialHz      = Layout::scaleOf (Layout::modRateMarks);
+        dial->setScale (&dialPercent);
+        if (i == 0)
+            dial->setOuterScaleAndResize (&dialHz, { Layout::dialCentreX[i], Layout::dialCentreY });
         addAndMakeVisible (*dial);
         dials[i] = std::move (dial);
     }
@@ -112,6 +148,10 @@ void FifthMemberEditorContent::bindDials (int character)
 {
     boundCharacter = character;
 
+    // Section 4.5: dial 1's outer Hz arc is the live ring in BBD and the dim one elsewhere; the
+    // inner percent arc is the reverse. Exactly one of the two reads as current at any time.
+    dials[0]->setOuterRingLit (character == 1);
+
     for (size_t i = 0; i < dials.size(); ++i)
     {
         const auto* id = dialParameterFor ((int) i, character);
@@ -119,6 +159,15 @@ void FifthMemberEditorContent::bindDials (int character)
         // Release the old attachment BEFORE making the new one: two live attachments on one
         // Slider would both write to their parameters on the next change.
         dialAttachments[i].reset();
+
+        if (id == nullptr)
+        {
+            // Unassigned in this mode. No attachment, so the knob turns a value that goes nowhere -
+            // and crucially writes nothing to the APVTS. Re-binding on the next mode change pulls it
+            // back to that parameter's stored value, which the slew then animates.
+            dials[i]->setDoubleClickReturnValue (false, 0.0);
+            continue;
+        }
 
         if (auto* param = processorRef.apvts.getParameter (id))
             dials[i]->setDoubleClickReturnValue (true, param->convertFrom0to1 (param->getDefaultValue()));

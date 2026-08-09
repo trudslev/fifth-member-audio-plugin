@@ -221,7 +221,12 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
     {
         // Skewed so the short end - where a few ms genuinely matter - gets most of the travel.
         // 375 ms lands near the middle of the knob rather than a fifth of the way up.
-        Range range { Timing::minDelayMs, Timing::maxDelayMs, 1.0f };
+        // Interval 0, not 1 ms. Measured against this skew, one millisecond is 11.68 degrees of
+        // rotation at 1 ms and 0.056 degrees at 2000: quantising to whole milliseconds makes 1.5 or
+        // 2.5 ms unreachable exactly where short-delay comb effects need the resolution, while at
+        // the long end the step is far finer than the knob can be aimed and buys nothing. The LCD
+        // formats one decimal below 10 ms and whole milliseconds above.
+        Range range { Timing::minDelayMs, Timing::maxDelayMs, 0.0f };
         range.setSkewForCentre (375.0f);
         addFloat (ParamIDs::timeMs, "Time", range, ParamDefaults::timeMs, "ms");
     }
