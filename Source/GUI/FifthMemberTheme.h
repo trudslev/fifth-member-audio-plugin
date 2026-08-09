@@ -66,6 +66,9 @@ namespace Colour
     inline const juce::Colour lcdBorder       { 0xFF2A2823 };
     inline const juce::Colour lcdText         { 0xFFCFD8CB };
     inline const juce::Colour lcdTextDim      { 0xFF9FB2A2 };
+    /** Section 8.2: 9.69:1 on the LCD substrate. Only the bank tag was promoted to the program
+        name's treatment; the chevron keeps this dimmer green. */
+    inline const juce::Colour lcdChevron      { 0xFFA9BDA9 };
     inline const juce::Colour listBg          { 0xFF060D09 };
     inline const juce::Colour meterBg         { 0xFF05080A };
     inline const juce::Colour meterText       { 0xFFB9C3C8 };
@@ -82,8 +85,29 @@ namespace Colour
     inline const juce::Colour scopePingMarker { juce::Colour::fromRGBA (200, 210, 200, 41) };  // .16
 
     // --- type ----------------------------------------------------------------
+    /** Section 8.2. Nearly every functional role resolves onto two values: #a8a294 at 7.36:1 for
+        panel text, #c3bcae at 9.91:1 for knob names. The old ramp (labelMid/labelDim/labelDimSoft/
+        labelFaint/...) had a dozen greys, several of which fell below the 7:1 floor for text that
+        is functional rather than flavour.
+
+        Four roles stay deliberately dimmer, and section 8.3 documents each: unlit multi-label rows
+        (2.82:1) and unselected mode-button labels (7.11:1), because an LED carries the state and
+        the brand rule forbids conveying relevance by dimming the control; dial 1's idle ring, the
+        same exception in a third place; and disabled DELETE (3.06:1), a disengaged control. */
     inline const juce::Colour labelBright     { 0xFFF0EADE };
     inline const juce::Colour label           { 0xFFC3BCAE };
+    inline const juce::Colour panelText       { 0xFFA8A294 };   // 7.36:1 - captions, headings, foot
+
+    /** Section 8.3's two documented exceptions, named so they read as deliberate rather than as
+        greys someone forgot to lift. Both stay dim BY DESIGN: an LED carries the state, and
+        BRAND.md forbids conveying relevance by dimming the control itself.
+
+        stackLabelUnlit is printed legend for the two modes a dial is not currently driving;
+        buttonLabelUnselected is deliberately below the 13.73:1 of a selected label, because it is
+        the pairing of a pressed face, a lit lamp and brighter text that marks selection. */
+    inline const juce::Colour stackLabelLit        { 0xFFE7E1D4 };   // 14.36:1
+    inline const juce::Colour stackLabelUnlit      { 0xFF615C54 };   //  2.82:1 - exception
+    inline const juce::Colour buttonLabelUnselected{ 0xFFB0AA9C };   //  7.11:1 - exception
     inline const juce::Colour labelMid        { 0xFFA49D92 };
     inline const juce::Colour labelMidAlt     { 0xFFA9A297 };
     inline const juce::Colour labelDim        { 0xFF857F75 };
@@ -359,6 +383,18 @@ inline constexpr float nameplateTextSize = 29.0f;
     inline constexpr float chevronH = 8.0f;
     inline constexpr float chevronStroke = 1.6f;
     inline constexpr float chevronPadX = 11.0f;
+
+    /** Section 6.2. 19px Share Tech Mono at .12em advances 12.54 px/char, so the 335.8px name cell
+        holds 26 - which is also the cap the build enforces on user Program names. Anything longer
+        steps to 16px (10.56 px/char, 31 characters) rather than overrunning. */
+    inline constexpr float lcdTextSize = 19.0f;
+    inline constexpr float lcdTextSizeGuard = 16.0f;
+    inline constexpr float lcdTracking = 0.12f;
+    inline constexpr int lcdCharacterBudget = 26;
+
+    /** Section 6.3: the live readout holds this long after the gesture ends, then the Program name
+        returns. Only direct manipulation starts it - host automation must never drive it. */
+    inline constexpr int lcdReadoutHoldMs = 900;
 
     inline constexpr float saveX = 827.0f;
     inline constexpr float saveW = 68.0f;

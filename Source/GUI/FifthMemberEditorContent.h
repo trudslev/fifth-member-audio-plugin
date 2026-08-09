@@ -79,5 +79,8 @@ private:
 
     void bindDials (int character);
 
+    /** Routes a control's own drag to the LCD's parameter readout (section 6.3). */
+    void attachReadout (juce::Slider& knob, const juce::String& paramID);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FifthMemberEditorContent)
 };

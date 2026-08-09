@@ -99,6 +99,8 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
         attachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (
             processorRef.apvts, specs[i].paramID, *knob);
 
+        attachReadout (*knob, specs[i].paramID);
+
         knobs[i] = std::move (knob);
         displayProportion[i] = knobs[i]->getDrawnProportion();
     }
@@ -150,6 +152,25 @@ FifthMemberEditorContent::~FifthMemberEditorContent()
 }
 
 //==============================================================================
+void FifthMemberEditorContent::attachReadout (juce::Slider& knob, const juce::String& paramID)
+{
+    auto* param = processorRef.apvts.getParameter (paramID);
+    if (param == nullptr)
+        return;
+
+    // Section 6.3: the LCD shows this control's value while it is being moved. GUARDED ON THE
+    // KNOB'S OWN DRAG STATE - a SliderAttachment also fires when a Program is applied and on every
+    // host automation step, and without the guard the readout latches onto whichever parameter was
+    // written last and flickers for the length of a song.
+    auto* raw = &knob;
+    knob.onValueChange = [this, raw, param]
+    {
+        if (raw->isMouseButtonDown())
+            programHeader.showParameter (*param);
+    };
+    knob.onDragEnd = [this] { programHeader.releaseParameter(); };
+}
+
 void FifthMemberEditorContent::bindDials (int character)
 {
     boundCharacter = character;
@@ -180,6 +201,8 @@ void FifthMemberEditorContent::bindDials (int character)
 
         dialAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (
             processorRef.apvts, id, *dials[i]);
+
+        attachReadout (*dials[i], id);
     }
 }
 

@@ -88,7 +88,7 @@ public:
     static juce::File getDefaultUserProgramDirectory();
     static juce::String getProgramFileExtension() { return ".fifthmemberprogram"; }
 
-    static constexpr int maxProgramNameLength = 22;
+    static constexpr int maxProgramNameLength = 26;   // section 6.2's measured cell budget
 
 private:
     void handleAsyncUpdate() override;

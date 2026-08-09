@@ -3,6 +3,7 @@ juce_add_console_app(FifthMemberTests PRODUCT_NAME "FifthMemberTests")
 target_sources(FifthMemberTests PRIVATE
     TestMain.cpp
     ProgramModelTests.cpp
+    PrintedScaleTests.cpp
     FactoryProgramsTests.cpp
     TimingEngineTests.cpp
     DelayCoreTests.cpp
@@ -20,7 +21,12 @@ target_compile_definitions(FifthMemberTests PRIVATE
     NF_COMPANY_NAME="${FIFTHMEMBER_COMPANY_NAME}"
     NF_PRODUCT_NAME="${FIFTHMEMBER_PRODUCT_NAME}")
 
+# FifthMemberBinaryData is linked so the tests can include FifthMemberTheme.h, which pulls in
+# BinaryData.h for the embedded fonts. PrintedScaleTests asserts the mark tables that live there -
+# the alternative was a second copy of every mark angle in the test, which is exactly the drift the
+# tables exist to prevent.
 target_link_libraries(FifthMemberTests PRIVATE
+    FifthMemberBinaryData
     juce::juce_dsp
     juce::juce_audio_basics
     juce::juce_audio_processors

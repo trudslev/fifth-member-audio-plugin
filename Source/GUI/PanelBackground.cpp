@@ -18,7 +18,7 @@ namespace
         g.fillRect (patch);
 
         Text::drawTracked (g, text, font, tracking, patch, juce::Justification::centred,
-                           Colour::labelDimAlt);
+                           Colour::panelText);
     }
 
     void drawPanelBox (juce::Graphics& g, juce::Rectangle<float> r, const juce::String& legend)
@@ -463,25 +463,25 @@ void PanelBackground::paintHeaderChrome (juce::Graphics& g)
 
     Text::drawTracked (g, "TEMPO-SYNCED DELAY", tagFont, tagTracking,
                        { Layout::taglineX, Layout::taglineY1, 400.0f, Layout::taglineLineHeight },
-                       juce::Justification::left, Colour::labelDimAlt);
+                       juce::Justification::left, Colour::panelText);
 
     Text::drawTracked (g, "MODEL DL-88 " + Text::middleDot() + " STEREO", tagFontMedium, tagTracking,
                        { Layout::taglineX, Layout::taglineY2, 400.0f, Layout::taglineLineHeight },
-                       juce::Justification::left, Colour::labelFaint);
+                       juce::Justification::left, Colour::panelText);
 
     Text::drawTracked (g, "PROGRAM", Font::label (10.0f), Font::trackingPx (0.28f, 10.0f),
                        { Layout::programLabelX, Layout::programLabelY, 200.0f, 12.5f },
-                       juce::Justification::left, Colour::labelDimSoft);
+                       juce::Justification::left, Colour::panelText);
 
     const auto captionFont = Font::label (10.0f);
     const float captionTracking = Font::trackingPx (0.26f, 10.0f);
 
     Text::drawTracked (g, "IN", captionFont, captionTracking,
                        { Layout::meterInX, Layout::meterCaptionY, Layout::meterBoxW, 12.5f },
-                       juce::Justification::centred, Colour::labelDimSoft);
+                       juce::Justification::centred, Colour::panelText);
     Text::drawTracked (g, "OUT", captionFont, captionTracking,
                        { Layout::meterOutX, Layout::meterCaptionY, Layout::meterBoxW, 12.5f },
-                       juce::Justification::centred, Colour::labelDimSoft);
+                       juce::Justification::centred, Colour::panelText);
 
     g.setColour (Colour::headerRule);
     g.fillRect (Layout::fasciaContentX, Layout::headerRuleY, Layout::fasciaContentW, 1.0f);
@@ -494,7 +494,7 @@ void PanelBackground::paintHeaderChrome (juce::Graphics& g)
     Text::drawTracked (g, "REPEAT TIMELINE", Font::label (11.0f), Font::trackingPx (0.24f, 11.0f),
                        { Layout::headerContentX, Layout::scopeCaptionY,
                          Layout::headerContentW, Layout::scopeCaptionH },
-                       juce::Justification::right, Colour::scopeCaption);
+                       juce::Justification::right, Colour::panelText);
 }
 
 void PanelBackground::paintPanelChrome (juce::Graphics& g)
@@ -514,24 +514,24 @@ void PanelBackground::paintStaticLabels (juce::Graphics& g)
 {
     // Knob captions. No LED belongs to any of these except TIME and CROSS-FEED, whose lamps are
     // drawn live by PanelControls; the text itself never changes.
-    drawKnobCaption (g, "FEEDBACK", Layout::feedbackKnobCentre.x, Layout::repeatsLabelY, Colour::labelMidAlt);
-    drawKnobCaption (g, "MIX", Layout::mixKnobCentre.x, Layout::outputLabelY, Colour::labelMidAlt);
+    drawKnobCaption (g, "FEEDBACK", Layout::feedbackKnobCentre.x, Layout::repeatsLabelY, Colour::label);
+    drawKnobCaption (g, "MIX", Layout::mixKnobCentre.x, Layout::outputLabelY, Colour::label);
     drawKnobCaption (g, "OUTPUT TRIM", Layout::trimKnobCentre.x, Layout::outputLabelY);
     drawKnobCaption (g, "DAMPING", Layout::dampingKnobCentre.x, Layout::sharedLabelY);
     drawKnobCaption (g, "SATURATION", Layout::saturationKnobCentre.x, Layout::sharedLabelY);
 
     Text::drawTracked (g, "NOTE DIVISION", Font::label (10.0f), Font::trackingPx (0.24f, 10.0f),
                        { Layout::divisionLabelX, Layout::divisionLabelY, 200.0f, 12.5f },
-                       juce::Justification::left, Colour::labelMid);
+                       juce::Justification::left, Colour::panelText);
 
     Text::drawTracked (g, "STEREO MODE", Font::label (10.0f), Font::trackingPx (0.24f, 10.0f),
                        { Layout::stereoLabelX, Layout::stereoLabelY, 200.0f, 12.5f },
-                       juce::Justification::left, Colour::scopeCaption);
+                       juce::Justification::left, Colour::panelText);
 
     Text::drawTracked (g, "CHARACTER " + Text::middleDot() + " ALL MODES",
                        Font::label (10.0f), Font::trackingPx (0.24f, 10.0f),
                        { Layout::sharedHeadingX, Layout::sharedHeadingY, 250.0f, 12.5f },
-                       juce::Justification::left, Colour::labelFaint);
+                       juce::Justification::left, Colour::panelText);
 }
 
 void PanelBackground::paintFoot (juce::Graphics& g)
@@ -557,7 +557,7 @@ void PanelBackground::paintFoot (juce::Graphics& g)
 
     Text::drawTracked (g, channelText, stencilFont, stencilTracking,
                        { Layout::footWindowTextX, Layout::footWindowTextY, textWidth + 4.0f, 15.2f },
-                       juce::Justification::left, Colour::footLabel);
+                       juce::Justification::left, Colour::panelText);
 
     const auto footFont = Font::label (10.0f);
     const float footTracking = Font::trackingPx (0.26f, 10.0f);
@@ -565,7 +565,7 @@ void PanelBackground::paintFoot (juce::Graphics& g)
 
     Text::drawTracked (g, "DL-88 " + dot + " TOURING SPEC " + dot + " 5U", footFont, footTracking,
                        { Layout::footSpecX, Layout::footTextY, 400.0f, 12.5f },
-                       juce::Justification::left, Colour::labelFaintest);
+                       juce::Justification::left, Colour::panelText);
 
     // Section 9: a static serial, not a state. NF_VERSION_SHORT rather than the spec's literal
     // "v1.0" - the project is at 0.1.0, so hard-coding 1.0 would print a version that does not
@@ -573,5 +573,5 @@ void PanelBackground::paintFoot (juce::Graphics& g)
     Text::drawTracked (g, juce::String (Layout::footSerial) + " " + dot + " v" NF_VERSION_SHORT,
                        footFont, footTracking,
                        { Layout::headerContentX, Layout::footTextY, Layout::headerContentW, 12.5f },
-                       juce::Justification::right, Colour::labelFaintest);
+                       juce::Justification::right, Colour::panelText);
 }

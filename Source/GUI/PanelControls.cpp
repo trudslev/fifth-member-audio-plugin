@@ -257,7 +257,7 @@ void PanelControls::paintSyncSwitch (juce::Graphics& g, bool sync)
     Text::drawTracked (g, sync ? "SYNC ON" : "SYNC OFF",
                        Font::label (11.0f), Font::trackingPx (0.22f, 11.0f),
                        { Layout::syncCaptionX, Layout::syncCaptionY, 200.0f, 13.75f },
-                       juce::Justification::left, Colour::labelMid);
+                       juce::Justification::left, Colour::panelText);
 }
 
 void PanelControls::paintDivisionRow (juce::Graphics& g, bool, int division)
@@ -281,7 +281,7 @@ void PanelControls::paintDivisionRow (juce::Graphics& g, bool, int division)
         Paint::drawLed (g, { ledX, r.getCentreY() }, Layout::ledStandard - 1.0f, selected);
 
         g.setFont (font);
-        g.setColour (selected ? Colour::labelBright : Colour::labelDim);
+        g.setColour (selected ? Colour::labelBright : Colour::buttonLabelUnselected);
         g.drawText (Timing::divisionLabel (i),
                     r.withTrimmedLeft (16.0f), juce::Justification::centred, false);
     }
@@ -303,7 +303,7 @@ void PanelControls::paintStereoRow (juce::Graphics& g, int stereoMode)
         Text::drawTracked (g, stereoNames[(size_t) i], Font::label (11.0f),
                            Font::trackingPx (0.18f, 11.0f),
                            r.withTrimmedLeft (24.0f), juce::Justification::centred,
-                           selected ? Colour::labelBright : Colour::labelDim);
+                           selected ? Colour::labelBright : Colour::buttonLabelUnselected);
     }
 }
 
@@ -325,7 +325,7 @@ void PanelControls::paintCharacterColumn (juce::Graphics& g, int character)
                            Font::trackingPx (0.24f, Layout::modeLabelSize),
                            { Layout::modeLabelX, r.getCentreY() - 9.0f, 120.0f, 18.0f },
                            juce::Justification::left,
-                           selected ? Colour::labelBright : Colour::labelDim);
+                           selected ? Colour::labelBright : Colour::buttonLabelUnselected);
     }
 }
 
@@ -364,7 +364,7 @@ void PanelControls::paintDialLabels (juce::Graphics& g, int character)
             Text::drawTracked (g, text, font, tracking,
                                { stackX + Layout::dialLabelTextOffsetX, rowY, widest + 4.0f, 12.5f },
                                juce::Justification::left,
-                               lit ? juce::Colour (0xFFE7E1D4) : Colour::labelFainter);
+                               lit ? Colour::stackLabelLit : Colour::stackLabelUnlit);
         }
     }
 }

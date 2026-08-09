@@ -69,7 +69,10 @@ bool ProgramHeader::isEnabled (Region region) const
 
     switch (region)
     {
-        case Region::display:        return true;
+        // Not while naming: opening the list then would apply a Program underneath a
+        // half-typed name, leaving a stale field over a Program that never had it. TapeRot has
+        // this bug; it is not worth replicating.
+        case Region::display:        return ! namingMode;
         case Region::save:           return displayedIsModified;
         case Region::deleteOrCancel: return ! displayedIsFactory;
         case Region::none:           break;
@@ -107,6 +110,14 @@ bool ProgramHeader::refreshFromProcessor()
 void ProgramHeader::timerCallback()
 {
     bool needsRepaint = refreshFromProcessor();
+
+    // The live readout reverts on its own clock rather than a second timer (section 6.3).
+    if (readoutRevertAtMs != 0 && juce::Time::getMillisecondCounter() >= readoutRevertAtMs)
+    {
+        readoutRevertAtMs = 0;
+        liveReadout.clear();
+        needsRepaint = true;
+    }
 
     if (namingMode)
         if (const bool on = caretIsOn(); on != caretVisible)
@@ -184,7 +195,7 @@ void ProgramHeader::showProgramMenu()
     auto& manager = processorRef.getProgramManager();
 
     juce::PopupMenu menu;
-    menu.setLookAndFeel (&getLookAndFeel());
+    menu.setLookAndFeel (&menuLookAndFeel);
 
     const int current = manager.getCurrentProgram();
     const int total = manager.getNumPrograms();
@@ -222,6 +233,9 @@ void ProgramHeader::showProgramMenu()
 
 void ProgramHeader::enterNamingMode()
 {
+    liveReadout.clear();
+    readoutRevertAtMs = 0;
+
     namingMode = true;
     typedName.clear();
     caretVisible = true;
@@ -335,6 +349,45 @@ void ProgramHeader::paintMeters (juce::Graphics& g)
 }
 
 //==============================================================================
+juce::String ProgramHeader::currentLcdString() const
+{
+    if (liveReadout.isNotEmpty())
+        return liveReadout;
+
+    return juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName;
+}
+
+void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)
+{
+    if (namingMode)
+        return;   // the glass belongs to the name field until it commits or cancels
+
+    // Straight through the parameter's own name and JUCE's own text conversion, so the LCD and the
+    // host never disagree about what a control reads. Section 6.3's examples set the shape:
+    // "FEEDBACK: 62 %", "TIME: 375 ms", "OUTPUT TRIM: +2.5 dB".
+    const auto name = param.getName (Layout::lcdCharacterBudget).toUpperCase();
+    // Name, value, unit - section 6.3's "FEEDBACK: 62 %", "TIME: 375 ms". The label is joined here
+    // rather than baked into the value text so JUCE's own generic editor does not double it.
+    const auto unit = param.getLabel();
+    const auto text = name + ": " + param.getCurrentValueAsText()
+                    + (unit.isEmpty() ? juce::String() : " " + unit);
+
+    if (text != liveReadout)
+    {
+        liveReadout = text;
+        repaint();
+    }
+
+    readoutRevertAtMs = 0;
+}
+
+void ProgramHeader::releaseParameter()
+{
+    if (liveReadout.isNotEmpty())
+        readoutRevertAtMs = juce::Time::getMillisecondCounter()
+                                + (juce::uint32) Layout::lcdReadoutHoldMs;
+}
+
 void ProgramHeader::paint (juce::Graphics& g)
 {
     const auto display = displayArea();
@@ -354,9 +407,11 @@ void ProgramHeader::paint (juce::Graphics& g)
 
         const juce::Rectangle<float> tag { display.getX(), display.getY(), Layout::bankTagW, display.getHeight() };
 
-        g.setFont (Font::mono (14.0f));
-        g.setColour (Colour::lcdTextDim);
-        g.drawText (showUser ? "USER" : "FACT", tag, juce::Justification::centred, false);
+        // Section 6.2: identical to the program name in face, size, tracking and colour. It sits
+        // inside a display, so it is display text - it is no longer set smaller and dimmer.
+        Text::drawTracked (g, showUser ? "USER" : "FACT", Font::mono (Layout::lcdTextSize),
+                            Font::trackingPx (Layout::lcdTracking, Layout::lcdTextSize),
+                            tag, juce::Justification::centred, Colour::lcdText);
 
         g.setColour (juce::Colours::white.withAlpha (0.09f));
         g.fillRect (tag.getRight(), display.getY() + 4.0f, 1.0f, display.getHeight() - 8.0f);
@@ -364,11 +419,18 @@ void ProgramHeader::paint (juce::Graphics& g)
 
     // --- the name, or the naming field ---------------------------------------
     {
-        const auto nameArea = display.withTrimmedLeft (Layout::bankTagW)
-                                     .withTrimmedRight (Layout::caretW);
+        const auto nameArea = juce::Rectangle<float> (Layout::lcdNameCellX, display.getY(),
+                                                       Layout::lcdNameCellW, display.getHeight());
 
-        const auto font = Font::mono (19.0f);
-        const float tracking = Font::trackingPx (0.14f, 19.0f);
+        // Section 6.2's guard: 19px holds 26 characters in this cell at 12.54 px/char. Nothing
+        // authored reaches that - the longest live readout, "GENERATION LOSS: 100 %", is 22 - but a
+        // user program name can, so anything longer steps to 16px rather than overrunning the cell.
+        // The step is instantaneous; there is no animation between the two sizes.
+        const juce::String longest = namingMode ? typedName : currentLcdString();
+        const float size = longest.length() > Layout::lcdCharacterBudget ? Layout::lcdTextSizeGuard
+                                                                          : Layout::lcdTextSize;
+        const auto font = Font::mono (size);
+        const float tracking = Font::trackingPx (Layout::lcdTracking, size);
 
         const auto drawPhosphor = [&] (const juce::String& text, juce::Justification justification)
         {
@@ -387,24 +449,29 @@ void ProgramHeader::paint (juce::Graphics& g)
         }
         else
         {
-            drawPhosphor (juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName,
-                          juce::Justification::centred);
+            drawPhosphor (currentLcdString(), juce::Justification::centred);
         }
     }
 
-    // --- caret ---------------------------------------------------------------
+    // --- chevron: section 6.4's drawn path -----------------------------------
+    //
+    // "M1 1.6 L7 6.4 L13 1.6" in a 14 x 8 viewBox, scaled to that box and stroked at 1.6 with round
+    // caps and joins - built as a Path rather than a typographic glyph so it renders identically
+    // across platforms and font fallbacks. It marks the window as a picker, so it is hidden while
+    // naming: there is nothing to pick then.
     if (! namingMode)
     {
-        const float cx = display.getRight() - 18.0f;
-        const float cy = display.getCentreY() - 1.0f;
+        const float left = display.getRight() - Layout::chevronPadX - Layout::chevronW;
+        const float top = display.getCentreY() - Layout::chevronH * 0.5f;
 
         juce::Path chevron;
-        chevron.startNewSubPath (cx - 5.0f, cy - 2.0f);
-        chevron.lineTo (cx, cy + 3.5f);
-        chevron.lineTo (cx + 5.0f, cy - 2.0f);
+        chevron.startNewSubPath (left + 1.0f,  top + 1.6f);
+        chevron.lineTo          (left + 7.0f,  top + 6.4f);
+        chevron.lineTo          (left + 13.0f, top + 1.6f);
 
-        g.setColour (juce::Colour (0xFF6F7A70));
-        g.strokePath (chevron, { 1.6f, juce::PathStrokeType::curved, juce::PathStrokeType::square });
+        g.setColour (Colour::lcdChevron);
+        g.strokePath (chevron, { Layout::chevronStroke,
+                                  juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
     }
 
     paintButton (g, saveArea(), namingMode ? "STORE" : "SAVE",

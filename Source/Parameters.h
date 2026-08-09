@@ -202,12 +202,32 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
 
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
+    // withLabel() alone only feeds getLabel(); it does NOT change getText(), so a parameter left at
+    // JUCE's default renders through juce::String(float) at full precision - "64.0" where the panel
+    // and the host should both read "64". The LCD's live readout (section 6.3) joins the name, this
+    // text and the label, and a host's automation lane shows the same string.
+    //
+    // The unit stays in the label rather than the text so the two are not doubled up when JUCE's own
+    // generic editor appends it - except for Hz, where the unit is value-dependent.
     const auto addFloat = [&params] (const char* id, const juce::String& name,
                                      Range range, float defaultValue, const juce::String& unit)
     {
+        auto attrs = Attributes().withLabel (unit);
+
+        if (unit == "%")
+            attrs = attrs.withStringFromValueFunction ([] (float v, int) { return juce::String (juce::roundToInt (v)); });
+        else if (unit == "dB")
+            attrs = attrs.withStringFromValueFunction ([] (float v, int)
+                                                        { return (v >= 0.0f ? "+" : "") + juce::String (v, 1); });
+        else if (unit == "ms")
+            // One decimal below 10 ms, whole milliseconds above: with the interval now continuous,
+            // the short end is where sub-millisecond resolution is both reachable and audible.
+            attrs = attrs.withStringFromValueFunction ([] (float v, int)
+                                                        { return v < 10.0f ? juce::String (v, 1)
+                                                                           : juce::String (juce::roundToInt (v)); });
+
         params.push_back (std::make_unique<juce::AudioParameterFloat> (
-            juce::ParameterID { id, 1 }, name, range, defaultValue,
-            Attributes().withLabel (unit)));
+            juce::ParameterID { id, 1 }, name, range, defaultValue, attrs));
     };
 
     // --- TIMING --------------------------------------------------------------
@@ -254,7 +274,10 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
     {
         Range range { 0.1f, 5.0f, 0.01f };
         range.setSkewForCentre (1.0f);
-        addFloat (ParamIDs::modRate, "Mod Rate", range, ParamDefaults::modRate, "Hz");
+        params.push_back (std::make_unique<juce::AudioParameterFloat> (
+            juce::ParameterID { ParamIDs::modRate, 1 }, "Mod Rate", range, ParamDefaults::modRate,
+            Attributes().withLabel ("Hz")
+                        .withStringFromValueFunction ([] (float v, int) { return juce::String (v, 2); })));
     }
 
     addFloat (ParamIDs::modDepth, "Mod Depth",      Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::modDepth, "%");
@@ -267,7 +290,12 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
         // delay is a filter.
         Range range { 1000.0f, 16000.0f, 1.0f };
         range.setSkewForCentre (4000.0f);
-        addFloat (ParamIDs::damping, "Damping", range, ParamDefaults::dampingHz, "Hz");
+        // Reads in kHz across its whole 1-16 kHz range, so the unit is in the text and the label is
+        // left empty - "6.0 kHz", never "6000 Hz", which is what the panel prints beside it.
+        params.push_back (std::make_unique<juce::AudioParameterFloat> (
+            juce::ParameterID { ParamIDs::damping, 1 }, "Damping", range, ParamDefaults::dampingHz,
+            Attributes().withStringFromValueFunction ([] (float v, int)
+                                                       { return juce::String (v / 1000.0f, 1) + " kHz"; })));
     }
 
     addFloat (ParamIDs::saturation, "Saturation", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::saturation, "%");

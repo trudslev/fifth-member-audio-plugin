@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "FifthMemberTheme.h"
+#include "FifthMemberMenuLookAndFeel.h"
 
 class FifthMemberAudioProcessor;
 
@@ -27,6 +28,17 @@ public:
     ~ProgramHeader() override;
 
     void paint (juce::Graphics& g) override;
+
+    /** Section 6.3. While a control is being moved the name cell shows "NAME: value unit" -
+        "FEEDBACK: 62 %", "TIME: 375 ms" - reverting to the Program name 900 ms after release.
+
+        **The CALLER guards on the control's own drag state.** A SliderAttachment also fires when a
+        Program is applied and on every host automation step; without that guard the display latches
+        onto whichever parameter was written last and flickers for the length of a song, which is
+        exactly what section 6.3 forbids. Naming mode wins over both - the glass belongs to the name
+        field until it commits or cancels. */
+    void showParameter (const juce::RangedAudioParameter& param);
+    void releaseParameter();
     bool hitTest (int x, int y) override;
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;
@@ -55,6 +67,17 @@ private:
     void paintButton (juce::Graphics& g, juce::Rectangle<float> area, const juce::String& text,
                       bool enabled, bool hovered, bool isDelete);
     void paintMeters (juce::Graphics& g);
+
+    /** What the name cell currently reads: the live parameter readout if one is in flight,
+        otherwise "NN NAME". */
+    juce::String currentLcdString() const;
+
+    /** Owned here rather than made per-menu: it has to outlive showMenuAsync's callback, and a
+        local would leave the menu drawing through a dangling LookAndFeel. */
+    FifthMemberMenuLookAndFeel menuLookAndFeel;
+
+    juce::String liveReadout;
+    juce::uint32 readoutRevertAtMs = 0;
 
     FifthMemberAudioProcessor& processorRef;
 
