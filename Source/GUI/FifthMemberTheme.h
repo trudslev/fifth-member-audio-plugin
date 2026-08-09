@@ -562,6 +562,17 @@ inline constexpr float nameplateTextSize = 29.0f;
         const ScaleMark* marks;
         int count;
 
+        /** The range this ring legends, when that is NOT the knob's currently bound parameter.
+
+            Dial 1 needs it and nothing else does. It carries two rings - a percentage and a
+            frequency - but only one parameter is bound at a time, so asking the Slider to map both
+            puts every percent mark through the Hz range: 25, 50, 75 and 100 all clamp to 1.0 and
+            stack on top of each other at +135 degrees. Leave lo == hi and the ring maps through the
+            bound parameter instead, which is right for every single-ring knob and keeps their marks
+            tied to the taper they actually legend. */
+        float lo = 0.0f, hi = 0.0f, skew = 1.0f;
+
+
         /** True once the plate bakes this ring, at which point the build must stop drawing it or it
             double-prints at a one-pixel offset. False for every ring today: the plate specified in
             build-handoff section 1 has not been delivered, so the build draws all of them. Dial 1's
@@ -620,7 +631,12 @@ inline constexpr float nameplateTextSize = 29.0f;
         { 3.0f, "3",   true }, { 4.0f, nullptr, false }, { 5.0f, "5",   true } };
 
     template <int N>
-    inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N]) { return { m, N, false }; }
+    inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N]) { return { m, N, 0.0f, 0.0f, 1.0f, false }; }
+
+    /** For a ring whose range is not the bound parameter's - see KnobScale::lo. */
+    template <int N>
+    inline constexpr KnobScale scaleOf (const ScaleMark (&m)[N], float lo, float hi, float skew)
+    { return { m, N, lo, hi, skew, false }; }
 
     /** Section 4.2a geometry. Both rings end on a common outer tip so the eye reads one arc. */
     inline constexpr float tickMajorInner = 8.0f, tickMajorOuter = 17.0f, tickMajorWidth = 2.0f;

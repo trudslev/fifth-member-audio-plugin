@@ -114,9 +114,15 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
         // and a frequency cannot share numerals - 1 Hz sits at 0 degrees where the percent ring
         // prints 50 - so both are permanently printed at different radii and each lights or dims
         // with the mode, exactly as the stacked labels do. Section 4.5.
-        static const Layout::KnobScale dialPercent = Layout::scaleOf (Layout::percentFullMarks);
-        static const Layout::KnobScale dialHz      = Layout::scaleOf (Layout::modRateMarks);
-        dial->setScale (&dialPercent);
+        // Both of dial 1's rings carry their own range: exactly one of them matches the bound
+        // parameter at a time, so neither can rely on the Slider's mapping. Dials 2 and 3 have a
+        // single ring that always matches, so they keep the plain form.
+        static const Layout::KnobScale dialPercent = Layout::scaleOf (Layout::percentFullMarks,
+                                                                       0.0f, 100.0f, 1.0f);
+        static const Layout::KnobScale dialHz      = Layout::scaleOf (Layout::modRateMarks,
+                                                                       0.1f, 5.0f, 0.4090339496f);
+        static const Layout::KnobScale dialPlain   = Layout::scaleOf (Layout::percentFullMarks);
+        dial->setScale (i == 0 ? &dialPercent : &dialPlain);
         if (i == 0)
             dial->setOuterScaleAndResize (&dialHz, { Layout::dialCentreX[i], Layout::dialCentreY });
         addAndMakeVisible (*dial);

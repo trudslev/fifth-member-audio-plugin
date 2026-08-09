@@ -165,8 +165,13 @@ void FifthMemberKnob::drawScale (juce::Graphics& g, juce::Point<float> centre, f
     {
         const auto& m = s.marks[i];
 
-        // The knob's own mapping, so this is exact for skewed parameters rather than assumed linear.
-        const float p = (float) valueToProportionOfLength ((double) m.value);
+        // The knob's own mapping, so this is exact for skewed parameters rather than assumed
+        // linear - EXCEPT where the ring legends something other than the bound parameter, which is
+        // dial 1's percent ring in BBD and its Hz ring everywhere else. Mapping those through the
+        // Slider puts every out-of-range mark on the same clamped angle, stacked on one another.
+        const float p = s.hi > s.lo
+                          ? std::pow (juce::jlimit (0.0f, 1.0f, (m.value - s.lo) / (s.hi - s.lo)), s.skew)
+                          : (float) valueToProportionOfLength ((double) m.value);
         const float angle = Layout::knobArcStartDegrees
                           + p * (Layout::knobArcEndDegrees - Layout::knobArcStartDegrees);
 
