@@ -54,16 +54,19 @@ juce::File ProgramManager::getUserProgramDirectory() const
 
 juce::File ProgramManager::getDefaultUserProgramDirectory()
 {
-   #if JUCE_WINDOWS || JUCE_LINUX
+    // **Application data on every platform - no macOS special case.** This used to branch, putting
+    // macOS Programs under ~/Library/Audio/Presets. That is Apple's location for the AU PRESET
+    // FORMAT: .aupreset files the AU system itself scans, reads and writes. Our user Programs are
+    // not those - they are application-owned data in our own XML format.
+    //
+    // The "Application Support" segment is JUCE's and must never be hard-coded:
+    // userApplicationDataDirectory resolves to ~/Library/Application Support on macOS, %APPDATA% on
+    // Windows and ~/.config on Linux. A shared literal path would be wrong on two of the three.
+    //
+    // No migration from the old location - nothing has shipped, so nothing is there to migrate.
+    // See Elmer's ProgramManager for why that is a decision rather than an oversight.
     return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
                .getChildFile (NF_COMPANY_NAME).getChildFile (NF_PRODUCT_NAME).getChildFile ("Programs");
-   #else
-    // "Presets" is Apple's own scanned folder name, not a lapse in BRAND.md's terminology rule -
-    // what is inside it is still called Programs everywhere the user can see.
-    return juce::File::getSpecialLocation (juce::File::userHomeDirectory)
-               .getChildFile ("Library/Audio/Presets")
-               .getChildFile (NF_COMPANY_NAME).getChildFile (NF_PRODUCT_NAME);
-   #endif
 }
 
 void ProgramManager::refreshUserProgramList()
