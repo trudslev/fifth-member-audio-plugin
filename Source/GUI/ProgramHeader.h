@@ -39,6 +39,12 @@ public:
         field until it commits or cancels. */
     void showParameter (const juce::RangedAudioParameter& param);
     void releaseParameter();
+
+    /** The component the Program list is laid out inside. Its bounds become the list's parent area,
+        which is what fixes the list's top edge and caps its height - so this is layout, not
+        plumbing. Passing nullptr returns the list to being a free desktop window sized to its own
+        content, which for a long bank overhangs the panel. */
+    void setMenuParent (juce::Component* parent) noexcept { menuParent = parent; }
     bool hitTest (int x, int y) override;
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;
@@ -47,6 +53,8 @@ public:
     void focusLost (FocusChangeType) override;
 
 private:
+    juce::Component* menuParent = nullptr;
+
     enum class Region { none, display, save, deleteOrCancel };
 
     void timerCallback() override;

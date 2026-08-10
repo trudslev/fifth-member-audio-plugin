@@ -147,6 +147,27 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
     addAndMakeVisible (controls);
     addAndMakeVisible (programHeader);
 
+    // The Program list opens INSIDE this component rather than as its own desktop window, which is
+    // what pins it. JUCE lays a PopupMenu out within its "parent area" - the parent component's
+    // bounds when one is given, the display otherwise - so the area we hand it is exactly the two
+    // guarantees: it starts at the LCD's bottom edge, so the top never moves, and it ends at the
+    // panel's, so it can never grow taller than the plugin. A list too long for that scrolls
+    // instead, which is what a 61-Program bank does.
+    //
+    // Without this the menu is a free desktop window sized to its content: 61 Programs made it
+    // ~995px tall, overhanging the top and bottom of a 932px panel and covering the whole thing.
+    //
+    // It must be a sibling, NOT a child of programHeader. That component narrows its hitTest to the
+    // LCD and the two buttons, and JUCE stops searching a component's children once its own
+    // hitTest rejects the point - so a menu parented there would be dead everywhere except the
+    // 449x34 strip it drops from.
+    const int lcdBottom = (int) std::ceil (Layout::lcdY + Layout::lcdH);
+    menuHost.setBounds (0, lcdBottom, getWidth(), getHeight() - lcdBottom);
+    menuHost.setInterceptsMouseClicks (false, true);
+    addAndMakeVisible (menuHost);
+    menuHost.toFront (false);
+    programHeader.setMenuParent (&menuHost);
+
     controls.onCharacterChanged = [this] { beginRearmSweep(); };
 
     lastFrameMs = juce::Time::getMillisecondCounter();

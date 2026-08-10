@@ -228,11 +228,51 @@ void ProgramHeader::showProgramMenu()
     // bank into columns and the list stops matching the bar it drops from.
     const auto glassOnScreen = localAreaToGlobal (displayArea().getSmallestIntegerContainer());
 
-    menu.showMenuAsync (juce::PopupMenu::Options()
-                            .withTargetComponent (this)
-                            .withTargetScreenArea (glassOnScreen)
-                            .withMinimumWidth (glassOnScreen.getWidth())
-                            .withMaximumNumColumns (1),
+    auto options = juce::PopupMenu::Options()
+                       .withTargetComponent (this)
+                       .withTargetScreenArea (glassOnScreen)
+                       .withMaximumNumColumns (1);
+
+    if (menuParent != nullptr)
+    {
+        // Anchor to a 1px strip on the glass's bottom EDGE, not to the glass itself.
+        //
+        // JUCE opens a menu at targetArea.getBottom(), but when a parent component is given it
+        // first does `target = pc->getLocalArea (nullptr, target).constrainedWithin (parentArea)`.
+        // The LCD sits above menuHost, so constrainedWithin slides the whole 34px glass down into
+        // the host before measuring - and the menu then opens 34px below where the glass actually
+        // ends, floating clear of the bar it belongs to. A thin target on the edge has nothing to
+        // slide: its bottom is the edge, wherever it is clamped.
+        //
+        // 1px, NOT zero: createWindow derives its whole alignment mode from
+        // `! getTargetScreenArea().isEmpty()`, and a zero-height rectangle is empty by JUCE's
+        // definition. That drops the list out of align-to-rectangle into the side placement used
+        // for submenus, which sends it out to the right of the panel instead of under the bar.
+        //
+        // Keeping the glass's x and width matters too - the menu takes its left edge from the
+        // target, so this is what keeps the list flush with the bar rather than merely near it.
+        const auto glass = displayArea().getSmallestIntegerContainer();
+        const auto anchorOnScreen =
+            localAreaToGlobal (juce::Rectangle<int> { glass.getX(), glass.getBottom(), glass.getWidth(), 1 });
+
+        options = options.withTargetScreenArea (anchorOnScreen);
+
+        // Laid out inside menuHost, whose top edge is the LCD's bottom and whose bottom is the
+        // panel's. JUCE places a menu against its parent area and clamps it there, so the list
+        // opens hard against the glass every time and scrolls rather than growing past the panel.
+        //
+        // Width is the glass in COMPONENT units here, not the screen rectangle above: inside a
+        // parent the menu is laid out in that parent's coordinate space, so feeding it screen
+        // pixels would size the list by the editor's scale factor and only look right at 100%.
+        options = options.withParentComponent (menuParent)
+                         .withMinimumWidth ((int) std::ceil (displayArea().getWidth()));
+    }
+    else
+    {
+        options = options.withMinimumWidth (glassOnScreen.getWidth());
+    }
+
+    menu.showMenuAsync (options,
                         [safeThis] (int result)
                         {
                             if (safeThis != nullptr && result != 0)

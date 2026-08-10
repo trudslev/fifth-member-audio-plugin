@@ -73,6 +73,11 @@ private:
     PanelControls controls;
     ProgramHeader programHeader;
 
+    /** Paints nothing and claims no clicks of its own; it exists so the Program list has a parent
+        area to be laid out in. Its bounds are what stop the list moving or overflowing - see the
+        constructor. */
+    juce::Component menuHost;
+
     int boundCharacter = -1;
     int rearmFramesRemaining = 0;
     juce::uint32 lastFrameMs = 0;
