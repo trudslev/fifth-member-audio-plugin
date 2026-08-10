@@ -11,7 +11,15 @@ FifthMemberAudioProcessorEditor::FifthMemberAudioProcessorEditor (FifthMemberAud
 {
     addAndMakeVisible (content);
 
-    setResizable (true, true);
+    // Resizable, but WITHOUT JUCE's corner grip - that is what the second argument adds, and it
+    // draws its diagonal hatch straight over the plate's bottom-right rack ear. It was the only
+    // region of the composite diff that did not correspond to a designed runtime element: the
+    // panel's own artwork, overprinted by a piece of framework furniture.
+    //
+    // The window stays resizable from its edges, and the fixed aspect ratio below still governs.
+    // The trade is that a host offering no frame of its own leaves the editor at its opening size;
+    // that is the better failure for a photoreal panel than a hatch across the ear.
+    setResizable (true, false);
 
     if (auto* constrainer = getConstrainer())
     {
