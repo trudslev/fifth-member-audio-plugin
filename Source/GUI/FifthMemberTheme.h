@@ -484,16 +484,26 @@ inline constexpr float nameplateTextSize = 29.0f;
     inline constexpr float timeLabelY = 535.45f;
     // Measured off the plate's own ink, not derived from the label's box: the caption is baked now,
     // so its printed cap-height band is the only thing the lamp can be centred against. TIME's
-    // glyph run spans y 539.0..546.5 at 2x, centre 542.75.
-    inline constexpr juce::Point<float> timeLedCentre { 206.0f, 542.75f };
+    // glyph run spans y 539.0..546.5 at 2x, centre 542.75, and starts at x 215.5.
+    //
+    // X is set from the label stack, which is the panel's reference for a lamp beside a word: it
+    // puts text at stackX + 13 with a 6px lamp centred at stackX + 3, and renders a 7.5px gap from
+    // lamp edge to first ink. These two lamps are 7px, so centre = first ink - 7.5 - 3.5.
+    inline constexpr juce::Point<float> timeLedCentre { 205.0f, 542.75f };
 
     inline constexpr juce::Point<float> feedbackKnobCentre { 508.0f, 375.45f };
     inline constexpr juce::Point<float> crossFeedKnobCentre { 717.0f, 375.45f };
     inline constexpr float repeatsLabelY = 457.45f;
-    // Likewise measured: CROSS-FEED's baked ink spans y 450.0..466.5, centre 458.25. The 463.7 this
-    // replaces was computed from repeatsLabelY plus a half-line, which put the lamp below the
-    // caption's baseline rather than on its optical centre.
-    inline constexpr juce::Point<float> crossFeedLedCentre { 681.0f, 458.25f };
+    // Likewise measured: CROSS-FEED's baked ink spans y 450.0..457.5, centre 453.75.
+    //
+    // Measure a caption in an x-window that stops at the caption, not at the next control. The
+    // window 660..900 looks like it isolates CROSS-FEED and does not - it also catches the "0"
+    // numeral of the knob to its right, which sits ~9px lower and drags the apparent centre down to
+    // 458.25. Both wrong values this constant has held came from that: 463.7 from the label box,
+    // then 458.25 from a contaminated band. The check that catches it is cap height - both this
+    // caption and TIME's measure exactly 7.5px, and a "caption" reading 16.5px tall is two things.
+    // Caption ink starts at x 689.5, so the stack's 7.5px gap puts the centre at 679.
+    inline constexpr juce::Point<float> crossFeedLedCentre { 679.0f, 453.75f };
 
     inline constexpr float stereoLabelX = 403.0f;
     inline constexpr float stereoLabelY = 480.45f;
