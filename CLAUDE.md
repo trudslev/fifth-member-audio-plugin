@@ -63,9 +63,27 @@ chooses between alternatives, the non-selected alternatives are not Program stat
 persist independently across Program changes, the way a physical knob keeps its position regardless
 of which patch is recalled.
 
-| Always stored | Conditionally stored | Never stored |
-|---|---|---|
-| Sync, Feedback, Stereo Mode, Delay Character, Damping, Saturation, Mix, Output Trim | Note Division *(iff Sync on)* · Time *(iff Sync off)* · Wow+Flutter+Generation Loss *(iff Tape)* · Mod Rate+Mod Depth *(iff BBD)* · Repeat Degrade *(iff Digital)* | Cross-Feed |
+| Always stored | Conditionally stored |
+|---|---|
+| Sync, Feedback, Stereo Mode, Delay Character, Damping, Saturation, Mix, Output Trim | Note Division *(iff Sync on)* · Time *(iff Sync off)* · Wow+Flutter+Generation Loss *(iff Tape)* · Mod Rate+Mod Depth *(iff BBD)* · Repeat Degrade *(iff Digital)* · **Cross-Feed** *(iff Ping-Pong)* |
+
+**Nothing is in a "never stored" column any more, and the reason it was emptied is worth keeping.**
+Cross-Feed sat there on the reasoning that it is a knob the player rides rather than part of a patch.
+That could not survive its own interaction with Stereo Mode: Stereo Mode *is* always stored, so
+recalling a Program recalls Ping-Pong — the one mode whose `DelayCore` branch reads the cross term —
+without recalling the value that defines the bounce, and at cross 0 Ping-Pong leaves the right line
+silent. A factory Program could therefore name a ping-pong effect it had no way to reproduce,
+depending on where the user's knob happened to be sitting.
+
+The general test that settles this class of question: **a parameter may be left out of a Program only
+when the Program cannot recall a state in which that parameter is audible.** The conditional
+exclusions pass it because their discriminators (Sync, Character, Stereo Mode) are themselves always
+stored, so what a Program omits is exactly what is inaudible in the mode it recalls. Cross-Feed
+failed it, and now passes by being conditional on the mode that uses it.
+
+If the concern is only that a control shouldn't *light SAVE*, the lighter tool is Chorus-60's:
+exclude it from the dirty check while still storing it, so Programs stay reproducible. Excluding it
+from storage is the heavier one and needs the audibility test above.
 
 `ActivePath` in `Source/Parameters.h` is the single definition. Everything downstream derives from
 it, and four consequences are easy to break:
@@ -75,11 +93,17 @@ it, and four consequences are easy to break:
 2. **Applying a Program writes only its subset.** For User Programs that rules out
    `apvts.replaceState()` — the way Gatecrasher does it — because that would clobber every
    persisting parameter. They serialise the filtered subset and apply it attribute by attribute.
-3. **The dirty check compares only the active path.** Otherwise moving Cross-Feed lights SAVE and
-   saving produces a Program indistinguishable from the loaded one. The path is recomputed from the
-   live Sync/Character state each time, because flipping either changes what is being compared.
+3. **The dirty check compares only the active path.** Otherwise moving the inactive timing control
+   or another mode's dial lights SAVE and saving produces a Program indistinguishable from the
+   loaded one. The path is recomputed from the live Sync/Character/Stereo Mode state each time,
+   because flipping any of them changes what is being compared — Cross-Feed dirties a Ping-Pong
+   Program and not a Stereo one.
 4. **`getStateInformation` still persists the whole APVTS.** Session state and Program state are
    different things: the persisting knobs must survive a reload even though no Program owns them.
+
+**Schema 2** is this change. A schema-1 User Program simply has no `crossFeed` attribute, and the
+apply loop walks the attributes the file actually has, so old files load with Cross-Feed left where
+the player had it — the schema-1 behaviour exactly, and no migration step to write.
 
 `FactoryPrograms.h` zero-fills every field a Program does not own, and
 `Tests/FactoryProgramsTests.cpp` asserts it per Program — so the rule is structurally checkable

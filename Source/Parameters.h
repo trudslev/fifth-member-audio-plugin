@@ -112,8 +112,16 @@ namespace Timing
     else", not "adding another simultaneous state".
 
     Everything downstream depends on this being the only definition: ProgramManager applies exactly
-    this set and nothing else, the dirty check compares exactly this set (so moving Cross-Feed must
-    not light SAVE), and the factory-bank tests assert the untagged fields are zero.
+    this set and nothing else, the dirty check compares exactly this set, and the factory-bank tests
+    assert the untagged fields are zero.
+
+    **Cross-Feed used to be excluded outright**, on the reasoning that it is a knob the player rides
+    rather than part of a patch. That could not survive its own interaction with Stereo Mode. Stereo
+    Mode IS stored, so recalling a Program recalls Ping-Pong - the one mode in which Cross-Feed is
+    audible - without recalling the value that defines the bounce, and at cross 0 Ping-Pong leaves
+    the right line silent. A Program could therefore name a ping-pong effect it had no way to
+    reproduce. It is now stored on exactly the mode that uses it, which is the same conditional
+    shape as Time and the character groups rather than a special case.
 */
 namespace ActivePath
 {
@@ -144,16 +152,34 @@ namespace ActivePath
         return {};
     }
 
-    /** The complete set a Program stores for the given selector state.
+    /** Cross-Feed, and only in Ping-Pong.
 
-        Note what is absent: Cross-Feed is never here. It is audible only in Ping-Pong and its LED
-        is conditional, but it is never Program state - it persists across every Program change. */
-    inline std::vector<const char*> forState (bool sync, int character)
+        DelayCore reads it in that branch alone: Mono collapses to a single line, and Stereo feeds
+        each line from its own input with `fb * dL` / `fb * dR`, never touching the cross term. So
+        in the other two modes the value is genuinely inaudible and storing it would make every Mono
+        and Stereo Program carry a figure that changes nothing - the same argument that keeps a
+        Tape Program from storing Mod Rate.
+
+        The panel already says this: the Cross-Feed LED is lit only in Ping-Pong. Storage now agrees
+        with both the lamp and the DSP. */
+    inline std::vector<const char*> crossFeedFor (int stereoMode)
+    {
+        if ((StereoMode) stereoMode == StereoMode::pingPong)
+            return { ParamIDs::crossFeed };
+
+        return {};
+    }
+
+    /** The complete set a Program stores for the given selector state. */
+    inline std::vector<const char*> forState (bool sync, int character, int stereoMode)
     {
         auto ids = always();
         ids.push_back (timingFor (sync));
 
         for (const auto* id : characterFor (character))
+            ids.push_back (id);
+
+        for (const auto* id : crossFeedFor (stereoMode))
             ids.push_back (id);
 
         return ids;
@@ -189,7 +215,12 @@ namespace LegacyMigration
         APVTS's own XML is keyed by plain ID string regardless, so a schema change needs its own
         marker. */
     inline constexpr auto stateSchemaVersionAttribute = "fifthMemberStateSchemaVersion";
-    inline constexpr int currentStateSchemaVersion = 1;
+
+    /** 2: Ping-Pong Programs carry Cross-Feed. A schema-1 User Program simply has no crossFeed
+        attribute, and the apply loop walks the attributes the file actually has - so an old file
+        loads with Cross-Feed left where the player had it, exactly the schema-1 behaviour, and
+        needs no migration step. The bump records that a Program's meaning changed. */
+    inline constexpr int currentStateSchemaVersion = 2;
 
     inline constexpr auto currentProgramIndexAttribute = "fifthMemberCurrentProgramIndex";
 }

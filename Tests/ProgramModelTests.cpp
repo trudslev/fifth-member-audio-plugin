@@ -22,7 +22,7 @@ public:
 
     void runTest() override
     {
-        beginTest ("Cross-Feed is never Program state and survives every Program change");
+        beginTest ("Cross-Feed is Program state in Ping-Pong and persists in the other two modes");
         {
             ScopedTestDirectory dir { "crossfeed" };
             TestHostProcessor host;
@@ -31,15 +31,58 @@ public:
             manager.initialise();
             host.setPlain (ParamIDs::crossFeed, 17.5f);
 
-            // Walk the whole factory bank; Cross-Feed must not move once.
+            // Walk the whole factory bank. A Ping-Pong Program must impose its own cross - this is
+            // the reproducibility case: at cross 0 that mode leaves the right line silent, so a
+            // Program that inherited whatever the knob happened to be at could recall as a
+            // one-sided delay. Every other Program must leave the knob exactly where it was.
             for (int i = 0; i < kNumFactoryPrograms; ++i)
             {
+                const auto& program = kFactoryPrograms[(size_t) i];
+                const auto name = manager.getProgramName (i);
+
+                host.setPlain (ParamIDs::crossFeed, 17.5f);
                 manager.requestProgramChange (i);
                 manager.flushPendingChange();
 
-                expectWithinAbsoluteError (host.plain (ParamIDs::crossFeed), 17.5f, 0.05f,
-                                           "Program " + manager.getProgramName (i) + " moved Cross-Feed");
+                if ((StereoMode) program.stereoMode == StereoMode::pingPong)
+                    expectWithinAbsoluteError (host.plain (ParamIDs::crossFeed), program.crossFeedPercent,
+                                               0.05f, name + ": a Ping-Pong Program did not restore its cross");
+                else
+                    expectWithinAbsoluteError (host.plain (ParamIDs::crossFeed), 17.5f, 0.05f,
+                                               name + ": a non-Ping-Pong Program moved Cross-Feed");
             }
+        }
+
+        beginTest ("moving Cross-Feed dirties a Ping-Pong Program but not a Stereo one");
+        {
+            ScopedTestDirectory dir { "crossfeeddirty" };
+            TestHostProcessor host;
+            ProgramManager manager { host.apvts, dir.directory };
+
+            manager.initialise();
+
+            const auto loadModeAndNudgeCross = [&] (StereoMode mode)
+            {
+                // Pick the first factory Program in the wanted mode so the snapshot is a real one.
+                for (int i = 0; i < kNumFactoryPrograms; ++i)
+                {
+                    if ((StereoMode) kFactoryPrograms[(size_t) i].stereoMode != mode)
+                        continue;
+
+                    manager.requestProgramChange (i);
+                    manager.flushPendingChange();
+                    break;
+                }
+
+                expect (! manager.isModifiedFromLoadedProgram(), "a freshly loaded Program is dirty");
+                host.setPlain (ParamIDs::crossFeed, host.plain (ParamIDs::crossFeed) > 50.0f ? 20.0f : 90.0f);
+                return manager.isModifiedFromLoadedProgram();
+            };
+
+            expect (loadModeAndNudgeCross (StereoMode::pingPong),
+                    "Cross-Feed did not light SAVE in Ping-Pong, where it is the sound");
+            expect (! loadModeAndNudgeCross (StereoMode::stereo),
+                    "Cross-Feed lit SAVE in Stereo, where DelayCore never reads it");
         }
 
         beginTest ("the two non-selected character modes keep their values");
@@ -110,13 +153,10 @@ public:
             TestHostProcessor host;
             ProgramManager manager { host.apvts, dir.directory };
 
-            manager.initialise();   // 01 YOU TOO? - synced, BBD
+            manager.initialise();   // 01 YOU TOO? - synced, BBD, Ping-Pong
             expect (! manager.isModifiedFromLoadedProgram(), "a freshly loaded Program is clean");
 
             // Not Program state: none of these may mark it dirty.
-            host.setPlain (ParamIDs::crossFeed, 12.0f);
-            expect (! manager.isModifiedFromLoadedProgram(), "Cross-Feed marked the Program dirty");
-
             host.setPlain (ParamIDs::timeMs, 999.0f);
             expect (! manager.isModifiedFromLoadedProgram(),
                     "Time marked a SYNCED Program dirty");
@@ -126,7 +166,13 @@ public:
             expect (! manager.isModifiedFromLoadedProgram(),
                     "another mode's dial marked a BBD Program dirty");
 
-            // On the active path: this must.
+            // On the active path: these must. Cross-Feed is here because YOU TOO? is Ping-Pong -
+            // in a Mono or Stereo Program the same move is a persisting one and stays clean, which
+            // the mode-by-mode test above covers.
+            host.setPlain (ParamIDs::crossFeed, 12.0f);
+            expect (manager.isModifiedFromLoadedProgram(),
+                    "Cross-Feed did not mark a Ping-Pong Program dirty");
+
             host.setPlain (ParamIDs::feedback, 88.0f);
             expect (manager.isModifiedFromLoadedProgram(), "Feedback did not mark the Program dirty");
         }
@@ -228,21 +274,33 @@ public:
         {
             // ActivePath is the single definition Correction 1 rests on. If it drifts, everything
             // above still passes for the wrong reason.
-            const auto syncedTape = ActivePath::forState (true, (int) DelayCharacter::tape);
+            const auto syncedTape = ActivePath::forState (true, (int) DelayCharacter::tape,
+                                                          (int) StereoMode::stereo);
             expect (contains (syncedTape, ParamIDs::noteDivision));
             expect (! contains (syncedTape, ParamIDs::timeMs));
             expect (contains (syncedTape, ParamIDs::wow));
             expect (! contains (syncedTape, ParamIDs::modRate));
-            expect (! contains (syncedTape, ParamIDs::crossFeed), "Cross-Feed is never Program state");
+            expect (! contains (syncedTape, ParamIDs::crossFeed),
+                    "Cross-Feed is not Program state outside Ping-Pong");
 
-            const auto freeDigital = ActivePath::forState (false, (int) DelayCharacter::digital);
+            const auto freeDigital = ActivePath::forState (false, (int) DelayCharacter::digital,
+                                                           (int) StereoMode::mono);
             expect (contains (freeDigital, ParamIDs::timeMs));
             expect (! contains (freeDigital, ParamIDs::noteDivision));
             expect (contains (freeDigital, ParamIDs::degrade));
             expect (! contains (freeDigital, ParamIDs::wow));
             expect (! contains (freeDigital, ParamIDs::flutter));
+            expect (! contains (freeDigital, ParamIDs::crossFeed), "Mono stored a Cross-Feed");
 
-            const auto bbd = ActivePath::forState (true, (int) DelayCharacter::bbd);
+            // Ping-Pong is the one mode DelayCore reads the cross term in, so it is the one mode
+            // that stores it.
+            const auto pingPong = ActivePath::forState (true, (int) DelayCharacter::bbd,
+                                                        (int) StereoMode::pingPong);
+            expect (contains (pingPong, ParamIDs::crossFeed), "Ping-Pong did not store its Cross-Feed");
+            expectEquals ((int) pingPong.size(), 12, "8 always + 1 timing + 2 BBD + Cross-Feed");
+
+            const auto bbd = ActivePath::forState (true, (int) DelayCharacter::bbd,
+                                                   (int) StereoMode::stereo);
             expectEquals ((int) bbd.size(), 11, "8 always + 1 timing + 2 BBD");
         }
     }

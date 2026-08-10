@@ -17,9 +17,15 @@
 
     What is NOT Gatecrasher's is the data model. Per Correction 1, a Program stores only the
     parameters on its **active path**, defined once in ActivePath (Parameters.h). Everything else -
-    Cross-Feed, the inactive timing control, the two non-selected character modes - is left
-    completely untouched by a Program change and persists independently, the way a physical knob
-    keeps its position regardless of which patch is recalled.
+    the inactive timing control, the two non-selected character modes, and Cross-Feed outside
+    Ping-Pong - is left completely untouched by a Program change and persists independently, the way
+    a physical knob keeps its position regardless of which patch is recalled.
+
+    There is no parameter that is *never* Program state. Cross-Feed was one until it turned out to
+    be reachable: Stereo Mode is always stored, so a Program recalls Ping-Pong - the only mode whose
+    DelayCore branch reads the cross term - and at cross 0 that mode leaves the right line silent.
+    A Program could name a bounce it had no way to reproduce. It is conditionally stored now, on
+    Stereo Mode, alongside the other two conditional axes.
 
     Three consequences that are easy to get wrong, and are each covered by a test:
 

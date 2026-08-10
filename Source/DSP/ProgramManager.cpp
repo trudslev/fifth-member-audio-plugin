@@ -117,7 +117,9 @@ std::vector<const char*> ProgramManager::currentActivePath() const
         return 0;
     };
 
-    return ActivePath::forState (boolOf (ParamIDs::sync), intOf (ParamIDs::character));
+    return ActivePath::forState (boolOf (ParamIDs::sync),
+                                 intOf (ParamIDs::character),
+                                 intOf (ParamIDs::stereoMode));
 }
 
 //==============================================================================
@@ -241,7 +243,10 @@ void ProgramManager::applyFactoryProgram (const FactoryProgram& program)
             break;
     }
 
-    // Cross-Feed is never written. It persists across every Program change.
+    // Cross-Feed, iff Ping-Pong - the only mode whose DelayCore branch reads it. In Mono and Stereo
+    // it is left alone for the same reason the unselected character group is.
+    if ((StereoMode) program.stereoMode == StereoMode::pingPong)
+        setPlain (apvts, ParamIDs::crossFeed, program.crossFeedPercent);
 }
 
 //==============================================================================

@@ -96,6 +96,16 @@ public:
                     expect (p.degrade == 0.0f, name + ": stores a Degrade it does not own");
                 else
                     expect (p.degrade > 0.0f, name + ": a Digital Program with no degrade");
+
+                // Cross-Feed is the third conditional axis, on Stereo Mode rather than on Sync or
+                // Character. The lower bound is not decoration: Ping-Pong at cross 0 leaves the
+                // right line silent, and at 0.5 both lines get the same mix and the bounce collapses
+                // to the centre, so a Ping-Pong Program below ~0.6 is not the effect it is named for.
+                if ((StereoMode) p.stereoMode != StereoMode::pingPong)
+                    expect (p.crossFeedPercent == 0.0f, name + ": stores a Cross-Feed it does not own");
+                else
+                    expect (p.crossFeedPercent >= 60.0f && p.crossFeedPercent <= 100.0f,
+                            name + ": a Ping-Pong Program whose cross does not bounce");
             }
         }
 
