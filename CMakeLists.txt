@@ -84,6 +84,16 @@ juce_add_plugin(FifthMember
     PRODUCT_NAME "${FIFTHMEMBER_PRODUCT_NAME}"
     COMPANY_NAME "${FIFTHMEMBER_COMPANY_NAME}"
     BUNDLE_ID "com.neonfoundry.fifthmember"
+    # Without this the Standalone cannot get audio INPUT on macOS, and fails silently doing it.
+    # An app with no NSMicrophoneUsageDescription is never granted capture access - the OS does not
+    # prompt and does not error, the input stream simply delivers zeros. On an effect that reads as
+    # dead metering: IN sits at its floor and OUT follows, because there is nothing to process. The
+    # meters are wired correctly; they have nothing to show.
+    #
+    # Plugin formats are unaffected - the host owns the input there - so this only shows up when
+    # someone opens the Standalone to listen.
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    MICROPHONE_PERMISSION_TEXT "FIFTH MEMBER needs audio input so the Standalone can process what you play into it."
     PLUGIN_MANUFACTURER_CODE Nfdy
     PLUGIN_CODE Fm88
     FORMATS ${FIFTHMEMBER_FORMATS}
