@@ -45,6 +45,25 @@ public:
         plumbing. Passing nullptr returns the list to being a free desktop window sized to its own
         content, which for a long bank overhangs the panel. */
     void setMenuParent (juce::Component* parent) noexcept { menuParent = parent; }
+
+    /** The panel row the list's top edge lands on: the LCD's own bottom edge, so the two read as
+        one object rather than a bar with a list floating under it. */
+    static int menuAnchorY() noexcept
+    {
+        return (int) std::floor (FifthMemberTheme::Layout::lcdY + FifthMemberTheme::Layout::lcdH);
+    }
+
+    /** Where menuHost has to start, and it is NOT the anchor.
+
+        JUCE clamps a menu to `jmax (parentArea.getY() + 1, ...)`, so a host beginning exactly at
+        the anchor can only ever open one pixel below it - a hairline of panel between the bar and
+        its list. The host therefore starts a short lead above, and the anchor does the positioning.
+
+        The lead has a floor as well as a ceiling. Too small and the clamp bites again; too large
+        and the list can grow past the panel, because JUCE sizes it to `parentArea.getHeight() - 24`
+        while the room actually below the anchor is 34px less than that. Anything from ~2 to ~17
+        satisfies both for this panel; 8 sits in the middle. */
+    static int menuHostTop() noexcept { return menuAnchorY() - 8; }
     bool hitTest (int x, int y) override;
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;

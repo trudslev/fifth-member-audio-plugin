@@ -253,7 +253,7 @@ void ProgramHeader::showProgramMenu()
         // target, so this is what keeps the list flush with the bar rather than merely near it.
         const auto glass = displayArea().getSmallestIntegerContainer();
         const auto anchorOnScreen =
-            localAreaToGlobal (juce::Rectangle<int> { glass.getX(), glass.getBottom(), glass.getWidth(), 1 });
+            localAreaToGlobal (juce::Rectangle<int> { glass.getX(), menuAnchorY() - 1, glass.getWidth(), 1 });
 
         options = options.withTargetScreenArea (anchorOnScreen);
 

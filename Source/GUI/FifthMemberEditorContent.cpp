@@ -161,8 +161,8 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
     // LCD and the two buttons, and JUCE stops searching a component's children once its own
     // hitTest rejects the point - so a menu parented there would be dead everywhere except the
     // 449x34 strip it drops from.
-    const int lcdBottom = (int) std::ceil (Layout::lcdY + Layout::lcdH);
-    menuHost.setBounds (0, lcdBottom, getWidth(), getHeight() - lcdBottom);
+    const int hostTop = ProgramHeader::menuHostTop();
+    menuHost.setBounds (0, hostTop, getWidth(), getHeight() - hostTop);
     menuHost.setInterceptsMouseClicks (false, true);
     addAndMakeVisible (menuHost);
     menuHost.toFront (false);
