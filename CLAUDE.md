@@ -317,20 +317,55 @@ passes while proving nothing.
   better implementation: `getNonexistentSibling()` so a name collision never overwrites, and
   cancel-on-focus-loss. The dropdown is additionally suppressed while naming — TapeRot opens it
   regardless, which applies a Program underneath a half-typed name.
+
+  **The dropdown's pinning originated here and was ported back to the whole suite** — it hangs off
+  the LCD's bottom edge at the LCD's width, never moves, and never outgrows the panel. The mechanism
+  and the four `PopupMenu` traps behind it are in the root `CLAUDE.md` under "The Program dropdown";
+  the local pieces are `menuHost` in `FifthMemberEditorContent` and `menuAnchorY`/`menuHostTop` in
+  `ProgramHeader`. Verified with a 61-Program bank, which is what exposed the problem in the first
+  place: as a free desktop window the list came out ~995 px tall over a 932 px panel.
+- **Cross-Feed is Program state, but only in Ping-Pong** (schema 2). It is the one parameter whose
+  storage is keyed on Stereo Mode rather than on Sync or Character, because that is the only mode
+  whose `DelayCore` branch reads the cross term. See the data-model section above for the rule this
+  settled — a parameter may be left out of a Program only when the Program cannot recall a state in
+  which that parameter is audible.
 - **GUI**: conformant to the revision-2 handoff. Every coordinate was re-measured by instrumenting
   the prototype's DOM rather than adjusted by eye. Printed scales replace the value tooltip as the
   at-rest reference; live values appear in the PROGRAM LCD while a control is moved and nowhere
   else. `auval` and `pluginval --strictness-level 8` pass on AU and VST3.
+
+  **Register a lamp against the caption's printed ink, not against a label's layout box.** The
+  captions are baked now, so the box the code once used to place them means nothing. Both live lamps
+  were wrong on both axes because of it. Two habits that caught it: measure the caption in an
+  x-window that stops at the caption rather than running into the next control's numerals — the
+  window 660..900 looks like it isolates CROSS-FEED and also catches the "0" of the knob to its
+  right, which sits ~9 px lower and drags the apparent centre — and sanity-check with **cap height**,
+  because every caption here measures exactly 7.5 px and a "caption" reading 16.5 px tall is two
+  things in one window. For horizontal spacing the panel's own reference is the character label
+  stack: 7.5 px from lamp edge to first ink.
+- **The Standalone needs `MICROPHONE_PERMISSION_ENABLED`**, which it now has. Without it macOS never
+  grants capture access — no prompt, no error, an input stream of zeros — and the IN/OUT readouts sit
+  at their floor looking like dead metering when they are simply being handed silence. Every `-99.0`
+  in a screenshot from before that fix is this and not a meter bug.
 - **The composite diff is against the plate now, which is the better target** — it removes the state
   problem entirely, since the plate has no live elements to differ on. The build paints **3.4 %** of
   the panel, and the regions are the knob bodies, the dials and the header text, i.e. section 1.2's
   runtime list.
 
-  **Capture the window at exactly 1240 wide or the numbers lie.** The standalone gives 1239, and a
-  1239/1240 scale drifts progressively across the width — enough that the rack ears' 2 px brush and
-  the marker-ink tape elements diff hard at the edges and look like double-drawing. The tell is that
-  the left ear's difference falls from 17.05 to 2.67 under a +2 px shift while the whole-panel figure
-  does not improve under any uniform shift: that is scale, not translation, and not a drawing error.
+  **Capture at exactly 1240 wide or the numbers lie**, and the standalone will not give you that by
+  default: it restores its last window size — often ~870 wide — and macOS resamples the whole GUI to
+  fit, so every edge differs slightly and a spanning "region" appears that is really the entire
+  panel. That resampling was also the true source of the "1239 vs 1240 scale drift" this note used
+  to describe; the drift was real, but its cause was the restored window size rather than anything
+  inherent.
+
+  So: set the size explicitly, **then confirm it took before measuring anything**. The window
+  manager does not always honour the request — repeated resizes here have come back 1202 x 960 and
+  1240 x 988 rather than the 1240 x 960 asked for, and a rerun under those is worthless. The check
+  that settles it is correlating the capture against the plate: **residual 0.000 means true 1:1**,
+  and anything above ~1 means it is scaled and no measurement off it can be trusted. Guard every
+  capture on the app being frontmost too — an unguarded one silently grabs whatever window is in
+  front, which is usually the editor you launched it from.
 - **The plate is delivered and integrated.** `design/plate/fifth-member-plate-2x.png`, 2480 x 1864.
   `PanelBackground` is a blit now; the ~500 lines that rasterised the fascia, wear, ears, screws,
   tape elements, section frames and silkscreen are gone with it. Every ring except dial 1's two is
