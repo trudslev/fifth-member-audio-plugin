@@ -73,6 +73,7 @@ public:
 
 private:
     juce::Component* menuParent = nullptr;
+    bool menuOpen = false;
 
     enum class Region { none, display, save, deleteOrCancel };
 

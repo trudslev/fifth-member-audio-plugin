@@ -272,10 +272,21 @@ void ProgramHeader::showProgramMenu()
         options = options.withMinimumWidth (glassOnScreen.getWidth());
     }
 
+    // Set before showing and cleared in the callback, which JUCE also runs on a dismissal
+    // (result 0) - so the mark cannot be left inverted by clicking away from the list.
+    menuOpen = true;
+    repaint();
+
     menu.showMenuAsync (options,
                         [safeThis] (int result)
                         {
-                            if (safeThis != nullptr && result != 0)
+                            if (safeThis == nullptr)
+                                return;
+
+                            safeThis->menuOpen = false;
+                            safeThis->repaint();
+
+                            if (result != 0)
                                 safeThis->processorRef.setCurrentProgram (result - 1);
                         });
 }
@@ -513,15 +524,22 @@ void ProgramHeader::paint (juce::Graphics& g)
     // caps and joins - built as a Path rather than a typographic glyph so it renders identically
     // across platforms and font fallbacks. It marks the window as a picker, so it is hidden while
     // naming: there is nothing to pick then.
+    //
+    // It inverts while the list is open, mirrored about the viewBox's centre line rather than
+    // rotated, so the apex stays on the same vertical axis and the mark does not appear to shift
+    // sideways as it flips. Without it the only thing saying the picker is open is the list itself,
+    // and the mark still points down at a list that is already down.
     if (! namingMode)
     {
         const float left = display.getRight() - Layout::chevronPadX - Layout::chevronW;
         const float top = display.getCentreY() - Layout::chevronH * 0.5f;
+        const float outer = menuOpen ? 6.4f : 1.6f;
+        const float apex  = menuOpen ? 1.6f : 6.4f;
 
         juce::Path chevron;
-        chevron.startNewSubPath (left + 1.0f,  top + 1.6f);
-        chevron.lineTo          (left + 7.0f,  top + 6.4f);
-        chevron.lineTo          (left + 13.0f, top + 1.6f);
+        chevron.startNewSubPath (left + 1.0f,  top + outer);
+        chevron.lineTo          (left + 7.0f,  top + apex);
+        chevron.lineTo          (left + 13.0f, top + outer);
 
         g.setColour (Colour::lcdChevron);
         g.strokePath (chevron, { Layout::chevronStroke,
