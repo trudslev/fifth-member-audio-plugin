@@ -116,6 +116,7 @@ namespace Colour
     inline const juce::Colour labelFaint      { 0xFF6D685F };
     inline const juce::Colour labelFainter    { 0xFF615C54 };
     inline const juce::Colour labelFaintest   { 0xFF57534C };
+    // contrast: 3.06:1 vs buttonTop,buttonBottom [state]
     inline const juce::Colour labelDisabled   { 0xFF4D4941 };
     inline const juce::Colour footLabel       { 0xFFA09883 };
     inline const juce::Colour scopeCaption    { 0xFF79746B };
