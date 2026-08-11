@@ -79,7 +79,10 @@ namespace Colour
     inline const juce::Colour scopeGrid       { juce::Colour::fromRGBA (150, 175, 155, 26) };  // .10
     inline const juce::Colour scopeStripRule  { juce::Colour::fromRGBA (150, 175, 155, 33) };  // .13
     inline const juce::Colour scopeBaseline   { juce::Colour::fromRGBA (160, 180, 165, 56) };  // .22
-    inline const juce::Colour scopeReadout    { 0xFF7D8D7E };
+    // Lightened from #7D8D7E (5.81:1). The scope strip prints REPEATS LIVE and its readouts -
+    // live state, so functional rather than flavour.
+    // contrast: 7.05:1 vs scopeBg [functional]
+    inline const juce::Colour scopeReadout    { 0xFF8E9C8F };
     inline const juce::Colour scopeReadoutHi  { 0xFFA9BDA9 };
     inline const juce::Colour scopeGhost      { juce::Colour::fromRGBA (190, 200, 190, 18) };  // .07
     inline const juce::Colour scopePingMarker { juce::Colour::fromRGBA (200, 210, 200, 41) };  // .16
@@ -116,8 +119,11 @@ namespace Colour
     inline const juce::Colour labelFaint      { 0xFF6D685F };
     inline const juce::Colour labelFainter    { 0xFF615C54 };
     inline const juce::Colour labelFaintest   { 0xFF57534C };
-    // contrast: 3.06:1 vs buttonTop,buttonBottom [state]
-    inline const juce::Colour labelDisabled   { 0xFF4D4941 };
+    // Lightened from #4D4941, which read 1.62:1 against its own button - absent rather than dim.
+    // The block comment above once claimed 3.06:1 for that value; it never measured that against
+    // the button's actual gradient, which is what tools/check_contrast.py now checks.
+    // contrast: 3.16-3.94:1 vs buttonTop,buttonBottom [state]
+    inline const juce::Colour labelDisabled   { 0xFF78756F };
     inline const juce::Colour footLabel       { 0xFFA09883 };
     inline const juce::Colour scopeCaption    { 0xFF79746B };
 
