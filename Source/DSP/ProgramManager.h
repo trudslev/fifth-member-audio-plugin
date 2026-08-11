@@ -56,6 +56,14 @@ public:
     int getNumPrograms() const;
     juce::String getProgramName (int index) const;
 
+    /** INIT sits outside both banks at index -1, so it is neither factory nor user. */
+    static bool isInitProgram (int index) noexcept { return index == initProgramIndex; }
+
+    /** What the LCD and the dropdown show: a two-digit 1-based index, a space, then the name.
+        getProgramName stays raw - that is what the HOST's program list wants, since a host renders
+        its own numbering and would print "01" twice. INIT is unnumbered in both. */
+    juce::String getProgramDisplayName (int index) const;
+
     static bool isFactoryProgram (int index) noexcept
     {
         return index >= 0 && index < kNumFactoryPrograms;
@@ -102,6 +110,14 @@ private:
     void refreshUserProgramList();
     void applyProgramByIndex (int index);
     void applyFactoryProgram (const FactoryProgram& program);
+
+    /** **INIT only, and the ONE place the active-path filter is deliberately bypassed.**
+
+        Every other Program writes only the parameters on its own path, so the ones it does not own
+        keep the positions the player left them in. INIT cannot work that way: a canvas that is only
+        blank along the path you happen to be on is not blank, and switching to Digital afterwards
+        would land on whatever the last Digital Program left behind. */
+    void applyInitProgram();
     void captureCleanSnapshot();
 
     /** The active-path IDs for the CURRENT parameter state. */
@@ -113,7 +129,10 @@ private:
     juce::Array<juce::File> userProgramFiles;
 
     std::atomic<int> currentProgramIndex { defaultFactoryProgramIndex };
-    std::atomic<int> pendingProgramIndex { -1 };
+    // **-2, not -1.** -1 is INIT's index now, so it can no longer double as "nothing pending" -
+    // using it would make selecting INIT indistinguishable from having nothing queued.
+    static constexpr int noPendingProgram = -2;
+    std::atomic<int> pendingProgramIndex { noPendingProgram };
 
     /** Normalised values keyed by parameter ID - not a positional vector, because the set being
         compared changes with the selectors. Message-thread only. */

@@ -75,5 +75,47 @@ inline constexpr std::array<FactoryProgram, 11> kFactoryPrograms { {
 
 inline constexpr int kNumFactoryPrograms = (int) kFactoryPrograms.size();
 
+/** INIT's index. **-1, deliberately outside the bank rather than position 0 within it.**
+
+    INIT is the blank canvas you start from, not an authored sound competing with the eleven, so
+    numbering it would push every Program down one and imply a running order it is not part of.
+    Keeping it outside also means it never renumbers anything, so no saved session needs migrating.
+
+    -1 is therefore a meaningful index here, and every "no index" sentinel in this casting has to be
+    something else - see ProgramManager's pending-apply sentinel, which is -2. */
+inline constexpr int initProgramIndex = -1;
+
+/** The blank canvas: the delay present and audible in its plainest form, with everything that gives
+    Fifth Member its character at zero.
+
+    Three rules decide every value, and they are not the same rule:
+      - **Character and amount go to zero** - Feedback, Wow, Flutter, Generation Loss, Mod Depth,
+        Repeat Degrade, Saturation. Raise any one and you immediately hear what that one does.
+      - **Structure goes to a usable middle, never zero** - Time 375 ms and Mod Rate 1.0 Hz. Both
+        are *exactly* the centre of their knobs, and not by coincidence: `Parameters.h` sets each
+        range's skew with `setSkewForCentre(375.0f)` and `setSkewForCentre(1.0f)` respectively. A
+        delay at its 1 ms minimum is not neutral, it is a comb filter.
+      - **Anything meaning "not acting" takes whatever value that is** - Damping at its 16 kHz
+        ceiling, so the filter is open and repeats do not darken; Trim 0 dB.
+
+    **This is the one Program that carries a value in every field, including the inactive paths.**
+    Every other Program zero-fills what it does not own, and `Tests/FactoryProgramsTests.cpp`
+    asserts exactly that - a value in an inactive slot is a bug there, because the panel's knobs
+    persist across Program changes the way physical knobs do.
+
+    INIT is the deliberate exception, and the reason is what it is FOR. Loading it with the
+    active-path filter would leave Repeat Degrade at 80 % because that is where the last Digital
+    Program left it, so switching to Digital from a "blank canvas" would land on someone else's
+    sound. A canvas that is only blank along the path you happen to be on is not blank. So INIT
+    applies all seventeen parameters unconditionally - see ProgramManager::applyInitProgram, which
+    exists for this and nothing else.
+
+    **Mix is 50 %.** Fifth Member is a wet/dry effect, and the midpoint reads as "nothing decided
+    yet" where a value like 35 % would look like a judgement someone made. The two serial castings,
+    TapeRot and Elmer, sit at 100 % for the opposite reason. */
+inline constexpr FactoryProgram kInitProgram
+    //          sync  div   time    fb     st ch   wow    flut   gen    rate   depth  degr   cross  damp      sat    mix    trim
+    { "INIT",   true, 2,    375.0f, 0.0f,  1, 0,   0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  50.0f, 16000.0f, 0.0f,  50.0f, 0.0f };
+
 /** Loaded on instantiation and whenever no saved session state exists. */
 inline constexpr int defaultFactoryProgramIndex = 0;

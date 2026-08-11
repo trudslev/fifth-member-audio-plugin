@@ -243,6 +243,13 @@ namespace Font
 //==============================================================================
 namespace Text
 {
+    /** U+2014, from its codepoint: juce::String's const char* constructor decodes Latin-1, so a
+        UTF-8 literal would render as stray glyphs. */
+    inline juce::String emDash()
+    {
+        return juce::String::charToString ((juce::juce_wchar) 0x2014);
+    }
+
     inline juce::String middleDot()
     {
         // Built from the codepoint: juce::String's const char* constructor decodes Latin-1, not

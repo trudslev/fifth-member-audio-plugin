@@ -107,6 +107,9 @@ int ProgramManager::getNumPrograms() const
 
 juce::String ProgramManager::getProgramName (int index) const
 {
+    if (isInitProgram (index))
+        return kInitProgram.name;
+
     if (isFactoryProgram (index))
         return kFactoryPrograms[(size_t) index].name;
 
@@ -142,7 +145,9 @@ std::vector<const char*> ProgramManager::currentActivePath() const
 //==============================================================================
 void ProgramManager::requestProgramChange (int index)
 {
-    if (! juce::isPositiveAndBelow (index, getNumPrograms()))
+    // INIT is a legal target and is NOT isPositiveAndBelow, so it is admitted explicitly rather
+    // than by widening the check - which would also admit every other negative index.
+    if (! isInitProgram (index) && ! juce::isPositiveAndBelow (index, getNumPrograms()))
         return;
 
     pendingProgramIndex.store (index, std::memory_order_relaxed);
@@ -151,22 +156,27 @@ void ProgramManager::requestProgramChange (int index)
 
 void ProgramManager::cancelPendingChange()
 {
-    pendingProgramIndex.store (-1, std::memory_order_relaxed);
+    pendingProgramIndex.store (noPendingProgram, std::memory_order_relaxed);
     cancelPendingUpdate();
 }
 
 void ProgramManager::handleAsyncUpdate()
 {
-    const int index = pendingProgramIndex.exchange (-1, std::memory_order_relaxed);
+    const int index = pendingProgramIndex.exchange (noPendingProgram, std::memory_order_relaxed);
 
-    if (index >= 0)
+    if (index != noPendingProgram)
         applyProgramByIndex (index);
 }
 
 void ProgramManager::setCurrentProgramIndexWithoutApplying (int index)
 {
-    currentProgramIndex.store (juce::isPositiveAndBelow (index, getNumPrograms())
-                                   ? index : defaultFactoryProgramIndex,
+    // INIT is a valid remembered Program and is NOT isPositiveAndBelow, so it is admitted
+    // explicitly rather than by widening the check. **No migration is needed**: INIT was ADDED at
+    // -1 rather than inserted at 0, so not one existing Factory index moved and every session saved
+    // before today still names the sound it was saved with.
+    const bool valid = isInitProgram (index) || juce::isPositiveAndBelow (index, getNumPrograms());
+
+    currentProgramIndex.store (valid ? index : defaultFactoryProgramIndex,
                                std::memory_order_relaxed);
     captureCleanSnapshot();
 
@@ -177,6 +187,18 @@ void ProgramManager::setCurrentProgramIndexWithoutApplying (int index)
 //==============================================================================
 void ProgramManager::applyProgramByIndex (int index)
 {
+    if (isInitProgram (index))
+    {
+        applyInitProgram();
+        currentProgramIndex.store (index, std::memory_order_relaxed);
+        captureCleanSnapshot();
+
+        if (onProgramListChanged)
+            onProgramListChanged();
+
+        return;
+    }
+
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return;
 
@@ -210,6 +232,55 @@ void ProgramManager::applyProgramByIndex (int index)
 
     if (onProgramListChanged)
         onProgramListChanged();
+}
+
+void ProgramManager::applyInitProgram()
+{
+    const auto& p = kInitProgram;
+
+    // **Every parameter, unconditionally - no active-path filter.** This is the one place that
+    // filter is bypassed, and the reason is what INIT is FOR: a canvas that is only blank along the
+    // path you happen to be on is not blank. Filtered, loading INIT from a Digital Program would
+    // leave Repeat Degrade wherever that Program left it, so the first switch back to Digital would
+    // land on someone else's sound.
+    //
+    // Written out rather than routed through applyFactoryProgram with a flag, because the two do
+    // genuinely different things and a bool parameter would hide that at every call site.
+    if (auto* sync = dynamic_cast<juce::AudioParameterBool*> (apvts.getParameter (ParamIDs::sync)))
+        *sync = p.sync;
+
+    if (auto* div = dynamic_cast<juce::AudioParameterChoice*> (apvts.getParameter (ParamIDs::noteDivision)))
+        *div = juce::jlimit (0, numNoteDivisions - 1, p.division);
+
+    if (auto* sm = dynamic_cast<juce::AudioParameterChoice*> (apvts.getParameter (ParamIDs::stereoMode)))
+        *sm = juce::jlimit (0, numStereoModes - 1, p.stereoMode);
+
+    if (auto* ch = dynamic_cast<juce::AudioParameterChoice*> (apvts.getParameter (ParamIDs::character)))
+        *ch = juce::jlimit (0, numDelayCharacters - 1, p.character);
+
+    setPlain (apvts, ParamIDs::timeMs,     p.timeMs);
+    setPlain (apvts, ParamIDs::feedback,   p.feedbackPercent);
+    setPlain (apvts, ParamIDs::wow,        p.wow);
+    setPlain (apvts, ParamIDs::flutter,    p.flutter);
+    setPlain (apvts, ParamIDs::genLoss,    p.genLoss);
+    setPlain (apvts, ParamIDs::modRate,    p.modRateHz);
+    setPlain (apvts, ParamIDs::modDepth,   p.modDepth);
+    setPlain (apvts, ParamIDs::degrade,    p.degrade);
+    setPlain (apvts, ParamIDs::crossFeed,  p.crossFeedPercent);
+    setPlain (apvts, ParamIDs::damping,    p.dampingHz);
+    setPlain (apvts, ParamIDs::saturation, p.saturationPercent);
+    setPlain (apvts, ParamIDs::mix,        p.mixPercent);
+    setPlain (apvts, ParamIDs::outputTrim, p.trimDb);
+}
+
+juce::String ProgramManager::getProgramDisplayName (int index) const
+{
+    const auto name = getProgramName (index);
+
+    if (isInitProgram (index) || name.isEmpty())
+        return name;
+
+    return juce::String (index + 1).paddedLeft ('0', 2) + " " + name;
 }
 
 void ProgramManager::applyFactoryProgram (const FactoryProgram& program)

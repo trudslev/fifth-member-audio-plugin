@@ -74,7 +74,9 @@ bool ProgramHeader::isEnabled (Region region) const
         // this bug; it is not worth replicating.
         case Region::display:        return ! namingMode;
         case Region::save:           return displayedIsModified;
-        case Region::deleteOrCancel: return ! displayedIsFactory;
+        // Factory Programs are read-only, and INIT is not a stored thing at all - there is
+        // nothing to delete.
+        case Region::deleteOrCancel: return ! displayedIsFactory && ! displayedIsInit;
         case Region::none:           break;
     }
 
@@ -94,12 +96,14 @@ bool ProgramHeader::refreshFromProcessor()
     const int index = manager.getCurrentProgram();
     const auto name = manager.getProgramName (index);
     const bool factory = ProgramManager::isFactoryProgram (index);
+    const bool onInit = ProgramManager::isInitProgram (index);
     const bool modified = manager.isModifiedFromLoadedProgram();
 
     if (index == displayedIndex && name == displayedName
         && factory == displayedIsFactory && modified == displayedIsModified)
         return false;
 
+    displayedIsInit = onInit;
     displayedIndex = index;
     displayedName = name;
     displayedIsFactory = factory;
@@ -205,6 +209,13 @@ void ProgramHeader::showProgramMenu()
         return juce::String (i + 1).paddedLeft ('0', 2) + " " + manager.getProgramName (i);
     };
 
+    // INIT first, unnumbered and above the Factory group, with a divider beneath it. Its item ID
+    // cannot be index + 1 like the rest - that would be 0, which PopupMenu reserves for "dismissed"
+    // - so it carries its own sentinel and is translated back on selection.
+    constexpr int initMenuId = 9999;
+    menu.addItem (initMenuId, "INIT", true, ProgramManager::isInitProgram (current));
+    menu.addSeparator();
+
     menu.addSectionHeader ("Factory");
 
     for (int i = 0; i < kNumFactoryPrograms; ++i)
@@ -287,7 +298,8 @@ void ProgramHeader::showProgramMenu()
                             safeThis->repaint();
 
                             if (result != 0)
-                                safeThis->processorRef.setCurrentProgram (result - 1);
+                                safeThis->processorRef.setCurrentProgram (
+                                    result == initMenuId ? initProgramIndex : result - 1);
                         });
 }
 
@@ -418,8 +430,14 @@ juce::String ProgramHeader::currentLcdString() const
     // clears on store, on delete and on loading another Program - all three reset displayedIsModified
     // through refreshFromProcessor, so nothing extra is needed here. Worst case is the 26-character
     // name cap plus "NN " and the marker, 31, which is inside the 16px guard's own 31.
-    return juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName
-         + (displayedIsModified ? " *" : "");
+    // **INIT is unnumbered**, here as in the dropdown: it is outside the bank, so a number would
+    // place it in a running order it is not part of - and the arithmetic would print "00", since
+    // its index is -1.
+    const auto label = displayedIsInit
+                         ? displayedName
+                         : juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName;
+
+    return label + (displayedIsModified ? " *" : "");
 }
 
 void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)
@@ -468,15 +486,20 @@ void ProgramHeader::paint (juce::Graphics& g)
 
     // --- bank tag: a single dynamic value, FACT or USER. Never both with one greyed. ----------
     {
+        // **On INIT the tag reads an em-dash at 42% ink, not FACT and not USER.** INIT sits
+        // outside both banks, so either word would name a bank it is not in.
+        const bool onInit = displayedIsInit && ! namingMode;
         const bool showUser = namingMode || ! displayedIsFactory;
+        const auto tagText = onInit ? Text::emDash() : juce::String (showUser ? "USER" : "FACT");
 
         const juce::Rectangle<float> tag { display.getX(), display.getY(), Layout::bankTagW, display.getHeight() };
 
         // Section 6.2: identical to the program name in face, size, tracking and colour. It sits
         // inside a display, so it is display text - it is no longer set smaller and dimmer.
-        Text::drawTracked (g, showUser ? "USER" : "FACT", Font::mono (Layout::lcdTextSize),
+        Text::drawTracked (g, tagText, Font::mono (Layout::lcdTextSize),
                             Font::trackingPx (Layout::lcdTracking, Layout::lcdTextSize),
-                            tag, juce::Justification::centred, Colour::lcdText);
+                            tag, juce::Justification::centred,
+                            onInit ? Colour::lcdText.withAlpha (0.42f) : Colour::lcdText);
 
         g.setColour (juce::Colours::white.withAlpha (0.09f));
         g.fillRect (tag.getRight(), display.getY() + 4.0f, 1.0f, display.getHeight() - 8.0f);

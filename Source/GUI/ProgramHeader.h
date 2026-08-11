@@ -109,9 +109,11 @@ private:
 
     FifthMemberAudioProcessor& processorRef;
 
-    int displayedIndex = -1;
+    // -2, not -1: -1 is INIT's index now, so it can no longer double as "nothing cached yet".
+    int displayedIndex = -2;
     juce::String displayedName;
     bool displayedIsFactory = true;
+    bool displayedIsInit = false;
     bool displayedIsModified = false;
 
     bool namingMode = false;
