@@ -3,6 +3,9 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "FifthMemberTheme.h"
+#include "../DSP/FactoryPrograms.h"   // ProgramId / ProgramBank
+
+#include <vector>
 #include "FifthMemberMenuLookAndFeel.h"
 
 class FifthMemberAudioProcessor;
@@ -109,11 +112,11 @@ private:
 
     FifthMemberAudioProcessor& processorRef;
 
-    // -2, not -1: -1 is INIT's index now, so it can no longer double as "nothing cached yet".
-    int displayedIndex = -2;
-    juce::String displayedName;
-    bool displayedIsFactory = true;
-    bool displayedIsInit = false;
+    /** The Program the panel is showing, mirrored so the poll only repaints on a real change. */
+    ProgramId displayedId;
+
+    /** The Programs the open menu was built from, in row order. */
+    std::vector<ProgramId> menuRows;
     bool displayedIsModified = false;
 
     bool namingMode = false;

@@ -41,7 +41,7 @@ public:
                 const auto name = manager.getProgramName (i);
 
                 host.setPlain (ParamIDs::crossFeed, 17.5f);
-                manager.requestProgramChange (i);
+                manager.requestProgramChange (ProgramManager::factoryIdAt (i));
                 manager.flushPendingChange();
 
                 if ((StereoMode) program.stereoMode == StereoMode::pingPong)
@@ -69,7 +69,7 @@ public:
                     if ((StereoMode) kFactoryPrograms[(size_t) i].stereoMode != mode)
                         continue;
 
-                    manager.requestProgramChange (i);
+                    manager.requestProgramChange (ProgramManager::factoryIdAt (i));
                     manager.flushPendingChange();
                     break;
                 }
@@ -103,7 +103,7 @@ public:
 
             // 04 GREAT GIG is a Tape Program: it should write the Tape dials and leave BBD and
             // Digital exactly where they were.
-            manager.requestProgramChange (3);
+            manager.requestProgramChange (ProgramManager::factoryIdAt (3));
             manager.flushPendingChange();
 
             expectWithinAbsoluteError (host.plain (ParamIDs::wow), 30.0f, 0.05f, "Tape wow was not applied");
@@ -112,7 +112,7 @@ public:
             expectWithinAbsoluteError (host.plain (ParamIDs::degrade), 22.0f, 0.05f, "Digital degrade was clobbered");
 
             // 08 SLAP HAPPY is Digital: it writes Degrade and leaves the Tape dials alone.
-            manager.requestProgramChange (7);
+            manager.requestProgramChange (ProgramManager::factoryIdAt (7));
             manager.flushPendingChange();
 
             expectWithinAbsoluteError (host.plain (ParamIDs::degrade), 10.0f, 0.05f, "Digital degrade was not applied");
@@ -132,14 +132,14 @@ public:
             host.setPlain (ParamIDs::noteDivision, (float) NoteDivision::sixteenth);
 
             // 01 YOU TOO? is synced: it writes Note Division and must not touch Time.
-            manager.requestProgramChange (0);
+            manager.requestProgramChange (ProgramManager::factoryIdAt (0));
             manager.flushPendingChange();
 
             expectEquals (divisionOf (host), (int) NoteDivision::dottedEighth, "division was not applied");
             expectWithinAbsoluteError (host.plain (ParamIDs::timeMs), 1234.0f, 1.0f, "Time was clobbered by a synced Program");
 
             // 06 LONG LOOP is free-running: it writes Time and must not touch Note Division.
-            manager.requestProgramChange (5);
+            manager.requestProgramChange (ProgramManager::factoryIdAt (5));
             manager.flushPendingChange();
 
             expectWithinAbsoluteError (host.plain (ParamIDs::timeMs), 900.0f, 1.0f, "Time was not applied");
@@ -184,15 +184,15 @@ public:
             ProgramManager manager { host.apvts, dir.directory };
 
             manager.initialise();
-            manager.requestProgramChange (3);        // 04 GREAT GIG - free-running, Tape
+            manager.requestProgramChange (ProgramManager::factoryIdAt (3));        // 04 GREAT GIG - free-running, Tape
             manager.flushPendingChange();
 
             host.setPlain (ParamIDs::wow, 11.0f);
             host.setPlain (ParamIDs::timeMs, 321.0f);
             manager.saveNewUserProgram ("MY TAKE");
 
-            const int saved = manager.getCurrentProgram();
-            expect (! ProgramManager::isFactoryProgram (saved));
+            const auto saved = manager.getCurrentProgramId();
+            expect (saved.bank == ProgramBank::user);
 
             // Move everything, including the things the Program does not own.
             host.setPlain (ParamIDs::wow, 99.0f);
@@ -219,26 +219,36 @@ public:
 
             host.setPlain (ParamIDs::feedback, 20.0f);
             manager.saveNewUserProgram ("SAME NAME");
-            const auto firstName = manager.getProgramName (manager.getCurrentProgram());
+            const auto firstId = manager.getCurrentProgramId();
 
             host.setPlain (ParamIDs::feedback, 80.0f);
             manager.saveNewUserProgram ("SAME NAME");
-            const auto secondName = manager.getProgramName (manager.getCurrentProgram());
+            const auto secondId = manager.getCurrentProgramId();
 
-            expectEquals (manager.getNumPrograms(), kNumFactoryPrograms + 2);
+            // **The host list must NOT have grown** - that is the juce_AudioProcessor.h contract
+            // this change exists to honour. The two saved Programs are counted from listPrograms.
+            expectEquals (manager.getNumPrograms(), kNumFactoryPrograms);
 
-            // Compared by NAME, not index: the list re-sorts on every save, so a new Program can
-            // take an index an older one held. Index equality would prove nothing.
-            expect (firstName != secondName, "the second save reused the first Program's name");
+            int userCount = 0;
+
+            for (const auto& id : manager.listPrograms())
+                if (id.bank == ProgramBank::user)
+                    ++userCount;
+
+            expectEquals (userCount, 2);
+
+            // Compared by IDENTITY, which is now the only thing they could be compared by - and
+            // which is the point: the list re-sorts on every save, so a position proves nothing.
+            expect (firstId != secondId, "the second save reused the first Program's identity");
 
             bool foundOriginal = false;
 
-            for (int i = kNumFactoryPrograms; i < manager.getNumPrograms(); ++i)
+            for (const auto& id : manager.listPrograms())
             {
-                if (manager.getProgramName (i) != firstName)
+                if (id != firstId)
                     continue;
 
-                manager.requestProgramChange (i);
+                manager.requestProgramChange (id);
                 manager.flushPendingChange();
                 expectWithinAbsoluteError (host.plain (ParamIDs::feedback), 20.0f, 0.2f);
                 foundOriginal = true;
@@ -255,19 +265,22 @@ public:
 
             manager.initialise();
 
-            for (int i = 0; i < kNumFactoryPrograms; ++i)
-                manager.deleteUserProgram (i);
+            // Every Factory Program, plus INIT. The gate is on the BANK now, which is stronger
+            // than the old index range: an id from any other bank cannot address a file.
+            for (const auto& id : manager.listPrograms())
+                manager.deleteUserProgram (id);
 
             expectEquals (manager.getNumPrograms(), kNumFactoryPrograms);
 
             manager.saveNewUserProgram ("DOOMED");
-            const int index = manager.getCurrentProgram();
+            const auto doomed = manager.getCurrentProgramId();
 
-            manager.deleteUserProgram (index);
+            manager.deleteUserProgram (doomed);
             manager.flushPendingChange();
 
             expectEquals (manager.getNumPrograms(), kNumFactoryPrograms);
-            expectEquals (manager.getCurrentProgram(), defaultFactoryProgramIndex);
+            expect (manager.getCurrentProgramId()
+                        == ProgramManager::factoryIdAt (defaultFactoryProgramIndex));
         }
 
         beginTest ("the active path is exactly what it claims to be");

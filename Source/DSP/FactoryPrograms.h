@@ -1,5 +1,7 @@
 #pragma once
 
+#include <juce_core/juce_core.h>
+
 #include <array>
 
 /**
@@ -29,8 +31,37 @@
     Fifth Member's selectors are exclusive switches: switching is "now doing something else", not
     "adding another simultaneous state".
 */
+/** Which list a Program belongs to. INIT is its own bank rather than a magic index; `unresolved`
+    is a stored identifier that no longer names anything. */
+enum class ProgramBank
+{
+    init,
+    factory,
+    user,
+    unresolved
+};
+
+/** **How a Program is identified everywhere except the host adapter.** Not a position - positions
+    change when the bank is reordered or extended.
+
+    `displayName` is carried because a factory slug is not presentable: "sky-wide?" in the LCD would
+    read as a rendering fault. It is display only and never resolves anything. */
+struct ProgramId
+{
+    ProgramBank bank = ProgramBank::factory;
+    juce::String id;
+    juce::String displayName;
+
+    bool operator== (const ProgramId& o) const noexcept { return bank == o.bank && id == o.id; }
+    bool operator!= (const ProgramId& o) const noexcept { return ! operator== (o); }
+};
+
 struct FactoryProgram
 {
+    /** **The permanent identity, fixed at creation and never changed again.** `name` is a label the
+        designers may revise; `slug` may not be, because it is what a saved session stores. */
+    const char* slug;
+
     const char* name;
 
     bool  sync;
@@ -57,20 +88,20 @@ struct FactoryProgram
 // rest of the bank they are structurally reasoned and still awaiting a by-ear pass.
 inline constexpr std::array<FactoryProgram, 11> kFactoryPrograms { {
     //  name                sync  div  timeMs    FB  st  ch     wow  flut  gen    rate  depth  degr  cross   damp    sat   mix   trim
-    { "YOU TOO?",           true,   1,    0.0f, 35.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.6f, 20.0f,  0.0f, 80.0f, 6000.0f, 15.0f, 35.0f,  0.0f },
-    { "SKY WIDE",           true,   1,    0.0f, 45.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.5f, 15.0f,  0.0f, 90.0f, 8000.0f, 10.0f, 40.0f,  0.0f },
-    { "NEW YEAR'S",         true,   2,    0.0f, 40.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.7f, 25.0f,  0.0f, 80.0f, 7000.0f, 18.0f, 38.0f,  0.0f },
-    { "GREAT GIG",         false,  -1,  550.0f, 55.0f, 1, 0,  30.0f, 20.0f, 40.0f, 0.0f,  0.0f,  0.0f,  0.0f, 4500.0f, 30.0f, 45.0f,  0.0f },
-    { "DARK ECHOES",       false,  -1,  480.0f, 60.0f, 1, 0,  35.0f, 25.0f, 50.0f, 0.0f,  0.0f,  0.0f,  0.0f, 3500.0f, 35.0f, 40.0f,  0.0f },
-    { "LONG LOOP",         false,  -1,  900.0f, 70.0f, 1, 0,  20.0f, 12.0f, 35.0f, 0.0f,  0.0f,  0.0f,  0.0f, 5000.0f, 20.0f, 50.0f,  0.0f },
-    { "SLOW BUILD",        false,  -1,  700.0f, 65.0f, 1, 0,  22.0f, 14.0f, 38.0f, 0.0f,  0.0f,  0.0f,  0.0f, 5500.0f, 22.0f, 42.0f,  0.0f },
-    { "SLAP HAPPY",         true,   4,    0.0f, 15.0f, 0, 2,   0.0f, 0.0f, 0.0f,  0.0f,  0.0f, 10.0f,  0.0f, 10000.0f, 8.0f, 25.0f,  0.0f },
-    { "DOUBLED UP",         true,   4,    0.0f, 10.0f, 1, 2,   0.0f, 0.0f, 0.0f,  0.0f,  0.0f,  5.0f,  0.0f, 9000.0f,  5.0f, 20.0f,  0.0f },
-    { "SIXTEENTH SENSE",    true,   4,    0.0f, 50.0f, 2, 1,   0.0f, 0.0f, 0.0f,  1.2f, 30.0f,  0.0f, 75.0f, 6500.0f, 15.0f, 40.0f,  0.0f },
+    { "you-too", "YOU TOO?",           true,   1,    0.0f, 35.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.6f, 20.0f,  0.0f, 80.0f, 6000.0f, 15.0f, 35.0f,  0.0f },
+    { "sky-wide", "SKY WIDE",           true,   1,    0.0f, 45.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.5f, 15.0f,  0.0f, 90.0f, 8000.0f, 10.0f, 40.0f,  0.0f },
+    { "new-years", "NEW YEAR'S",         true,   2,    0.0f, 40.0f, 2, 1,   0.0f, 0.0f, 0.0f,  0.7f, 25.0f,  0.0f, 80.0f, 7000.0f, 18.0f, 38.0f,  0.0f },
+    { "great-gig", "GREAT GIG",         false,  -1,  550.0f, 55.0f, 1, 0,  30.0f, 20.0f, 40.0f, 0.0f,  0.0f,  0.0f,  0.0f, 4500.0f, 30.0f, 45.0f,  0.0f },
+    { "dark-echoes", "DARK ECHOES",       false,  -1,  480.0f, 60.0f, 1, 0,  35.0f, 25.0f, 50.0f, 0.0f,  0.0f,  0.0f,  0.0f, 3500.0f, 35.0f, 40.0f,  0.0f },
+    { "long-loop", "LONG LOOP",         false,  -1,  900.0f, 70.0f, 1, 0,  20.0f, 12.0f, 35.0f, 0.0f,  0.0f,  0.0f,  0.0f, 5000.0f, 20.0f, 50.0f,  0.0f },
+    { "slow-build", "SLOW BUILD",        false,  -1,  700.0f, 65.0f, 1, 0,  22.0f, 14.0f, 38.0f, 0.0f,  0.0f,  0.0f,  0.0f, 5500.0f, 22.0f, 42.0f,  0.0f },
+    { "slap-happy", "SLAP HAPPY",         true,   4,    0.0f, 15.0f, 0, 2,   0.0f, 0.0f, 0.0f,  0.0f,  0.0f, 10.0f,  0.0f, 10000.0f, 8.0f, 25.0f,  0.0f },
+    { "doubled-up", "DOUBLED UP",         true,   4,    0.0f, 10.0f, 1, 2,   0.0f, 0.0f, 0.0f,  0.0f,  0.0f,  5.0f,  0.0f, 9000.0f,  5.0f, 20.0f,  0.0f },
+    { "sixteenth-sense", "SIXTEENTH SENSE",    true,   4,    0.0f, 50.0f, 2, 1,   0.0f, 0.0f, 0.0f,  1.2f, 30.0f,  0.0f, 75.0f, 6500.0f, 15.0f, 40.0f,  0.0f },
     // Feedback above 100 % is deliberate - this one self-oscillates. DelayCore's always-on ceiling
     // is what keeps that a howl rather than an overflow. Cross is near the top so the oscillation
     // keeps circulating between the two lines instead of building up inside one of them.
-    { "HOWL",               true,   2,    0.0f, 105.0f, 2, 2,  0.0f, 0.0f, 0.0f,  0.0f,  0.0f, 60.0f, 95.0f, 5000.0f, 50.0f, 55.0f, -3.0f },
+    { "howl", "HOWL",               true,   2,    0.0f, 105.0f, 2, 2,  0.0f, 0.0f, 0.0f,  0.0f,  0.0f, 60.0f, 95.0f, 5000.0f, 50.0f, 55.0f, -3.0f },
 } };
 
 inline constexpr int kNumFactoryPrograms = (int) kFactoryPrograms.size();
@@ -115,7 +146,7 @@ inline constexpr int initProgramIndex = -1;
     TapeRot and Elmer, sit at 100 % for the opposite reason. */
 inline constexpr FactoryProgram kInitProgram
     //          sync  div   time    fb     st ch   wow    flut   gen    rate   depth  degr   cross  damp      sat    mix    trim
-    { "INIT",   true, 2,    375.0f, 0.0f,  1, 0,   0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  50.0f, 16000.0f, 0.0f,  50.0f, 0.0f };
+    { "init", "INIT",   true, 2,    375.0f, 0.0f,  1, 0,   0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  50.0f, 16000.0f, 0.0f,  50.0f, 0.0f };
 
 /** Loaded on instantiation and whenever no saved session state exists. */
 inline constexpr int defaultFactoryProgramIndex = 0;

@@ -53,16 +53,34 @@ public:
     double getTailLengthSeconds() const override { return 12.0; }
 
     //==============================================================================
+    //==============================================================================
+    /** **The host adapter - the ONLY place a Program is addressed by position.**
+
+        **The list is the Factory bank and nothing else.** juce_AudioProcessor.h documents
+        getNumPrograms as "The value returned must be valid as soon as this object is created, and
+        must not change over its lifetime"; a count including User Programs changed on every save.
+        JUCE's VST3 wrapper builds the automatable Program parameter ONCE from this value, so a
+        Program saved afterwards was unreachable from the host - the API keeping its documented
+        promise, not a bug. Excluding INIT too means host index n IS Factory Program n+1.
+
+        **Accepted divergence.** getCurrentProgram answers 0 while a User Program is loaded, so a
+        host's menu shows a Factory name while the panel shows the user's Program. Sound and panel
+        are both correct; only the host's own menu is wrong. */
     int getNumPrograms() override { return programManager.getNumPrograms(); }
-    int getCurrentProgram() override { return programManager.getCurrentProgram(); }
-    void setCurrentProgram (int index) override { programManager.requestProgramChange (index); }
+    int getCurrentProgram() override { return programManager.getCurrentFactoryPosition(); }
+    void setCurrentProgram (int index) override;
     const juce::String getProgramName (int index) override { return programManager.getProgramName (index); }
 
     /** Renaming in place would be an overwrite by another name, and there is deliberately no
         overwrite path - Save always creates a new Program. */
+    /** Deliberately a no-op: with Factory-only exposure nothing on the host's list can be renamed.
+        Implementing it would be a back door into the Factory bank. */
     void changeProgramName (int, const juce::String&) override {}
 
     ProgramManager& getProgramManager() noexcept { return programManager; }
+
+    /** Clears the stale-replay guard. Called from the editor when a change is USER-originated. */
+    void noteUserEdit() noexcept { justRestoredState.store (false, std::memory_order_relaxed); }
 
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
@@ -86,6 +104,12 @@ public:
     float getPerPassGain()   const noexcept { return displayPerPassGain.load (std::memory_order_relaxed); }
 
 private:
+    /** **Guards a host replaying a stale program index over a just-restored session.** Armed by
+        setStateInformation, disarmed by the first setCurrentProgram (ignored only when it matches
+        what getCurrentProgram reports) or the first USER-originated edit. Automation must not
+        disarm it: a host may write automation on load before replaying. */
+    std::atomic<bool> justRestoredState { false };
+
     ProgramManager programManager { apvts };
 
     TimingEngine timingEngine;

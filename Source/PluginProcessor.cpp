@@ -167,6 +167,18 @@ juce::AudioProcessorEditor* FifthMemberAudioProcessor::createEditor()
 }
 
 //==============================================================================
+void FifthMemberAudioProcessor::setCurrentProgram (int index)
+{
+    if (! juce::isPositiveAndBelow (index, programManager.getNumPrograms()))
+        return;
+
+    // The stale-replay guard, disarmed by this call whether or not it is honoured.
+    if (justRestoredState.exchange (false, std::memory_order_relaxed) && index == getCurrentProgram())
+        return;
+
+    programManager.requestProgramChange (ProgramManager::factoryIdAt (index));
+}
+
 void FifthMemberAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // The WHOLE APVTS, not just the active path. Session state and Program state are different
@@ -177,8 +189,12 @@ void FifthMemberAudioProcessor::getStateInformation (juce::MemoryBlock& destData
 
     xml->setAttribute (LegacyMigration::stateSchemaVersionAttribute,
                        LegacyMigration::currentStateSchemaVersion);
-    xml->setAttribute (LegacyMigration::currentProgramIndexAttribute,
-                       programManager.getCurrentProgram());
+    // **The bank, the identifier, and the full parameter state.** The values make the session
+    // sound right; the identity only decides what the panel CALLS them.
+    const auto id = programManager.getCurrentProgramId();
+    xml->setAttribute (LegacyMigration::programBankAttribute, LegacyMigration::bankAttributeValue (id.bank));
+    xml->setAttribute (LegacyMigration::programIdAttribute, id.id);
+    xml->setAttribute (LegacyMigration::programNameAttribute, id.displayName);
 
     copyXmlToBinary (*xml, destData);
 }
@@ -194,10 +210,17 @@ void FifthMemberAudioProcessor::setStateInformation (const void* data, int sizeI
 
     // Read, not merely written. Restoring an older layout otherwise leaves surviving IDs at their
     // saved values while new ones fall back to defaults - a silent hybrid nothing reports.
-    if (savedSchema != LegacyMigration::currentStateSchemaVersion)
+    // **Two branches, both pinned to literals.** Too old: the values cannot be interpreted. Too
+    // new: written by a later build, and reading it with today's assumptions would give plausible
+    // wrong values rather than an obvious fallback.
+    //
+    // This replaced `savedSchema != currentStateSchemaVersion`, which discarded schema-1 sessions
+    // wholesale even though this plugin's own schema note says schema-1 Programs load fine by
+    // design - the two were already inconsistent - and would have discarded schema-2 the same way.
+    if (LegacyMigration::classifySchema (savedSchema) != LegacyMigration::SchemaVerdict::readable)
     {
         programManager.cancelPendingChange();
-        programManager.requestProgramChange (defaultFactoryProgramIndex);
+        programManager.requestProgramChange (ProgramManager::factoryIdAt (defaultFactoryProgramIndex));
         return;
     }
 
@@ -207,8 +230,34 @@ void FifthMemberAudioProcessor::setStateInformation (const void* data, int sizeI
 
     apvts.replaceState (juce::ValueTree::fromXml (*xml));
 
-    programManager.setCurrentProgramIndexWithoutApplying (
-        xml->getIntAttribute (LegacyMigration::currentProgramIndexAttribute, defaultFactoryProgramIndex));
+    ProgramId restored;
+
+    if (savedSchema >= LegacyMigration::identitySchemaVersion)
+    {
+        restored = programManager.resolve (
+            LegacyMigration::bankFromAttribute (
+                xml->getStringAttribute (LegacyMigration::programBankAttribute)),
+            xml->getStringAttribute (LegacyMigration::programIdAttribute),
+            xml->getStringAttribute (LegacyMigration::programNameAttribute));
+    }
+    else
+    {
+        // Older readable sessions stored a position. Map it through the CURRENT bank.
+        const int savedIndex = xml->getIntAttribute (LegacyMigration::currentProgramIndexAttribute,
+                                                      defaultFactoryProgramIndex);
+
+        if (savedIndex == -1)
+            restored = ProgramManager::initId();
+        else if (juce::isPositiveAndBelow (savedIndex, kNumFactoryPrograms))
+            restored = ProgramManager::factoryIdAt (savedIndex);
+        else
+            restored = ProgramManager::factoryIdAt (defaultFactoryProgramIndex);
+    }
+
+    programManager.setCurrentProgramWithoutApplying (restored);
+
+    // **Armed AFTER replaceState**, or the restore's own writes would disarm it.
+    justRestoredState.store (true, std::memory_order_relaxed);
 }
 
 //==============================================================================

@@ -191,10 +191,17 @@ void FifthMemberEditorContent::attachReadout (juce::Slider& knob, const juce::St
     // host automation step, and without the guard the readout latches onto whichever parameter was
     // written last and flickers for the length of a song.
     auto* raw = &knob;
+    // The drag guard also disarms the processor's stale-replay flag, because this is the only
+    // place that knows a change came from a PERSON. It deliberately does not fire for automation: a
+    // host may write automation on session load before replaying its remembered program index, and
+    // disarming there would let that replay land on the restored state.
     knob.onValueChange = [this, raw, param]
     {
         if (raw->isMouseButtonDown())
+        {
+            processorRef.noteUserEdit();
             programHeader.showParameter (*param);
+        }
     };
     knob.onDragEnd = [this] { programHeader.releaseParameter(); };
 }

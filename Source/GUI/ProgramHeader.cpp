@@ -74,9 +74,8 @@ bool ProgramHeader::isEnabled (Region region) const
         // this bug; it is not worth replicating.
         case Region::display:        return ! namingMode;
         case Region::save:           return displayedIsModified;
-        // Factory Programs are read-only, and INIT is not a stored thing at all - there is
-        // nothing to delete.
-        case Region::deleteOrCancel: return ! displayedIsFactory && ! displayedIsInit;
+        // Only a User Program can be deleted. INIT and an unresolved id are not stored things.
+        case Region::deleteOrCancel: return displayedId.bank == ProgramBank::user;
         case Region::none:           break;
     }
 
@@ -93,20 +92,13 @@ bool ProgramHeader::refreshFromProcessor()
 
     auto& manager = processorRef.getProgramManager();
 
-    const int index = manager.getCurrentProgram();
-    const auto name = manager.getProgramName (index);
-    const bool factory = ProgramManager::isFactoryProgram (index);
-    const bool onInit = ProgramManager::isInitProgram (index);
+    const auto id = manager.getCurrentProgramId();
     const bool modified = manager.isModifiedFromLoadedProgram();
 
-    if (index == displayedIndex && name == displayedName
-        && factory == displayedIsFactory && modified == displayedIsModified)
+    if (id == displayedId && modified == displayedIsModified)
         return false;
 
-    displayedIsInit = onInit;
-    displayedIndex = index;
-    displayedName = name;
-    displayedIsFactory = factory;
+    displayedId = id;
     displayedIsModified = modified;
     return true;
 }
@@ -162,8 +154,8 @@ void ProgramHeader::mouseDown (const juce::MouseEvent& e)
         case Region::save:    enterNamingMode(); break;
 
         case Region::deleteOrCancel:
-            if (! displayedIsFactory)
-                processorRef.getProgramManager().deleteUserProgram (displayedIndex);
+            if (displayedId.bank == ProgramBank::user)
+                processorRef.getProgramManager().deleteUserProgram (displayedId);
             break;
 
         case Region::none: break;
@@ -201,33 +193,33 @@ void ProgramHeader::showProgramMenu()
     juce::PopupMenu menu;
     menu.setLookAndFeel (&menuLookAndFeel);
 
-    const int current = manager.getCurrentProgram();
-    const int total = manager.getNumPrograms();
+    const auto current = manager.getCurrentProgramId();
 
-    const auto rowFor = [&manager] (int i)
+    // **Row IDs are positions in THIS menu, not Program indices.** PopupMenu needs an int per row
+    // and reserves 0 for "dismissed"; the callback maps the row back to the ProgramId it was built
+    // from, so no Program is addressed by a bank position here.
+    menuRows = manager.listPrograms();
+
+    bool factoryHeaderDone = false;
+    bool userHeaderDone = false;
+
+    for (size_t i = 0; i < menuRows.size(); ++i)
     {
-        return juce::String (i + 1).paddedLeft ('0', 2) + " " + manager.getProgramName (i);
-    };
+        const auto& id = menuRows[i];
 
-    // INIT first, unnumbered and above the Factory group, with a divider beneath it. Its item ID
-    // cannot be index + 1 like the rest - that would be 0, which PopupMenu reserves for "dismissed"
-    // - so it carries its own sentinel and is translated back on selection.
-    constexpr int initMenuId = 9999;
-    menu.addItem (initMenuId, "INIT", true, ProgramManager::isInitProgram (current));
-    menu.addSeparator();
+        if (id.bank == ProgramBank::factory && ! std::exchange (factoryHeaderDone, true))
+        {
+            menu.addSeparator();
+            menu.addSectionHeader ("Factory");
+        }
 
-    menu.addSectionHeader ("Factory");
+        if (id.bank == ProgramBank::user && ! std::exchange (userHeaderDone, true))
+        {
+            menu.addSeparator();
+            menu.addSectionHeader ("User");
+        }
 
-    for (int i = 0; i < kNumFactoryPrograms; ++i)
-        menu.addItem (i + 1, rowFor (i), true, i == current);
-
-    if (total > kNumFactoryPrograms)
-    {
-        menu.addSeparator();
-        menu.addSectionHeader ("User");
-
-        for (int i = kNumFactoryPrograms; i < total; ++i)
-            menu.addItem (i + 1, rowFor (i), true, i == current);
+        menu.addItem ((int) i + 1, manager.displayLabelFor (id), true, id == current);
     }
 
     const juce::Component::SafePointer<ProgramHeader> safeThis { this };
@@ -297,9 +289,14 @@ void ProgramHeader::showProgramMenu()
                             safeThis->menuOpen = false;
                             safeThis->repaint();
 
-                            if (result != 0)
-                                safeThis->processorRef.setCurrentProgram (
-                                    result == initMenuId ? initProgramIndex : result - 1);
+                            if (result == 0)
+                                return;
+
+                            const auto row = (size_t) (result - 1);
+
+                            if (row < safeThis->menuRows.size())
+                                safeThis->processorRef.getProgramManager()
+                                    .requestProgramChange (safeThis->menuRows[row]);
                         });
 }
 
@@ -430,14 +427,16 @@ juce::String ProgramHeader::currentLcdString() const
     // clears on store, on delete and on loading another Program - all three reset displayedIsModified
     // through refreshFromProcessor, so nothing extra is needed here. Worst case is the 26-character
     // name cap plus "NN " and the marker, 31, which is inside the 16px guard's own 31.
-    // **INIT is unnumbered**, here as in the dropdown: it is outside the bank, so a number would
-    // place it in a running order it is not part of - and the arithmetic would print "00", since
-    // its index is -1.
-    const auto label = displayedIsInit
-                         ? displayedName
-                         : juce::String (displayedIndex + 1).paddedLeft ('0', 2) + " " + displayedName;
+    // An identifier the session named but the bank no longer has: the VALUES are correct and
+    // untouched, only the name is unknown, so the panel says so. No dirty asterisk either - there
+    // is no baseline to differ from.
+    if (displayedId.bank == ProgramBank::unresolved)
+        return displayedId.displayName + "?";
 
-    return label + (displayedIsModified ? " *" : "");
+    // Otherwise the number is a label computed from the Factory position at paint time. INIT and
+    // User Programs carry none.
+    return processorRef.getProgramManager().displayLabelFor (displayedId)
+         + (displayedIsModified ? " *" : "");
 }
 
 void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)
@@ -488,8 +487,9 @@ void ProgramHeader::paint (juce::Graphics& g)
     {
         // **On INIT the tag reads an em-dash at 42% ink, not FACT and not USER.** INIT sits
         // outside both banks, so either word would name a bank it is not in.
-        const bool onInit = displayedIsInit && ! namingMode;
-        const bool showUser = namingMode || ! displayedIsFactory;
+        const bool onInit = ! namingMode && (displayedId.bank == ProgramBank::init
+                                              || displayedId.bank == ProgramBank::unresolved);
+        const bool showUser = namingMode || displayedId.bank == ProgramBank::user;
         const auto tagText = onInit ? Text::emDash() : juce::String (showUser ? "USER" : "FACT");
 
         const juce::Rectangle<float> tag { display.getX(), display.getY(), Layout::bankTagW, display.getHeight() };

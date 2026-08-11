@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DSP/FactoryPrograms.h"
+
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include <memory>
@@ -220,7 +222,60 @@ namespace LegacyMigration
         attribute, and the apply loop walks the attributes the file actually has - so an old file
         loads with Cross-Feed left where the player had it, exactly the schema-1 behaviour, and
         needs no migration step. The bump records that a Program's meaning changed. */
-    inline constexpr int currentStateSchemaVersion = 2;
+    inline constexpr int currentStateSchemaVersion = 3;
+
+    /** The schema at which the session stopped storing a positional index and started storing bank
+        + identifier. */
+    inline constexpr int identitySchemaVersion = 3;
+
+    /** **The oldest schema whose values can still be interpreted, pinned to a literal.** Every bump
+        so far has been additive - schema 2 added crossFeed, and a schema-1 Program simply has no
+        such attribute, which the apply loop already handles by walking the attributes the file
+        actually has. So v1 remains fully readable.
+
+        A literal on purpose. The gate read `savedSchema != currentStateSchemaVersion`, which was
+        correct exactly once: it discarded schema-1 sessions wholesale even though this file's own
+        note says schema-1 Programs load fine by design - the two were already inconsistent - and
+        this bump would have discarded schema-2 sessions the same way. */
+    inline constexpr int oldestReadableSchemaVersion = 1;
+
+    /** **The identity attributes, and they are a contract.** `...ProgramName` is DISPLAY ONLY. */
+    inline constexpr auto programBankAttribute = "fifthMemberProgramBank";
+    inline constexpr auto programIdAttribute   = "fifthMemberProgramId";
+    inline constexpr auto programNameAttribute = "fifthMemberProgramName";
+
+    inline juce::String bankAttributeValue (ProgramBank bank)
+    {
+        switch (bank)
+        {
+            case ProgramBank::init:       return "init";
+            case ProgramBank::factory:    return "factory";
+            case ProgramBank::user:       return "user";
+            case ProgramBank::unresolved: return "unresolved";
+        }
+
+        return "factory";
+    }
+
+    inline ProgramBank bankFromAttribute (const juce::String& value)
+    {
+        if (value == "init")       return ProgramBank::init;
+        if (value == "user")       return ProgramBank::user;
+        if (value == "unresolved") return ProgramBank::unresolved;
+
+        return ProgramBank::factory;
+    }
+
+    /** Three outcomes, deliberately distinct: too old to interpret, too new to know about, usable. */
+    enum class SchemaVerdict { tooOld, tooNew, readable };
+
+    inline SchemaVerdict classifySchema (int savedSchema) noexcept
+    {
+        if (savedSchema < oldestReadableSchemaVersion) return SchemaVerdict::tooOld;
+        if (savedSchema > currentStateSchemaVersion)   return SchemaVerdict::tooNew;
+
+        return SchemaVerdict::readable;
+    }
 
     inline constexpr auto currentProgramIndexAttribute = "fifthMemberCurrentProgramIndex";
 }
