@@ -366,7 +366,21 @@ passes while proving nothing.
   and anything above ~1 means it is scaled and no measurement off it can be trusted. Guard every
   capture on the app being frontmost too — an unguarded one silently grabs whatever window is in
   front, which is usually the editor you launched it from.
-- **The plate is delivered and integrated.** `design/plate/fifth-member-plate-2x.png`, 2480 x 1864.
+- **The canvas is 1 px shorter as of the 2026-08-11 bundle, and the code has not caught up.** The
+  plate is now **1240 × 931** at 1× — 2480 × 1862 and 3720 × 2793, all three exact multiples, so it
+  is a deliberate cut rather than an export rounding — and both `GUI-SPEC.md` and `BUILD-HANDOFF.md`
+  §1 state it. `Layout::canvasHeight` is still `932.0f`. Until one of them moves, the plate is a
+  pixel shorter than the canvas it is blitted into. Change the constant with the header work, not
+  before: every absolute Y in `Layout` was measured against 932 and they have to move together.
+- **The 0.4 px meter offset is fixed in the artwork, and the mechanism is named.** BUILD-HANDOFF
+  §1.3: all five header elements are 34 px border-box (32 content + 1 px top and bottom) sharing one
+  bottom edge at y = 78.23, and *"a 5px gap put the meters 0.4px high"* — the IN/OUT captions now use
+  the PROGRAM caption's `margin-bottom: 6px` construction instead. That was the audit's §E finding
+  for this casting, resolved by the designers rather than by us guessing at it.
+- **`GUI-SPEC.md` §2 says the header row "sits on 32px" and BUILD-HANDOFF says 34px. Both are
+  right** — 32 is the content box, 34 the border box, and 34 is the figure the suite holds constant.
+  Read §2 alone and you build the band a border short.
+- **The plate is delivered and integrated.** `design/plate/fifth-member-plate-2x.png`, 2480 x 1862.
   `PanelBackground` is a blit now; the ~500 lines that rasterised the fascia, wear, ears, screws,
   tape elements, section frames and silkscreen are gone with it. Every ring except dial 1's two is
   `bakedInPlate`, verified by measuring ink in each tick annulus rather than read off the manifest -

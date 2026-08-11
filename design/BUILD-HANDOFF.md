@@ -3,7 +3,7 @@
 Model **DL-88**, tempo-synced stereo delay. Neon Foundry suite.
 Panel approved 2026-08-09. This document is **authoritative for the build** and supersedes any conflicting figure in `README.md` or `GUI-SPEC.md`.
 
-Canvas **1240 × 932 px** at 1×, fixed aspect, proportional scaling only. Left ear 52px, fascia 1136px, right ear 52px. Fascia padding 16px top / 18px sides / 12px bottom.
+Canvas **1240 × 931 px** at 1×, fixed aspect, proportional scaling only. Left ear 52px, fascia 1136px, right ear 52px. Fascia padding 16px top / 18px sides / 12px bottom.
 
 ---
 
@@ -13,9 +13,9 @@ Canvas **1240 × 932 px** at 1×, fixed aspect, proportional scaling only. Left 
 
 ### Exported bitmap — the plate
 
-One PNG, 1240 × 932 at 1× / 2× / 3×, alpha, sRGB.
+One PNG, 1240 × 931 at 1× / 2× / 3×, alpha, sRGB.
 
-**Delivered** — `plate/fifth-member-plate-1x.png` (1240 × 932), `-2x.png` (2480 × 1864), `-3x.png` (3720 × 2796). Cut from the approved prototype with every runtime layer suppressed. In the prototype source each such layer carries `data-plate="off"` (hidden entirely) or `data-plate="blank"` (well kept, contents dropped) — that attribute is the machine-readable form of the two tables below, so a recut stays in step with the panel.
+**Delivered** — `plate/fifth-member-plate-1x.png` (1240 × 931), `-2x.png` (2480 × 1862), `-3x.png` (3720 × 2793). Cut from the approved prototype with every runtime layer suppressed. In the prototype source each such layer carries `data-plate="off"` (hidden entirely) or `data-plate="blank"` (well kept, contents dropped) — that attribute is the machine-readable form of the two tables below, so a recut stays in step with the panel.
 
 It contains:
 
@@ -53,7 +53,8 @@ The other five dials keep their rings in the plate — none of them changes ink.
 | Knob bodies + pointers | vector, per §1.2 |
 | LEDs | vector, per §2.1 |
 | Mode buttons (division ×5, stereo ×3, character ×3) | vector rounded rects, per §1.3 |
-| SAVE / DELETE | vector, per §1.3 |
+| SAVE·STORE / DELETE·CANCEL button faces | vector, per §1.3 — face never changes |
+| The four Program-button legends | text, lit or dark per §1.3.1 |
 | Sync switch | vector, per §1.4 |
 | REPEATS LIVE lamp | vector, accent, 1.6s pulse |
 | Dial 1's two scale rings (ticks, minors, numerals) | vector + text, per §4.5 — `bakedInPlate = false` |
@@ -126,8 +127,45 @@ Sizes: division buttons 5 across at 30px tall, 5px gap; stereo buttons 3 across 
 
 Section boxes: TIMING 296 fixed, REPEATS flexible, OUTPUT 322 fixed, DELAY CHARACTER full width. See §4.1.
 
-SAVE 66 × 32, face `#2a2823 → #161512`, inset light 0.14, label `#d3ccbe`.
-DELETE 74 × 32, face `#242219 → #141310`, inset light 0.10, label `#d3ccbe` enabled / `#6f6a61` disabled. Two faces required.
+SAVE 66 × 32 content (**34 border-box**, the suite header height), face `#2a2823 → #161512`, inset light 0.14.
+DELETE 74 × 32 content (**34 border-box**), face `#242219 → #141310`, inset light 0.10.
+
+**One face each. No disabled face, no pressed variant** — see §1.3.1.
+
+### 1.3.1 The two Program buttons carry two legends each
+
+SAVE sits above STORE; DELETE above CANCEL. Resting function on top, what the button becomes while a Program is being named beneath it. **Neither button ever changes its face or its text** — only which legend is lit.
+
+Layout inside the 34px border-box: column, centred, **2px gap**, both legends Barlow Condensed **600 10px**, tracking .14em, `line-height: 1`. 10px is the brand floor for functional text and both legends are functional, so neither is set smaller than the other.
+
+Fifth Member's fascia is near-black, so the indication is **backlit — the legend itself lights.** No lamp beside it; there is no pale face here that would need one. Do not mix the two forms on this panel.
+
+| Legend | Lit | Dark |
+|---|---|---|
+| Ink | `#f2ece0` | `#77736a` |
+| Glow | `0 0 7px rgba(242,236,224,.55), 0 0 15px rgba(242,236,224,.25)` | none |
+| On SAVE face `#211f1b` | 13.98:1 | **3.48:1** |
+| On DELETE face `#1c1a15` | 14.71:1 | **3.66:1** |
+
+Both weights are 600/10px in both states. **Ink weight and colour never stand in for illumination** — the change is luminance plus bloom, which reads as a lamp; a bolder or blacker legend would read as emphasis.
+
+The lit ink is a **neutral bright, not the accent** and not any of the three mode LED colours (Tape / BBD / Digital) — the accent stays reserved for the live delay process.
+
+Dark is not absent. Both legends dark is the resting state of an unmodified Factory Program and must read as *nothing to do here*, never as a blank button, which is what the 3:1 state floor buys.
+
+**Which legend is live**
+
+| Panel state | SAVE | STORE | DELETE | CANCEL |
+|---|---|---|---|---|
+| Factory Program, unmodified | dark | dark | dark | dark |
+| Factory Program, edited | **lit** | dark | dark | dark |
+| User Program, unmodified | dark | dark | **lit** | dark |
+| User Program, edited | **lit** | dark | **lit** | dark |
+| Naming a Program | dark | **lit** | dark | **lit** |
+
+SAVE's lamp and the LCD's trailing ` *` read **the same edited flag**, so they cannot disagree. The flag sets on any parameter move or switch change and clears on Program recall and on a completed store; Escape out of naming leaves it set, because nothing was stored.
+
+Delivered faces: `plate/buttons/01-rest-nothing-to-do.png`, `02-edited-factory-save-lit.png`, `03-edited-user-save-delete-lit.png`, `04-naming-store-cancel-lit.png` — 3×, the button pair as a unit.
 
 ### 1.4 Sync switch — drawn
 
@@ -538,6 +576,10 @@ The strip carries **whole-effect state only**. `FB 62%` is the single parameter 
 
 ### 6.1 Geometry
 
+**The header band is 34px, and all five elements measure it.** PROGRAM LCD, SAVE, DELETE, IN and OUT are each **34px border-box** (32px content + 1px border top and bottom) and share one bottom edge at **y = 78.23** — verified on the render, not approximated. The IN/OUT captions use the PROGRAM caption's construction (`margin-bottom: 6px`, no flex gap) so the two column types resolve to the identical baseline; a 5px gap put the meters 0.4px high.
+
+Widths stay per-casting: LCD 449, SAVE 68, DELETE 76, IN 76, OUT 76 (border-box).
+
 ```
 All figures are BORDER-BOX unless marked content.
 
@@ -547,10 +589,10 @@ fill           linear-gradient 180°  #071009 → #040806
 border         1px #2a2823
 recess         inset 0 +2px 10px rgba(0,0,0,0.9) , 0 +1px 0 rgba(255,255,255,0.05)
 
-bank cell      75.2 px wide (content-sized: 12px padding, text, 12px padding)
+bank cell      67.2 px wide (content-sized: 8px padding, text, 8px padding)
                right border 1px rgba(255,255,255,0.09)
-name cell      335.8 px wide  ← the character budget below is against this
-chevron cell   36.0 px wide  = 11px padding + 14px glyph + 11px padding
+name cell      351.8 px wide  ← the character budget below is against this
+chevron cell   28.0 px wide  = 7px padding + 14px glyph + 7px padding
 ```
 
 ### 6.2 Type and character budget
@@ -565,11 +607,24 @@ Bank tag and program name are **identical**: Share Tech Mono **19px**, tracking 
 | `OUTPUT TRIM: +12.0 dB` | 21 | 263.3 px | yes |
 | `GENERATION LOSS: 100 %` | 22 | 275.9 px | yes |
 
-**Everything fits at 19px.** The longest live readout, `GENERATION LOSS: 100 %` at 22 characters, clears the cell by 59.9px. **26 characters is the cap the build should enforce on user program names.**
+**Everything fits at 19px.** The longest live readout, `GENERATION LOSS: 100 %` at 22 characters, clears the cell by 75.9px.
+
+**Budget 28 characters. User-name cap 26 — held, not shrunk.**
+
+```
+name cell 351.8 px  ÷  12.54 px/char  =  28 characters   ← the budget
+                    less the 2-char dirty marker " *"    =  26   ← the cap
+```
+
+User Programs carry no index (§3), so nothing else is deducted; Factory labels spend 3 of the 28 on `NN ` and are authored, not typed.
+
+The trailing ` *` marker was not previously drawn, and adding it to a 26-char budget would have cut the cap to 24 — **orphaning every already-saved name between 25 and 26 characters.** The two characters were taken out of padding instead, exactly as the brand rule prescribes: the bank cell went 12px → 8px per side and the chevron cell 11px → 7px, +16px in total, which lifted the budget 26 → 28 and left the cap where it was. Type, tracking, size and LCD width are all unchanged. The naming input follows the new cells at `left: 60px; right: 30px`.
+
+**Any future change to this row must state the resulting budget and confirm the cap has not fallen.**
 
 This required narrowing the wordmark column — see §7.1. At the previous 326px column the name cell was 278px and the two longest readouts overflowed, which would have forced a size step-down on every live readout; widening the LCD removed the need for one.
 
-A guard remains for safety: **any LCD string over 26 characters renders at 16px** instead of 19px, same face, tracking, colour and glow (advance 10.56 px/char, so 31 characters fit). It does not fire for any authored string, and the step is instantaneous — no animation between the two sizes.
+A guard remains for safety: **any LCD string over 28 characters renders at 16px** instead of 19px, same face, tracking, colour and glow (advance 10.56 px/char, so 31 characters fit). It does not fire for any authored string, and the step is instantaneous — no animation between the two sizes.
 
 ### 6.3 Live values vs. the scope strip
 
@@ -595,7 +650,7 @@ Rendered 14 × 8 px, vertically centred in the 32px content height, 11px padding
 
 ### 6.5 Dropdown
 
-Opens flush under the bar at `top: 34px` (the LCD's border-box height), full LCD border-box width, max height 210px, scrolling. Fill `#060d09`, 1px border `#2c2b26`, shadow `0 18px 32px rgba(0,0,0,0.75)`. Rows: 8px/14px padding, 1px `rgba(255,255,255,0.05)` separator, Share Tech Mono 15px `#93a894`, selected row `#d7e2d6`, trailing bank tag 12px `#93a894`.
+Opens flush under the bar at `top: 34px` (the LCD's border-box height, unchanged), full LCD border-box width, max height 210px, scrolling. Fill `#060d09`, 1px border `#2c2b26`, shadow `0 18px 32px rgba(0,0,0,0.75)`. Rows: 8px/14px padding, 1px `rgba(255,255,255,0.05)` separator, Share Tech Mono 15px `#93a894`, selected row `#d7e2d6`, trailing bank tag 12px `#93a894`.
 
 ---
 
@@ -700,10 +755,10 @@ Sprayed ink on brushed aluminium, rotated −90°, centred on the left ear. Barl
 | Division button label, unselected | `#b0aa9c` | STM 12px | button | 7.11 |
 | Stereo / character button label, selected | `#f0eade` | BC 600 12px / .18em (character: 13px / .24em) | button | 13.73 |
 | Stereo / character button label, unselected | `#b0aa9c` | same | button | 7.11 |
-| SAVE | `#d3ccbe` | BC 600 12px / .16em | button | 10.30 |
-| DELETE, enabled | `#d3ccbe` | BC 600 12px / .16em | button | 10.30 |
-| DELETE, disabled | `#6f6a61` | same | button | 3.06 ✱ |
-| Bank tag (FACT / USER) | `#cfd8cb` | STM 19px / .12em | LCD | 13.19 |
+| Program legend, lit (SAVE / STORE / DELETE / CANCEL) | `#f2ece0` | BC 600 10px / .14em | button | 13.98 |
+| Program legend, dark, on SAVE face | `#77736a` | same | button | 3.48 ✱ |
+| Program legend, dark, on DELETE face | `#77736a` | same | button | 3.66 ✱ |
+| Bank tag (FACT / USER / NAME) | `#cfd8cb` | STM 19px / .12em | LCD | 13.19 |
 | Program name / live readout | `#cfd8cb` | STM 19px (16px guard over 26 chars) | LCD | 13.19 |
 | Chevron stroke | `#a9bda9` | 1.6px path | LCD | 9.69 |
 | Rename field | `#d7e2d6` | STM 17px / .10em | `#0a1410` | 12.6 |
@@ -728,7 +783,7 @@ Both stay dimmer **by design**, because an LED carries the state and the brand r
 
 **Dimmed Dial 1 scale numerals** (2.82:1) are the same exception in a third place — see §4.5. Printed legend for a mode that is not live; the lit ring and the stack LED carry the current state.
 
-Disabled DELETE (3.06:1) is a fourth, narrower case: a disengaged control, exempt under the same rule that exempts bypass. It was raised from 1.99:1 regardless, since at that value it read as absent rather than disabled.
+The dark Program legends (3.48:1 and 3.66:1) are the fourth case, and the clearest one: a legend whose lamp is out is *state*, exempt from the functional floor, and it clears the brand's 3:1 state floor on both faces with margin. There is no longer a disabled DELETE face — the lamp goes out instead, which is what §1.3.1 replaced it with. It was raised from 1.99:1 regardless, since at that value it read as absent rather than disabled.
 
 ### 8.4 Accent
 
@@ -761,7 +816,7 @@ The scope trace should freeze rather than continue running, and the REPEATS LIVE
 - **The product icon.** Concept 1b, the phosphor repeat train. Delivered at `icons/fifth-member-icon-1024.png` (Projucer Large Icon) and `icons/fifth-member-icon-256.png` (Small Icon), PNG with alpha, transparent rounded-square corners so JUCE/macOS masking will not double-round it. Source of truth `IconPulse.dc.html` at a 256px design size; re-render at any multiple from there. No text in the mark; the decay train is vertically centred and reads at every size with no simplification variant.
 - **Whole visual identity.** Road-worn black rack chassis, fascia gradient, corner wear to bare metal, scuff streaks, brushed aluminium ears with screws, the gaffer-tape nameplate, the DLY 4 cable tape, the RACK 4 · MON WORLD stencil.
 - **Panel architecture.** Header composition, the three fixed Delay Character dials with permanently printed stacked labels, the Repeat Timeline scope, section grouping, all control positions and sizes.
-- **Program management.** SAVE always creates a new User Program; DELETE is disabled on Factory; one dynamic FACT/USER tag in the LCD.
+- **Program management.** SAVE always creates a new User Program. The two buttons carry stacked SAVE·STORE and DELETE·CANCEL legends, backlit individually, with no disabled face (§1.3.1); the bank tag reads FACT / USER / NAME.
 - **Interaction behaviour** apart from the removal of the tooltip: vertical drag, 190px of travel for full range, 620ms eased pointer motion on program recall only.
 - **Canvas** 1240px design width, proportional scaling.
 - **Accent** `#ff9d3c`.

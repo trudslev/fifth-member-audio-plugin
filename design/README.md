@@ -123,22 +123,30 @@ Background \`#060d09\`, border \`1px solid #2c2b26\`, shadow \`0 18px 32px rgba(
 Rows: padding \`8px 14px\`, Share Tech Mono 15 px, letter-spacing .1em, bottom border \`1px solid rgba(255,255,255,.05)\`.
 Row label left, bank tag right in 11 px \`#5d675e\`. Selected row \`#d7e2d6\`, unselected \`#7d8a7e\`.
 
-**Naming input** (when saving): overlays the name region, \`left: 72px; right: 34px; top: 5px; bottom: 5px\`,
+**Naming input** (when saving): overlays the name region, \`left: 60px; right: 30px; top: 3px; bottom: 3px\`,
 background \`#0a1410\`, border \`1px solid rgba(190,220,195,.35)\`, Share Tech Mono 18 px, letter-spacing .12em,
 centered, uppercase, placeholder \`NAME PROGRAM\`.
 
-**SAVE** button: 66 × 44, radius 3, \`linear-gradient(180deg,#2a2823,#161512)\`, border \`1px solid #0a0908\`,
-inset \`0 1px 0 rgba(255,255,255,.14)\`, drop \`0 2px 4px rgba(0,0,0,.5)\`, Barlow Condensed 600 12 px,
-letter-spacing .18em, \`#cec7ba\`. Hover: \`linear-gradient(180deg,#35322b,#1c1a16)\`.
+**SAVE** button: 66 × 32 content (**34 border-box**, the suite header height), radius 3,
+\`linear-gradient(180deg,#2a2823,#161512)\`, border \`1px solid #0a0908\`, inset \`0 1px 0 rgba(255,255,255,.14)\`,
+drop \`0 2px 4px rgba(0,0,0,.5)\`. Hover: \`linear-gradient(180deg,#35322b,#1c1a16)\`.
 
-**DELETE** button: 74 × 44, same construction but darker fill \`linear-gradient(180deg,#242219,#141310)\`
-and inset highlight \`.10\`. Label color \`#cec7ba\` when a User program is selected, \`#4d4941\` otherwise;
-cursor \`pointer\` / \`not-allowed\` correspondingly. **This is the one exception to the no-dimming rule** —
-DELETE is genuinely inapplicable on Factory programs.
+**DELETE** button: 74 × 32 content (**34 border-box**), same construction but darker fill
+\`linear-gradient(180deg,#242219,#141310)\` and inset highlight \`.10\`.
+
+**Both buttons carry two stacked legends and never change their face** — SAVE over STORE, DELETE over
+CANCEL, Barlow Condensed 600 **10 px**, letter-spacing .14em, \`line-height: 1\`, 2 px gap, centred in the
+34 px box. Each legend is individually **backlit**: lit \`#f2ece0\` with \`0 0 7px rgba(242,236,224,.55),
+0 0 15px rgba(242,236,224,.25)\`, dark \`#77736a\` with no glow. Weight and size never change between the
+two states. There is **no disabled face** — when a button has nothing to do, both its legends sit dark
+but stay readable (3.48:1 on SAVE's face, 3.66:1 on DELETE's). BUILD-HANDOFF §1.3.1 has the full
+state table; in short, SAVE lights on an edited Program, DELETE on a User Program, and STORE and
+CANCEL while a Program is being named.
 
 ### IN / OUT meters
-Two stacks, 10 px gap. Each: caption (Barlow Condensed 600, 10 px, letter-spacing .26em, \`#7e786e\`),
-5 px gap, then a readout box **74 × 32**, radius 2, background \`#05080a\`, border \`1px solid #2a2823\`,
+Two stacks, 10 px gap. Each: caption (Barlow Condensed 600, 11 px, letter-spacing .26em, \`#a8a294\`) with
+\`margin-bottom: 6px\` — the PROGRAM caption's construction, so the meters sit on the header band's shared
+baseline — then a readout box **74 × 32** (34 border-box), radius 2, background \`#05080a\`, border \`1px solid #2a2823\`,
 inset \`0 2px 8px rgba(0,0,0,.9)\`, Share Tech Mono 16 px, \`#b9c3c8\`, centered.
 Prototype shows static \`-12.4\` and \`-14.1\`; **in production these are live dBFS readouts** from the
 host's input and output buses, ballistics at the studio's standard peak/RMS behavior.
@@ -335,7 +343,7 @@ signals, no color change. That redundancy is deliberate; it survives on a dim st
 | Character mode | click | see below |
 | PROGRAM name / caret | click | opens/closes program list |
 | Program row | click | loads that program, closes list |
-| SAVE | click | opens the inline naming field |
+| SAVE | click | opens the inline naming field; STORE and CANCEL light, SAVE and DELETE go dark |
 | Naming field | Enter | creates a **new User program** (never overwrites); empty name defaults to \`TAKE <n>\` |
 | Naming field | Escape | cancels |
 | DELETE | click | removes the current User program; no-op on Factory |

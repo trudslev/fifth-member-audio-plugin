@@ -66,12 +66,12 @@
         <div style="flex:1">
           <div style="font:600 11px 'Barlow Condensed';letter-spacing:.28em;color:#a8a294;margin:0 0 6px 2px">PROGRAM</div>
           <div style="position:relative;display:flex;align-items:stretch;height:32px;border-radius:3px;background:linear-gradient(180deg,#071009,#040806);border:1px solid #2a2823;box-shadow:inset 0 2px 10px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05)">
-            <div data-plate="blank" style="display:flex;align-items:center;padding:0 12px;border-right:1px solid rgba(255,255,255,.09);font:19px 'Share Tech Mono';letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ bankTag }}</div>
+            <div data-plate="blank" style="display:flex;align-items:center;padding:0 8px;border-right:1px solid rgba(255,255,255,.09);font:19px 'Share Tech Mono';letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ bankTag }}</div>
             <div data-plate="blank" onClick="{{ toggleList }}" style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap;font-family:'Share Tech Mono';font-size:{{ lcdSize }};letter-spacing:.12em;color:#cfd8cb;text-shadow:0 0 9px rgba(180,210,185,.35)">{{ lcdText }}</div>
             <sc-if value="{{ naming }}" hint-placeholder-val="{{ false }}">
-              <input value="{{ draftName }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="NAME PROGRAM" style="position:absolute;left:68px;right:34px;top:3px;bottom:3px;background:#0a1410;border:1px solid rgba(190,220,195,.35);color:#d7e2d6;font:17px 'Share Tech Mono';letter-spacing:.10em;text-align:center;outline:none;text-transform:uppercase"></input>
+              <input value="{{ draftName }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="NAME PROGRAM" style="position:absolute;left:60px;right:30px;top:3px;bottom:3px;background:#0a1410;border:1px solid rgba(190,220,195,.35);color:#d7e2d6;font:17px 'Share Tech Mono';letter-spacing:.10em;text-align:center;outline:none;text-transform:uppercase"></input>
             </sc-if>
-            <div data-plate="off" onClick="{{ toggleList }}" style="display:flex;align-items:center;padding:0 11px;cursor:pointer">
+            <div data-plate="off" onClick="{{ toggleList }}" style="display:flex;align-items:center;padding:0 7px;cursor:pointer">
               <svg width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1.6 L7 6.4 L13 1.6" stroke="#a9bda9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
             </div>
             <sc-if value="{{ listOpen }}" hint-placeholder-val="{{ false }}">
@@ -86,20 +86,26 @@
             </sc-if>
           </div>
         </div>
-        <div style="display:flex;gap:7px">
-          <div data-plate="off" onClick="{{ onSave }}" style="width:66px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2a2823,#161512);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:#d3ccbe" style-hover="background:linear-gradient(180deg,#35322b,#1c1a16)">SAVE</div>
-          <div data-plate="off" onClick="{{ onDelete }}" style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:{{ delCursor }};background:linear-gradient(180deg,#242219,#141310);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 2px 4px rgba(0,0,0,.5);font:600 12px 'Barlow Condensed';letter-spacing:.16em;color:{{ delColor }}">DELETE</div>
+        <div data-asset="program-buttons" style="display:flex;gap:7px">
+          <div data-plate="off" onClick="{{ onSave }}" style="width:66px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:3px;cursor:pointer;background:linear-gradient(180deg,#2a2823,#161512);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.5)" style-hover="background:linear-gradient(180deg,#35322b,#1c1a16)">
+            <div style="font:600 10px 'Barlow Condensed';letter-spacing:.14em;line-height:1;color:{{ lgSave.c }};text-shadow:{{ lgSave.g }}">SAVE</div>
+            <div style="font:600 10px 'Barlow Condensed';letter-spacing:.14em;line-height:1;color:{{ lgStore.c }};text-shadow:{{ lgStore.g }}">STORE</div>
+          </div>
+          <div data-plate="off" onClick="{{ onDelete }}" style="width:74px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:3px;cursor:{{ delCursor }};background:linear-gradient(180deg,#242219,#141310);border:1px solid #0a0908;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 2px 4px rgba(0,0,0,.5)">
+            <div style="font:600 10px 'Barlow Condensed';letter-spacing:.14em;line-height:1;color:{{ lgDelete.c }};text-shadow:{{ lgDelete.g }}">DELETE</div>
+            <div style="font:600 10px 'Barlow Condensed';letter-spacing:.14em;line-height:1;color:{{ lgCancel.c }};text-shadow:{{ lgCancel.g }}">CANCEL</div>
+          </div>
         </div>
       </div>
 
       <!-- METERS -->
       <div style="display:flex;gap:10px;flex:none">
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294">IN</div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+          <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294;margin:0 0 6px">IN</div>
           <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8" data-plate="blank">{{ inMeter }}</div>
         </div>
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294">OUT</div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+          <div style="font:600 11px 'Barlow Condensed';letter-spacing:.26em;color:#a8a294;margin:0 0 6px">OUT</div>
           <div style="width:74px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#05080a;border:1px solid #2a2823;box-shadow:inset 0 2px 8px rgba(0,0,0,.9);font:16px 'Share Tech Mono';color:#b9c3c8" data-plate="blank">{{ outMeter }}</div>
         </div>
       </div>
@@ -419,7 +425,7 @@ class Component extends DCLogic {
       damping: 4000, saturation: 24,
       mix: 38, trim: 0,
       bank: 'FACT', factIdx: 0, userIdx: 0,
-      user: [], listOpen: false, naming: false, draft: '',
+      user: [], listOpen: false, naming: false, draft: '', dirty: false,
       live: null
     };
     this.FACT = ['YOU TOO?', 'SLAPBACK 66', 'CANYON WALL', 'HALF-STEP', 'GHOST NOTE', 'BUS TIRE DUB'];
@@ -561,7 +567,7 @@ class Component extends DCLogic {
       let v = start + ((startY - ev.clientY) / 190) * range;
       v = Math.max(min, Math.min(max, v));
       if (step) v = Math.round(v / step) * step;
-      this.setState({ [key]: v });
+      this.setState({ [key]: v, dirty: true });
       this.setLive(label, fmt(v));
     };
     const up = () => { this.setState({ active: null }); this.clearLive(); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
@@ -584,9 +590,12 @@ class Component extends DCLogic {
 
   setMode(i) {
     if (i === this.state.mode) return;
-    this.setState({ mode: i, armed: false });
+    this.setState({ mode: i, armed: false, dirty: true });
     setTimeout(() => this.setState({ armed: true }), 40);
   }
+
+  LIT  = { c: '#f2ece0', g: '0 0 7px rgba(242,236,224,.55), 0 0 15px rgba(242,236,224,.25)' };
+  DARK = { c: '#77736a', g: 'none' };
 
   progName() {
     const s = this.state;
@@ -615,7 +624,7 @@ class Component extends DCLogic {
         ledBg: sel && s.sync ? LED_ON : LED_OFF,
         ledGlow: sel && s.sync ? GLOW_ON : GLOW_OFF,
         shadow: sel ? PRESSED : RAISED,
-        onPick: () => this.setState({ div: i })
+        onPick: () => this.setState({ div: i, dirty: true })
       };
     });
 
@@ -625,7 +634,7 @@ class Component extends DCLogic {
       ledBg: i === s.stereo ? LED_ON : LED_OFF,
       ledGlow: i === s.stereo ? GLOW_ON : GLOW_OFF,
       shadow: i === s.stereo ? PRESSED : RAISED,
-      onPick: () => this.setState({ stereo: i })
+      onPick: () => this.setState({ stereo: i, dirty: true })
     }));
 
     const charModes = ['TAPE', 'BBD', 'DIGITAL'].map((m, i) => ({
@@ -702,11 +711,11 @@ class Component extends DCLogic {
     const bankList = this.FACT.map((n, i) => ({
       label: String(i + 1).padStart(2, '0') + ' ' + n, tag: 'FACT',
       color: s.bank === 'FACT' && s.factIdx === i ? '#d7e2d6' : '#93a894',
-      onPick: () => this.setState({ bank: 'FACT', factIdx: i, listOpen: false })
+      onPick: () => this.setState({ bank: 'FACT', factIdx: i, listOpen: false, dirty: false })
     })).concat(s.user.map((n, i) => ({
       label: String(i + 1).padStart(2, '0') + ' ' + n, tag: 'USER',
       color: s.bank === 'USER' && s.userIdx === i ? '#d7e2d6' : '#93a894',
-      onPick: () => this.setState({ bank: 'USER', userIdx: i, listOpen: false })
+      onPick: () => this.setState({ bank: 'USER', userIdx: i, listOpen: false, dirty: false })
     })));
 
     // --- printed scales ---------------------------------------------------
@@ -736,12 +745,20 @@ class Component extends DCLogic {
     const trimK = this.knob('trim', 'OUTPUT TRIM', -24, 24, v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' dB');
 
     return {
-      lcdText: s.live || this.progName(),
-      // Name cell is 335.8px; 19px Share Tech Mono at .12em runs 12.54px/char,
-      // so 26 chars fit — the longest live readout is 22. The step-down is a
-      // guard for over-long user program names; never fires on authored strings.
-      lcdSize: (s.live || this.progName()).length > 26 ? '16px' : '19px',
-      bankTag: s.bank,
+      lcdText: s.live || (this.progName() + (s.dirty && !s.naming ? ' *' : '')),
+      // Backlit legends. Lit = neutral bright + backlight bloom; unlit stays
+      // printed and readable at 3.4:1 on its own face (brand 3:1 state floor).
+      // Ink weight never stands in for illumination — both legends are 600/10px.
+      lgSave:   s.dirty && !s.naming ? this.LIT : this.DARK,
+      lgStore:  s.naming ? this.LIT : this.DARK,
+      lgDelete: !s.naming && s.bank === 'USER' && s.user.length ? this.LIT : this.DARK,
+      lgCancel: s.naming ? this.LIT : this.DARK,
+      // Name cell is 351.8px after the padding recovery; 19px Share Tech Mono
+      // at .12em runs 12.54px/char, so the budget is 28 chars. User-name cap =
+      // 28 less the 2-char dirty marker = 26 — held, not shrunk. User Programs
+      // carry no index, so nothing else is deducted.
+      lcdSize: (s.live || this.progName()).length > 28 ? '16px' : '19px',
+      bankTag: s.naming ? 'NAME' : s.bank,
       listOpen: s.listOpen,
       toggleList: () => this.setState({ listOpen: !s.listOpen, naming: false }),
       bankList,
@@ -751,7 +768,7 @@ class Component extends DCLogic {
         if (e.key === 'Enter') {
           const name = (s.draft || 'TAKE ' + (s.user.length + 1)).toUpperCase();
           const user = s.user.concat([name]);
-          this.setState({ user, userIdx: user.length - 1, bank: 'USER', naming: false, draft: '' });
+          this.setState({ user, userIdx: user.length - 1, bank: 'USER', naming: false, draft: '', dirty: false });
         } else if (e.key === 'Escape') this.setState({ naming: false, draft: '' });
       },
       onSave: () => this.setState({ naming: true, listOpen: false, draft: '' }),
@@ -760,8 +777,7 @@ class Component extends DCLogic {
         const user = s.user.slice(); user.splice(s.userIdx, 1);
         this.setState({ user, userIdx: Math.max(0, s.userIdx - 1), bank: user.length ? 'USER' : 'FACT' });
       },
-      delColor: s.bank === 'USER' && s.user.length ? '#d3ccbe' : '#6f6a61',
-      delCursor: s.bank === 'USER' && s.user.length ? 'pointer' : 'not-allowed',
+      delCursor: s.naming || (s.bank === 'USER' && s.user.length) ? 'pointer' : 'default',
       inMeter: '-12.4', outMeter: '-14.1',
 
       scopeRef: this.scopeRef,
@@ -772,7 +788,7 @@ class Component extends DCLogic {
 
       divLed: s.sync ? LED_ON : LED_OFF,
       divGlow: s.sync ? GLOW_ON : GLOW_OFF,
-      toggleSync: () => this.setState({ sync: !s.sync }),
+      toggleSync: () => this.setState({ sync: !s.sync, dirty: true }),
       syncText: s.sync ? 'ON' : 'OFF',
       syncKnobLeft: s.sync ? '27px' : '2px',
       divisions,
