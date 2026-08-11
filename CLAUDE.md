@@ -366,17 +366,27 @@ passes while proving nothing.
   and anything above ~1 means it is scaled and no measurement off it can be trusted. Guard every
   capture on the app being frontmost too — an unguarded one silently grabs whatever window is in
   front, which is usually the editor you launched it from.
-- **The canvas is 1 px shorter as of the 2026-08-11 bundle, and the code has not caught up.** The
-  plate is now **1240 × 931** at 1× — 2480 × 1862 and 3720 × 2793, all three exact multiples, so it
-  is a deliberate cut rather than an export rounding — and both `GUI-SPEC.md` and `BUILD-HANDOFF.md`
-  §1 state it. `Layout::canvasHeight` is still `932.0f`. Until one of them moves, the plate is a
-  pixel shorter than the canvas it is blitted into. Change the constant with the header work, not
-  before: every absolute Y in `Layout` was measured against 932 and they have to move together.
-- **The 0.4 px meter offset is fixed in the artwork, and the mechanism is named.** BUILD-HANDOFF
-  §1.3: all five header elements are 34 px border-box (32 content + 1 px top and bottom) sharing one
-  bottom edge at y = 78.23, and *"a 5px gap put the meters 0.4px high"* — the IN/OUT captions now use
-  the PROGRAM caption's `margin-bottom: 6px` construction instead. That was the audit's §E finding
-  for this casting, resolved by the designers rather than by us guessing at it.
+- **The canvas is 1 px shorter as of the 2026-08-11 bundle, and the code now matches.** The plate
+  is **1240 × 931** at 1× — 2480 × 1862 and 3720 × 2793, all three exact multiples, so a deliberate
+  cut rather than an export rounding — and `Layout::canvasHeight` is 931. It matters because
+  `PanelBackground` blits `stretchToFit` into the canvas, so a 931-tall plate in a 932 canvas
+  resampled the whole panel: a 0.107 % vertical stretch that blurs every baked edge and puts every
+  coordinate progressively out toward the bottom. Nothing looks broken; it simply stops being 1:1.
+
+  Safe to move because the plate's **content did not move**: the LCD well measures 54..86 in both
+  the old and the new plate, and only the bottom row was trimmed (last ink 931.5 → 930.5). That was
+  checked rather than assumed — the alternative was a re-layout, which would have invalidated every
+  absolute Y in `Layout` at once.
+- **The half-pixel meter offset is fixed, and the drift was never in the design.** `meterBoxY` was
+  52.72 against the LCD's and the buttons' 53.22 — the audit's §E finding for this casting. The
+  plate puts the meter well at exactly the same 54..86 as the LCD, so the artwork had the row
+  aligned all along and only the code disagreed. All five parts now alias one `headerRowY` /
+  `headerRowH` pair rather than each carrying its own literal, because they are one decision.
+
+  **53, not 53.22, and it is measured.** The baked recess runs 54..86, which is the 32 px content
+  box, so the border-box is 53..87. The designers reached the same place from the other side and
+  named the cause: *"a 5px gap put the meters 0.4px high"*, now replaced by the PROGRAM caption's
+  own `margin-bottom: 6px` construction so both column types resolve to one baseline.
 - **`GUI-SPEC.md` §2 says the header row "sits on 32px" and BUILD-HANDOFF says 34px. Both are
   right** — 32 is the content box, 34 the border box, and 34 is the figure the suite holds constant.
   Read §2 alone and you build the band a border short.

@@ -124,6 +124,25 @@ namespace Colour
     // the button's actual gradient, which is what tools/check_contrast.py now checks.
     // contrast: 3.16-3.94:1 vs buttonTop,buttonBottom [state]
     inline const juce::Colour labelDisabled   { 0xFF78756F };
+
+    /** **The Program buttons' two legends.** BUILD-HANDOFF §1.3.1: Fifth Member's fascia is
+        near-black, so the indication is **backlit - the legend itself lights**. There is no lamp
+        beside it, and no pale face here that would need one; the two forms must not be mixed on
+        this panel.
+
+        The lit ink is a neutral bright, NOT the accent and not any of the three mode LED colours
+        (Tape / BBD / Digital) - the accent stays reserved for the live delay process.
+
+        **Both legends are 600/10px in both states.** Ink weight and colour never stand in for
+        illumination: the change is luminance plus bloom, which reads as a lamp, where a bolder or
+        blacker legend would read as emphasis.
+        // contrast: 13.98:1 vs saveTop [functional] */
+    inline const juce::Colour legendLit       { 0xFFF2ECE0 };
+    /** Dark is not absent. Both legends dark is the resting state of an unmodified Factory Program
+        and has to read as "nothing to do here", never as a blank button - which is what the 3:1
+        state floor buys. Measures 3.48:1 on the SAVE face and 3.66:1 on DELETE's darker one.
+        // contrast: 3.48-3.66:1 vs saveTop,deleteTop [state] */
+    inline const juce::Colour legendDark      { 0xFF77736A };
     inline const juce::Colour footLabel       { 0xFFA09883 };
     inline const juce::Colour scopeCaption    { 0xFF79746B };
 
@@ -327,7 +346,17 @@ namespace Layout
         Measured, the chassis is 1240 x 931.45; 932 is that rounded up to a whole pixel. Raised
         with the designers; if a corrected prototype lands, re-measure rather than trusting either
         number. The previous 848 came from the same method on the pre-conformance panel. */
-    inline constexpr float canvasHeight = 932.0f;
+    /** **931, and it came down by one with the 2026-08-11 plate.** The plate is blitted
+        stretchToFit into canvasWidth x canvasHeight, so a 931-tall image in a 932 canvas resamples
+        the whole panel - a 0.107% vertical stretch that blurs every baked edge and puts every
+        coordinate progressively out toward the bottom. Nothing looks broken; it just stops being
+        1:1.
+
+        Safe to move because the plate's CONTENT did not move: the LCD well measures 54..86 in both
+        the old and the new plate, and only the bottom row was trimmed (last ink 931.5 -> 930.5).
+        Every absolute Y in this file stays valid. Checked rather than assumed - the alternative
+        was that the panel had been re-laid-out, which would have moved all of them. */
+    inline constexpr float canvasHeight = 931.0f;
     inline constexpr float unitRadius = 5.0f;
 
     /** EVERY coordinate below is absolute against the 1240 x 848 canvas.
@@ -369,7 +398,41 @@ inline constexpr float nameplateTextSize = 29.0f;
     inline constexpr float taglineLineHeight = 15.0f;
 
     inline constexpr float programLabelX = 370.0f;
-    inline constexpr float programLabelY = 34.22f;
+    inline constexpr float programLabelY = 34.72f;
+
+    /** **The header row: one Y and one height, for all five parts.** PROGRAM LCD, SAVE, DELETE and
+        both meter boxes are 34px border-box (32 content + a 1px border top and bottom) on y 53, so
+        the band reads as one instrument.
+
+        34 is BRAND.md's suite figure rather than this panel's: the castings are differently-sized
+        units, not scales of one design, and a manufacturer uses the same physical part across a
+        product line. Fifth Member was already at 34 and needed no change of height.
+
+        **53 is measured off the plate, not chosen.** The LCD well's baked recess runs 54..86, which
+        is the 32px content box, so the border-box is 53..87. The five constants below now alias
+        this pair rather than each carrying its own literal, because they are one decision.
+
+        That is what the audit's half-pixel was: `meterBoxY` was 52.72 against the LCD's and the
+        buttons' 53.22, so the meters sat half a pixel high on a row that the ARTWORK already had
+        aligned - the plate puts the meter well at exactly the same 54..86 as the LCD. The drift was
+        never in the design. The designers found the same thing from the other side and named the
+        cause: "a 5px gap put the meters 0.4px high", now replaced by the PROGRAM caption's own
+        margin-bottom construction so both column types resolve to one baseline. */
+    /** The Program buttons' two stacked legends: 10px Barlow Condensed 600 at .14em, 2px gap,
+        line-height 1. 10px is BRAND.md's floor for functional text and BOTH legends are
+        functional, so neither is set smaller than the other to make the pair fit the 34px cap.
+
+        **Named apart from control row A's `legendTextSize`/`legendTracking` deliberately, even
+        though the sizes coincide at 10px.** The tracking does not - .14em here against .28em there
+        - and the two describe different things: a backlit annunciator legend and a printed section
+        legend. This suite has twice been bitten by one constant serving two meanings, both times by
+        someone raising it for one consumer and silently moving the other. */
+    inline constexpr float programLegendTextSize = 10.0f;
+    inline constexpr float programLegendTracking = 0.14f;
+    inline constexpr float programLegendGap = 2.0f;
+
+    inline constexpr float headerRowY = 53.0f;
+    inline constexpr float headerRowH = 34.0f;
 
     /** Section 6.1's LCD, and every figure here is BORDER-BOX to match the rest of this file.
 
@@ -382,9 +445,9 @@ inline constexpr float nameplateTextSize = 29.0f;
         Cell widths are the render's, and they agree with the spec to a rounding: bank 75.17 against
         a stated 75.2, name 335.83 against 335.8, leaving 36.0 for the chevron. */
     inline constexpr float lcdX = 368.0f;
-    inline constexpr float lcdY = 53.22f;
+    inline constexpr float lcdY = headerRowY;
     inline constexpr float lcdW = 449.0f;
-    inline constexpr float lcdH = 34.0f;
+    inline constexpr float lcdH = headerRowH;
     inline constexpr float lcdRadius = 3.0f;
     inline constexpr float bankTagW = 75.17f;
     inline constexpr float lcdNameCellX = 444.17f;
@@ -414,13 +477,13 @@ inline constexpr float nameplateTextSize = 29.0f;
     inline constexpr float saveW = 68.0f;
     inline constexpr float deleteX = 902.0f;
     inline constexpr float deleteW = 76.0f;
-    inline constexpr float headerButtonY = 53.22f;
-    inline constexpr float headerButtonH = 34.0f;
+    inline constexpr float headerButtonY = headerRowY;
+    inline constexpr float headerButtonH = headerRowH;
 
     inline constexpr float meterCaptionY = 34.72f;
-    inline constexpr float meterBoxY = 52.72f;
+    inline constexpr float meterBoxY = headerRowY;
     inline constexpr float meterBoxW = 76.0f;
-    inline constexpr float meterBoxH = 34.0f;
+    inline constexpr float meterBoxH = headerRowH;
     inline constexpr float meterInX = 1004.0f;
     inline constexpr float meterOutX = 1090.0f;
 

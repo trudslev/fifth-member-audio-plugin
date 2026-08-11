@@ -369,11 +369,17 @@ void ProgramHeader::focusLost (FocusChangeType)
 }
 
 //==============================================================================
-void ProgramHeader::paintButton (juce::Graphics& g, juce::Rectangle<float> area, const juce::String& text,
-                                 bool enabled, bool isHovered, bool isDelete)
+void ProgramHeader::paintButton (juce::Graphics& g, juce::Rectangle<float> area,
+                                 const juce::String& topLegend, const juce::String& bottomLegend,
+                                 bool topLit, bool bottomLit, bool isHovered, bool isDelete)
 {
-    const auto top = isDelete ? Colour::deleteTop : (isHovered && enabled ? Colour::saveTopHover : Colour::saveTop);
-    const auto bottom = isDelete ? Colour::deleteBottom : (isHovered && enabled ? Colour::saveBotHover : Colour::saveBottom);
+    /*  **One face each. No disabled face, no relabelling** (BUILD-HANDOFF §1.3/§1.3.1). The face
+        varies only on hover, which is an affordance rather than a state; nothing here branches on
+        enablement. The `labelDisabled` treatment this replaced measured 1.78-1.94:1 - absent
+        rather than dim - and it was answering the wrong question anyway: a button with nothing to
+        do is not a button that has been switched off. */
+    const auto top = isDelete ? Colour::deleteTop : (isHovered ? Colour::saveTopHover : Colour::saveTop);
+    const auto bottom = isDelete ? Colour::deleteBottom : (isHovered ? Colour::saveBotHover : Colour::saveBottom);
 
     g.setGradientFill (Paint::vertical (area, top, bottom));
     g.fillRoundedRectangle (area, 3.0f);
@@ -384,9 +390,53 @@ void ProgramHeader::paintButton (juce::Graphics& g, juce::Rectangle<float> area,
     g.setColour (juce::Colours::white.withAlpha (isDelete ? 0.10f : 0.14f));
     g.drawLine (area.getX() + 3.0f, area.getY() + 1.5f, area.getRight() - 3.0f, area.getY() + 1.5f, 1.0f);
 
-    Text::drawTracked (g, text, Font::label (12.0f), Font::trackingPx (0.18f, 12.0f),
-                       area, juce::Justification::centred,
-                       enabled ? Colour::buttonText : Colour::labelDisabled);
+    /*  Two legends, column, centred, 2px gap, both Barlow Condensed 600 at 10px / .14em with
+        line-height 1. **Both are set at the same size and weight in both states**: 10px is
+        BRAND.md's floor for functional text and both legends are functional, so neither is set
+        smaller to make the pair fit, and neither is emboldened to stand in for illumination.
+
+        The change between states is luminance plus bloom, which reads as a lamp. A bolder or
+        blacker legend would read as emphasis - a different thing, and the one this construction
+        exists to avoid. */
+    const auto font = Font::label (Layout::programLegendTextSize);
+    const float tracking = Font::trackingPx (Layout::programLegendTracking, Layout::programLegendTextSize);
+    const float lineH = Layout::programLegendTextSize;
+    const float blockH = lineH * 2.0f + Layout::programLegendGap;
+    const float blockTop = area.getCentreY() - blockH * 0.5f;
+
+    const auto legend = [&] (const juce::String& text, float y, bool lit)
+    {
+        const juce::Rectangle<float> line { area.getX(), y, area.getWidth(), lineH };
+
+        if (lit)
+        {
+            /*  §1.3.1's `0 0 7px rgba(242,236,224,.55), 0 0 15px rgba(242,236,224,.25)`. JUCE has
+                no text-shadow and no cheap blur for a string, so each radius is the same tracked
+                text drawn at eight points around a circle; overlapping copies sum to a halo.
+                Alphas are tuned rather than quoted - eight copies at alpha a reach 1-(1-a)^8 where
+                they coincide, so the CSS figures cannot be used directly. */
+            for (auto [radius, alpha] : { std::pair { 7.5f, 0.030f }, std::pair { 3.5f, 0.075f } })
+                for (int i = 0; i < 8; ++i)
+                {
+                    const float angle = juce::MathConstants<float>::twoPi * (float) i / 8.0f;
+
+                    Text::drawTracked (g, text, font, tracking,
+                                       line.translated (std::cos (angle) * radius,
+                                                        std::sin (angle) * radius),
+                                       juce::Justification::centred,
+                                       Colour::legendLit.withAlpha (alpha));
+                }
+        }
+
+        Text::drawTracked (g, text, font, tracking, line, juce::Justification::centred,
+                           lit ? Colour::legendLit : Colour::legendDark);
+    };
+
+    const juce::Graphics::ScopedSaveState state (g);
+    g.reduceClipRegion (area.getSmallestIntegerContainer());
+
+    legend (topLegend, blockTop, topLit);
+    legend (bottomLegend, blockTop + lineH + Layout::programLegendGap, bottomLit);
 }
 
 void ProgramHeader::paintMeters (juce::Graphics& g)
@@ -569,10 +619,23 @@ void ProgramHeader::paint (juce::Graphics& g)
                                   juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
     }
 
-    paintButton (g, saveArea(), namingMode ? "STORE" : "SAVE",
-                 isEnabled (Region::save), hovered == Region::save, false);
-    paintButton (g, deleteArea(), namingMode ? "CANCEL" : "DELETE",
-                 isEnabled (Region::deleteOrCancel), hovered == Region::deleteOrCancel, true);
+    /*  §1.3.1's "which legend is live" table:
+
+        | Panel state                 | SAVE | STORE | DELETE | CANCEL |
+        | Factory Program, unmodified | dark | dark  | dark   | dark   |
+        | Factory Program, edited     | LIT  | dark  | dark   | dark   |
+        | User Program, unmodified    | dark | dark  | LIT    | dark   |
+        | User Program, edited        | LIT  | dark  | LIT    | dark   |
+        | Naming a Program            | dark | LIT   | dark   | LIT    |
+
+        SAVE's lamp and the LCD's trailing " *" read the same edited flag, so they cannot
+        disagree - which is why `isEnabled(save)` is the source here rather than a second test. */
+    paintButton (g, saveArea(), "SAVE", "STORE",
+                 ! namingMode && isEnabled (Region::save), namingMode,
+                 hovered == Region::save, false);
+    paintButton (g, deleteArea(), "DELETE", "CANCEL",
+                 ! namingMode && isEnabled (Region::deleteOrCancel), namingMode,
+                 hovered == Region::deleteOrCancel, true);
 
     paintMeters (g);
 }

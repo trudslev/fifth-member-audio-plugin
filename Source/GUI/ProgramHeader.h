@@ -95,8 +95,11 @@ private:
     static juce::Rectangle<float> saveArea();
     static juce::Rectangle<float> deleteArea();
 
-    void paintButton (juce::Graphics& g, juce::Rectangle<float> area, const juce::String& text,
-                      bool enabled, bool hovered, bool isDelete);
+    /** One face, two permanently printed legends, each lit or not. No `enabled` and no label
+        argument: the button never relabels and never wears a disabled face. */
+    void paintButton (juce::Graphics& g, juce::Rectangle<float> area,
+                      const juce::String& topLegend, const juce::String& bottomLegend,
+                      bool topLit, bool bottomLit, bool isHovered, bool isDelete);
     void paintMeters (juce::Graphics& g);
 
     /** What the name cell currently reads: the live parameter readout if one is in flight,
