@@ -11,7 +11,7 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Universal: Apple Silicon + Intel")
 endif()
 
-project(FifthMember VERSION 0.1.0 LANGUAGES CXX C)
+project(FifthMember VERSION 1.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
