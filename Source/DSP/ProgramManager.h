@@ -2,6 +2,9 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include <nf/ParameterSnapshot.h>
+#include <nf/UserProgramStore.h>
+
 #include "FactoryPrograms.h"
 
 #include <functional>
@@ -124,10 +127,8 @@ public:
 private:
     void handleAsyncUpdate() override;
 
-    void refreshUserProgramList();
     void applyProgram (const ProgramId& id);
     void setCurrentId (const ProgramId& id);
-    juce::File userProgramFile (const juce::String& stem) const;
     void applyFactoryProgram (const FactoryProgram& program);
 
     /** **INIT only, and the ONE place the active-path filter is deliberately bypassed.**
@@ -140,12 +141,14 @@ private:
     void captureCleanSnapshot();
 
     /** The active-path IDs for the CURRENT parameter state. */
-    std::vector<const char*> currentActivePath() const;
+    juce::StringArray currentActivePath() const;
 
     juce::AudioProcessorValueTreeState& apvts;
 
-    const juce::File userDirectory;
-    juce::Array<juce::File> userProgramFiles;
+    /** The User bank on disk. Scanning, naming, saving and deleting are core's - what a Program
+        CONTAINS stays here, because Fifth Member's active-path serialisation is the one thing in
+        this class no sibling shares. */
+    nf::UserProgramStore store;
 
     mutable juce::SpinLock currentIdLock;
     ProgramId currentId;
@@ -153,9 +156,9 @@ private:
     bool hasPendingProgram = false;
     ProgramId pendingProgram;
 
-    /** Normalised values keyed by parameter ID - not a positional vector, because the set being
-        compared changes with the selectors. Message-thread only. */
-    std::map<juce::String, float> cleanSnapshot;
+    /** The baseline the dirty flag compares against. Keyed by parameter ID inside - see
+        nf/ParameterSnapshot.h for why that is not an index. Message-thread only. */
+    nf::ParameterSnapshot cleanSnapshot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProgramManager)
 };

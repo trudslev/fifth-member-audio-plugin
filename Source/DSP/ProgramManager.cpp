@@ -2,6 +2,8 @@
 
 #include "../Parameters.h"
 
+#include <nf/UserProgramDirectory.h>
+
 #include <algorithm>
 #include <cmath>
 
@@ -13,8 +15,6 @@ is also compiled into the Tests console app."
 
 namespace
 {
-    constexpr float modifiedEpsilon = 1.0e-4f;
-
     /** Sets a parameter by ID from a plain physical value, going through the host so automation and
         the GUI both see it. */
     void setPlain (juce::AudioProcessorValueTreeState& apvts, const char* id, float plainValue)
@@ -30,14 +30,15 @@ namespace
 ProgramManager::ProgramManager (juce::AudioProcessorValueTreeState& state,
                                 juce::File userDirectoryOverride)
     : apvts (state),
-      userDirectory (userDirectoryOverride == juce::File() ? getDefaultUserProgramDirectory()
-                                                           : userDirectoryOverride)
+      store (nf::userProgramDirectory (NF_COMPANY_NAME, NF_PRODUCT_NAME, userDirectoryOverride),
+             getProgramFileExtension(),
+             maxProgramNameLength)
 {
     // The identity must be valid before initialise() runs, as the atomic index it replaced was
     // valid from its in-class initialiser.
     setCurrentId (factoryIdAt (defaultFactoryProgramIndex));
 
-    refreshUserProgramList();
+    store.refresh();
 }
 
 ProgramManager::~ProgramManager()
@@ -53,59 +54,16 @@ void ProgramManager::initialise()
 //==============================================================================
 juce::File ProgramManager::getUserProgramDirectory() const
 {
-    return userDirectory;
+    return store.getDirectory();
 }
 
 juce::File ProgramManager::getDefaultUserProgramDirectory()
 {
-    // **Application data on every platform - no macOS special case.** This used to branch, putting
-    // macOS Programs under ~/Library/Audio/Presets. That is Apple's location for the AU PRESET
-    // FORMAT: .aupreset files the AU system itself scans, reads and writes. Our user Programs are
-    // not those - they are application-owned data in our own XML format.
-    //
-    // **macOS needs the "Application Support" segment added by hand, and only macOS.** JUCE's
-    // userApplicationDataDirectory is `~/Library` there - NOT `~/Library/Application Support` -
-    // while it is `%APPDATA%` on Windows and `~/.config` on Linux, both of which are already the
-    // right root. JUCE's own PropertiesFile appends the segment the same way, for the same reason.
-    //
-    // This was got wrong once in exactly the plausible direction: the note here used to claim JUCE
-    // resolved the segment for us, and that hard-coding it would be wrong on two platforms out of
-    // three. The first half was false, and the second half only argues for the `#if` - it is one
-    // platform's extra segment, not a shared literal path. Programs landed directly in
-    // `~/Library/<Company>/` for a while, which is not where application data goes on macOS and is
-    // not a folder anything else writes into.
-    //
-    // No migration from the old location - nothing has shipped, so nothing is there to migrate.
-    // See Elmer's ProgramManager for why that is a decision rather than an oversight.
-    auto dir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-
-   #if JUCE_MAC
-    dir = dir.getChildFile ("Application Support");
-   #endif
-
-    return dir
-               .getChildFile (NF_COMPANY_NAME).getChildFile (NF_PRODUCT_NAME).getChildFile ("Programs");
-}
-
-void ProgramManager::refreshUserProgramList()
-{
-    userProgramFiles.clear();
-
-    if (userDirectory.isDirectory())
-        for (const auto& entry : juce::RangedDirectoryIterator (userDirectory, false,
-                                                                "*" + getProgramFileExtension()))
-            userProgramFiles.add (entry.getFile());
-
-    // Alphabetical by filename, deliberately not by modification time: the menu's order has to be
-    // the same on every launch.
-    std::sort (userProgramFiles.begin(), userProgramFiles.end(),
-               [] (const juce::File& a, const juce::File& b)
-               {
-                   // The STEM, not getFileName(): with the extension attached "AB C" sorts before
-                   // "AB", because a space (0x20) precedes the dot (0x2E).
-                   return a.getFileNameWithoutExtension()
-                           .compareIgnoreCase (b.getFileNameWithoutExtension()) < 0;
-               });
+    // The per-OS resolution, the "Application Support" segment macOS alone needs, and the reason
+    // ~/Library/Audio/Presets is the wrong answer are all in nf/UserProgramDirectory.h now. That
+    // reasoning was carried in six near-identical comment blocks, and the one time it was wrong it
+    // was wrong in all six at once.
+    return nf::userProgramDirectory (NF_COMPANY_NAME, NF_PRODUCT_NAME);
 }
 
 //==============================================================================
@@ -118,7 +76,7 @@ juce::String ProgramManager::getProgramName (int factoryPosition) const
 }
 
 //==============================================================================
-std::vector<const char*> ProgramManager::currentActivePath() const
+juce::StringArray ProgramManager::currentActivePath() const
 {
     const auto boolOf = [this] (const char* id)
     {
@@ -133,9 +91,16 @@ std::vector<const char*> ProgramManager::currentActivePath() const
         return 0;
     };
 
-    return ActivePath::forState (boolOf (ParamIDs::sync),
-                                 intOf (ParamIDs::character),
-                                 intOf (ParamIDs::stereoMode));
+    // ActivePath::forState is the single definition and stays a vector of literals - this converts
+    // once, at the boundary, because core's snapshot compares by juce::String key.
+    juce::StringArray ids;
+
+    for (const auto* id : ActivePath::forState (boolOf (ParamIDs::sync),
+                                                intOf (ParamIDs::character),
+                                                intOf (ParamIDs::stereoMode)))
+        ids.add (id);
+
+    return ids;
 }
 
 //==============================================================================
@@ -196,9 +161,8 @@ ProgramId ProgramManager::resolve (ProgramBank bank, const juce::String& id,
             return factoryIdAt (pos);
 
     if (bank == ProgramBank::user)
-        for (const auto& f : userProgramFiles)
-            if (f.getFileNameWithoutExtension() == id)
-                return { ProgramBank::user, id, id };
+        if (store.fileFor (id) != juce::File())
+            return { ProgramBank::user, id, id };
 
     // **Degrade honestly.** The restored values are correct and stay put; only the name is unknown.
     return { ProgramBank::unresolved, id, displayName.isNotEmpty() ? displayName : id };
@@ -207,14 +171,14 @@ ProgramId ProgramManager::resolve (ProgramBank bank, const juce::String& id,
 std::vector<ProgramId> ProgramManager::listPrograms() const
 {
     std::vector<ProgramId> out;
-    out.reserve (1 + kFactoryPrograms.size() + (size_t) userProgramFiles.size());
+    out.reserve (1 + kFactoryPrograms.size() + (size_t) store.getFiles().size());
 
     out.push_back (initId());
 
     for (size_t i = 0; i < kFactoryPrograms.size(); ++i)
         out.push_back (factoryIdAt ((int) i));
 
-    for (const auto& f : userProgramFiles)
+    for (const auto& f : store.getFiles())
     {
         const auto stem = f.getFileNameWithoutExtension();
         out.push_back ({ ProgramBank::user, stem, stem });
@@ -225,20 +189,10 @@ std::vector<ProgramId> ProgramManager::listPrograms() const
 
 juce::String ProgramManager::displayLabelFor (const ProgramId& id) const
 {
-    if (id.bank == ProgramBank::factory)
-        if (const int pos = factoryPositionOf (id.id); pos >= 0)
-            return juce::String (pos + 1).paddedLeft ('0', 2) + " " + id.displayName;
-
-    return id.displayName;
-}
-
-juce::File ProgramManager::userProgramFile (const juce::String& stem) const
-{
-    for (const auto& f : userProgramFiles)
-        if (f.getFileNameWithoutExtension() == stem)
-            return f;
-
-    return {};
+    // The Factory position is resolved here because the Factory bank is this casting's own; core
+    // never holds one. The two-digit number itself is presentation and is computed, never stored.
+    return nf::programDisplayLabel (id, id.bank == ProgramBank::factory ? factoryPositionOf (id.id)
+                                                                        : -1);
 }
 
 void ProgramManager::requestProgramChange (const ProgramId& id)
@@ -316,7 +270,7 @@ void ProgramManager::applyProgram (const ProgramId& id)
     }
     else if (id.bank == ProgramBank::user)
     {
-        const auto file = userProgramFile (id.id);
+        const auto file = store.fileFor (id.id);
 
         if (file == juce::File())
             return;
@@ -452,71 +406,46 @@ void ProgramManager::applyFactoryProgram (const FactoryProgram& program)
 //==============================================================================
 void ProgramManager::captureCleanSnapshot()
 {
-    cleanSnapshot.clear();
-
-    for (const auto* id : currentActivePath())
-        if (const auto* p = apvts.getParameter (id))
-            cleanSnapshot[juce::String (id)] = p->getValue();
+    // **Every parameter, not just the active path - and the comparison is what narrows.** The old
+    // code captured the path alone, so a parameter joining the path later had no baseline and was
+    // skipped. Capturing everything gives it one, and since the path is a function of Sync,
+    // Character and Stereo Mode - all three of which are always compared - a parameter can only be
+    // on the path when its discriminator is where the Program left it. The answer is identical
+    // either way; this one just cannot be read as "the baseline is incomplete".
+    cleanSnapshot.capture (apvts.processor);
 }
 
 bool ProgramManager::isModifiedFromLoadedProgram() const
 {
-    for (const auto* id : currentActivePath())
-    {
-        const auto key = juce::String (id);
-        const auto it = cleanSnapshot.find (key);
-
-        // A parameter that has just joined the active path - because Sync or Character was
-        // flipped - has no baseline. The selector that moved is itself on the path and will have
-        // registered the change, so this is not a missed modification.
-        if (it == cleanSnapshot.end())
-            continue;
-
-        if (const auto* p = apvts.getParameter (id))
-            if (std::abs (p->getValue() - it->second) > modifiedEpsilon)
-                return true;
-    }
-
-    return false;
+    // Restricted to the active path, recomputed each call: flipping Sync or Character changes which
+    // parameters are being compared, so moving the inactive timing control or another mode's dial
+    // is deliberately not a modification.
+    return cleanSnapshot.differsFrom (apvts.processor, currentActivePath());
 }
 
 //==============================================================================
 void ProgramManager::saveNewUserProgram (const juce::String& requestedName)
 {
-    juce::String name = requestedName.trim().toUpperCase();
-
-    if (name.isEmpty())
-        name = "TAKE " + juce::String (userProgramFiles.size() + 1);
-
-    if (name.length() > maxProgramNameLength)
-        name = name.substring (0, maxProgramNameLength);
-
-    if (! userDirectory.isDirectory())
-        userDirectory.createDirectory();
-
-    // Only the active path is serialised, so a User Program behaves exactly like a Factory one:
-    // recalling it leaves every persisting knob where the player left it.
+    // **Only the active path is serialised, and that stays here** - it is the one thing in this
+    // class no sibling shares. Core owns naming, collision and the write; what a Program CONTAINS
+    // is the casting's own business, which is exactly the split that lets Fifth Member's filtered
+    // model and the other five castings' whole-state model use one store.
     juce::XmlElement xml ("FifthMemberProgram");
     xml.setAttribute (LegacyMigration::stateSchemaVersionAttribute,
                       LegacyMigration::currentStateSchemaVersion);
 
-    for (const auto* id : currentActivePath())
+    for (const auto& id : currentActivePath())
         if (const auto* p = apvts.getParameter (id))
-            xml.setAttribute (juce::String (id), (double) p->convertFrom0to1 (p->getValue()));
+            xml.setAttribute (id, (double) p->convertFrom0to1 (p->getValue()));
 
-    juce::File file = userDirectory.getChildFile (
-        juce::File::createLegalFileName (name) + getProgramFileExtension());
+    const auto file = store.save (requestedName, xml);
 
-    // Save always creates a NEW Program. Both older siblings write straight to this path, which
-    // means reusing a name silently replaces that Program's contents - the one way their "never
-    // overwrites" guarantee could actually be broken.
-    if (file.existsAsFile())
-        file = file.getNonexistentSibling();
+    if (file == juce::File())
+        return;   // the write failed; the panel keeps naming the Program it was already on
 
-    xml.writeTo (file);
-
-    refreshUserProgramList();
-
+    // **The stem comes off the file core returned, not off the requested name.** A collision takes
+    // the next free sibling, so taking it from the request would point the panel at the first file
+    // while the values came from the second.
     const auto stem = file.getFileNameWithoutExtension();
     setCurrentId ({ ProgramBank::user, stem, stem });
     captureCleanSnapshot();
@@ -532,15 +461,10 @@ void ProgramManager::deleteUserProgram (const ProgramId& id)
     if (id.bank != ProgramBank::user)
         return;
 
-    const auto file = userProgramFile (id.id);
-
-    if (file == juce::File())
-        return;
-
     const bool wasCurrent = getCurrentProgramId() == id;
 
-    file.deleteFile();
-    refreshUserProgramList();
+    if (! store.remove (id.id))
+        return;
 
     // Deliberately NOT the unresolved state: deleting from the panel is unambiguous intent.
     if (wasCurrent)

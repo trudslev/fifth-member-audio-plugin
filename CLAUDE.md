@@ -294,6 +294,31 @@ silently. See BUILDING.md for the check that reads back what the bundle actually
 
 ### Build system
 
+**`neon-foundry-core` is pinned at `v1.0.0`, declared AFTER `FetchContent_MakeAvailable(JUCE)`.**
+That ordering is load-bearing: core links `juce::juce_core` and refuses to fetch its own when
+consumed, and two JUCE trees in one build link two `juce_core` builds into one binary. It is linked
+into **both** `FifthMember` and `FifthMemberTests`, because `ProgramManager.cpp` is compiled into
+both and now calls into it.
+
+What came from core, and what deliberately did not:
+
+| From core | Stayed here |
+|---|---|
+| `nf::userProgramDirectory` — the per-OS path and the `Application Support` segment | The `.fifthmemberprogram` extension and the 26-character cap |
+| `nf::UserProgramStore` — scanning, sorting, naming (`TAKE n`), collision, save, delete | **What a Program contains** — the active-path filter and the schema attribute |
+| `nf::ParameterSnapshot` — the dirty baseline, keyed by parameter ID | **Which parameters it compares** — `currentActivePath()`, recomputed per call |
+| `nf::ProgramId` / `nf::ProgramBank` / `programDisplayLabel` | The Factory bank, and resolving a slug to its position |
+
+The split is the point: core owns files and names, this repo owns meaning. It is what lets Fifth
+Member's filtered serialisation and the other five castings' `replaceState` model share one store.
+
+**The clean snapshot now captures every parameter, not just the active path**, and the comparison is
+what narrows. The answer is identical — the path is a function of Sync, Character and Stereo Mode,
+all three of which are always compared, so a parameter can only be on the path when its
+discriminator is where the Program left it — but a complete baseline cannot be misread as a missing
+one. All 34 test suites pass **unedited** against the extracted model, which was the acceptance bar:
+a test that needed changing would have meant the extraction changed behaviour.
+
 JUCE pinned to `8.0.14`, matching all four siblings. `PLUGIN_MANUFACTURER_CODE` (`Nfdy`),
 `PLUGIN_CODE` (`Fm88`), `BUNDLE_ID` (`com.neonfoundry.fifthmember`) and `COMPANY_NAME` are settled —
 changing them breaks saved projects in both AU and VST3, since JUCE derives the VST3 class ID from
