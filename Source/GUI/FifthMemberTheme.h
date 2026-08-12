@@ -30,6 +30,8 @@
     box-sizing reset, so every declared width/height excludes its border. That is already folded
     into the numbers below.
 */
+#include <nf/ParameterReadout.h>
+
 namespace FifthMemberTheme
 {
 
@@ -880,6 +882,27 @@ inline constexpr float nameplateTextSize = 29.0f;
         value. design/README.md calls this "the panel physically re-setting itself, the way real
         recall works" and asks for it to be kept. */
     inline constexpr float rearmHoldMs = 40.0f;
+
+    /** **How this panel spells the LCD parameter readout.**
+
+        A presentation decision, so it lives with the other presentation constants rather than in
+        ProgramHeader - and that placement is load-bearing for the test: ProgramHeader.h reaches the
+        processor, whose JucePlugin_* macros exist only in the plugin target, so a test reading the
+        format from there cannot link. The test must read the SHIPPING format rather than a copy, or
+        it asserts against itself. All six castings state it in the same place for that reason.
+    */
+    /** This casting's spelling of the readout. `NAME: VALUE UNIT` with the colon, the value left
+        in the case its parameter authored, and the suite's 900 ms revert.
+
+        Fifth Member was the reference for the extraction: it is the one casting the audit found no
+        defect in on this axis, so anything the shared version does differently here would be the
+        shared version being wrong. */
+    inline nf::ReadoutFormat readoutFormat()
+    {
+        nf::ReadoutFormat f;
+        f.nameCharacterBudget = lcdCharacterBudget;
+        return f;
+    }
 }
 
 //==============================================================================

@@ -517,7 +517,7 @@ void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)
     // control reads. Section 6.3's examples set the shape and are unchanged: "FEEDBACK: 62 %",
     // "TIME: 375 ms", "OUTPUT TRIM: +2.5 dB". The label is joined by core rather than baked into
     // the value text, so JUCE's own generic editor does not double it.
-    const auto text = nf::describeParameter (param, readoutFormat());
+    const auto text = nf::describeParameter (param, FifthMemberTheme::Layout::readoutFormat());
     const auto now = juce::Time::getMillisecondCounter();
 
     // Repaint only on a CHANGE. This fires on every value change through a drag, which is what

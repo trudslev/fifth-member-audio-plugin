@@ -42,18 +42,7 @@ public:
         onto whichever parameter was written last and flickers for the length of a song, which is
         exactly what section 6.3 forbids. Naming mode wins over both - the glass belongs to the name
         field until it commits or cancels. */
-    /** This casting's spelling of the readout. `NAME: VALUE UNIT` with the colon, the value left
-        in the case its parameter authored, and the suite's 900 ms revert.
 
-        Fifth Member was the reference for the extraction: it is the one casting the audit found no
-        defect in on this axis, so anything the shared version does differently here would be the
-        shared version being wrong. */
-    static nf::ReadoutFormat readoutFormat()
-    {
-        nf::ReadoutFormat f;
-        f.nameCharacterBudget = FifthMemberTheme::Layout::lcdCharacterBudget;
-        return f;
-    }
 
     void showParameter (const juce::RangedAudioParameter& param);
     void releaseParameter();
@@ -127,7 +116,7 @@ private:
 
     /** The parameter takeover: what to show, and until when. The deadline is core's; the fonts,
         the cell and every pixel of the painting stay here. */
-    nf::ReadoutTimer readout { readoutFormat() };
+    nf::ReadoutTimer readout { FifthMemberTheme::Layout::readoutFormat() };
 
     /** Whether the takeover was up at the last poll, so the timer repaints on the EDGE rather than
         every tick. The deadline itself lives in `readout`; this is only the change detector. */
