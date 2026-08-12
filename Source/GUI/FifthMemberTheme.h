@@ -57,7 +57,6 @@ namespace Colour
     inline const juce::Colour gafferDark      { 0xFFA8A293 };
     inline const juce::Colour cableTapeLight  { 0xFFE8E3D3 };
     inline const juce::Colour cableTapeDark   { 0xFFCDC7B6 };
-    inline const juce::Colour markerInk       { 0xFF151310 };
     inline const juce::Colour cableTapeInk    { 0xFF20201C };
 
     // --- LCD & phosphor ------------------------------------------------------
@@ -65,7 +64,6 @@ namespace Colour
     inline const juce::Colour lcdBottom       { 0xFF040806 };
     inline const juce::Colour lcdBorder       { 0xFF2A2823 };
     inline const juce::Colour lcdText         { 0xFFCFD8CB };
-    inline const juce::Colour lcdTextDim      { 0xFF9FB2A2 };
     /** Section 8.2: 9.69:1 on the LCD substrate. Only the bank tag was promoted to the program
         name's treatment; the chevron keeps this dimmer green. */
     inline const juce::Colour lcdChevron      { 0xFFA9BDA9 };
@@ -89,16 +87,20 @@ namespace Colour
 
     // --- type ----------------------------------------------------------------
     /** Section 8.2. Nearly every functional role resolves onto two values: #a8a294 at 7.36:1 for
-        panel text, #c3bcae at 9.91:1 for knob names. The old ramp (labelMid/labelDim/labelDimSoft/
-        labelFaint/...) had a dozen greys, several of which fell below the 7:1 floor for text that
-        is functional rather than flavour.
+        panel text, #c3bcae at 9.91:1 for knob names. The old ramp had a dozen greys, several below
+        the 7:1 floor for text that is functional rather than flavour.
+
+        **Thirteen of them are now gone rather than merely unused**, along with Layout's
+        tickStepDegrees - residue of the even-interval tick ring this file's own comment records
+        as removed. A dead colour constant is not inert: it reads as a sanctioned choice, so the
+        next person reaching for "a slightly dimmer grey" finds one already named and blessed and
+        reintroduces a value that was retired for failing the floor.
 
         Four roles stay deliberately dimmer, and section 8.3 documents each: unlit multi-label rows
         (2.82:1) and unselected mode-button labels (7.11:1), because an LED carries the state and
         the brand rule forbids conveying relevance by dimming the control; dial 1's idle ring, the
         same exception in a third place; and disabled DELETE (3.06:1), a disengaged control. */
     inline const juce::Colour labelBright     { 0xFFF0EADE };
-    inline const juce::Colour label           { 0xFFC3BCAE };
     inline const juce::Colour panelText       { 0xFFA8A294 };   // 7.36:1 - captions, headings, foot
 
     /** Section 8.3's two documented exceptions, named so they read as deliberate rather than as
@@ -111,14 +113,6 @@ namespace Colour
     inline const juce::Colour stackLabelLit        { 0xFFE7E1D4 };   // 14.36:1
     inline const juce::Colour stackLabelUnlit      { 0xFF615C54 };   //  2.82:1 - exception
     inline const juce::Colour buttonLabelUnselected{ 0xFFB0AA9C };   //  7.11:1 - exception
-    inline const juce::Colour labelMid        { 0xFFA49D92 };
-    inline const juce::Colour labelMidAlt     { 0xFFA9A297 };
-    inline const juce::Colour labelDim        { 0xFF857F75 };
-    inline const juce::Colour labelDimAlt     { 0xFF8D877C };
-    inline const juce::Colour labelDimSoft    { 0xFF7E786E };
-    inline const juce::Colour labelFaint      { 0xFF6D685F };
-    inline const juce::Colour labelFainter    { 0xFF615C54 };
-    inline const juce::Colour labelFaintest   { 0xFF57534C };
     // Lightened from #4D4941, which read 1.62:1 against its own button - absent rather than dim.
     // The block comment above once claimed 3.06:1 for that value; it never measured that against
     // the button's actual gradient, which is what tools/check_contrast.py now checks.
@@ -143,8 +137,6 @@ namespace Colour
         state floor buys. Measures 3.48:1 on the SAVE face and 3.66:1 on DELETE's darker one.
         // contrast: 3.48-3.66:1 vs saveTop,deleteTop [state] */
     inline const juce::Colour legendDark      { 0xFF77736A };
-    inline const juce::Colour footLabel       { 0xFFA09883 };
-    inline const juce::Colour scopeCaption    { 0xFF79746B };
 
     // --- controls ------------------------------------------------------------
     /** The one accent, per BRAND.md. Reserved for the scope lamp and the pulse train - the only
@@ -283,19 +275,23 @@ namespace Text
         return juce::String::charToString ((juce::juce_wchar) 0x00B7);
     }
 
+    /** **The run measured in ONE call, plus the tracking added between glyphs.**
+
+        It used to sum each character measured on its own. For Share Tech Mono that is identical -
+        every advance is the same and there is no kerning - which is why it survived: the LCD, the
+        budget test and every readout on this panel are mono. For a proportional face it is not: the
+        isolated widths fall short of the laid-out run, so the total under-reported and drawTracked's
+        glyph positions drifted left into each other.
+
+        Both now come from the same measurement, so a centred string and its own glyph positions
+        cannot disagree about where it ends. */
     inline float trackedWidth (const juce::String& text, const juce::Font& font, float tracking)
     {
-        float width = 0.0f;
+        if (text.isEmpty())
+            return 0.0f;
 
-        for (int i = 0; i < text.length(); ++i)
-        {
-            width += juce::GlyphArrangement::getStringWidth (font, juce::String::charToString (text[i]));
-
-            if (i < text.length() - 1)
-                width += tracking;
-        }
-
-        return width;
+        return juce::GlyphArrangement::getStringWidth (font, text)
+             + tracking * (float) (text.length() - 1);
     }
 
     /** juce::Font has no absolute-pixel letter-spacing, so tracked text is drawn glyph by glyph.
@@ -315,15 +311,33 @@ namespace Text
         else if (justification.testFlags (juce::Justification::right))
             x = area.getRight() - total;
 
+        /*  **Each glyph advances by the difference of two CUMULATIVE measurements, not by its own
+            width measured alone.** Those are not the same number for a proportional face: measuring
+            "N" on its own returns its isolated advance, while the run "SYN" carries whatever
+            kerning the font applies between them. Summing the isolated widths therefore falls
+            progressively short of where the text layout actually puts each glyph, and the
+            characters walk left into one another.
+
+            It showed on exactly one label, which is why it survived: every other tracked string on
+            this panel is Share Tech Mono, where isolated width and advance are equal by
+            construction, and every proportional caption except this one is baked into the plate.
+            The live "SYNC ON" rendered as "SYNC OON" - the N sliding under the O.
+
+            trackedWidth still measures the whole string in one call, so the total and the per-glyph
+            positions are derived from the same layout and cannot disagree. */
+        float measured = 0.0f;
+
         for (int i = 0; i < text.length(); ++i)
         {
-            const auto ch = juce::String::charToString (text[i]);
-            const float w = juce::GlyphArrangement::getStringWidth (font, ch);
+            const float upTo = juce::GlyphArrangement::getStringWidth (font, text.substring (0, i + 1));
+            const float advance = upTo - measured;
+            measured = upTo;
 
-            g.drawText (ch, juce::Rectangle<float> (x, area.getY(), w + 1.0f, area.getHeight()),
+            g.drawText (juce::String::charToString (text[i]),
+                        juce::Rectangle<float> (x, area.getY(), advance + 1.0f, area.getHeight()),
                         juce::Justification::centredLeft, false);
 
-            x += w + tracking;
+            x += advance + tracking;
         }
     }
 }
@@ -791,7 +805,14 @@ inline constexpr float nameplateTextSize = 29.0f;
     inline constexpr float knobArcStartDegrees = -135.0f;
     inline constexpr float knobArcEndDegrees   =  135.0f;
     /** 190 px of vertical drag spans the full range - the design's figure, not JUCE's default. */
+    /** 190px of vertical drag spans the full range, and 760 while Shift is held.
+
+        **Both are suite figures.** Six castings had six drag feels - JUCE's untouched 250 in two,
+        plus 200, 180 and 190 - so the same hand got a different response from each. Fifth Member
+        was already on the plurality; the Shift fine mode is what it gained, ported from Reflect-84
+        because a player who learns it on one casting expects it on the next. */
     inline constexpr int knobDragPixels = 190;
+    inline constexpr int knobFineDragPixels = 760;
 
     enum class KnobSize { small62, standard66, dial76, primary82, primary84 };
 
@@ -804,26 +825,29 @@ inline constexpr float nameplateTextSize = 29.0f;
         float tickInset;        // negative: the ring sits outside the body
         float tickMaskInner;    // the design's mask stops, as fractions of the ring box's
         float tickMaskOuter;    // FARTHEST-CORNER radius - not of the box radius
-        float tickStepDegrees;
+        // tickStepDegrees is GONE: dead residue of the even-interval ring this file's own
+        // comment records as removed. It was a POSITIONAL field, so deleting it meant
+        // deleting the matching value from all five initialisers - leaving it would have
+        // shifted tickWidth, slewMs and three colours by one place each.
         float tickWidth;
         juce::Colour faceTop, faceMid, faceBottom;
         juce::Colour tickColour;
         float slewMs;           // the character dials re-set more slowly than the rest
     };
 
-    inline const KnobVariant knob62 { 62.0f, 2.0f, 24.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
+    inline const KnobVariant knob62 { 62.0f, 2.0f, 24.0f, 6.0f, -10.0f, 0.62f, 0.74f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
                                       juce::Colour (0xFF121110), Colour::scaleTick, 620.0f };
-    inline const KnobVariant knob66 { 66.0f, 2.0f, 26.0f, 6.0f, -10.0f, 0.62f, 0.74f, 27.0f, 1.4f,
+    inline const KnobVariant knob66 { 66.0f, 2.0f, 26.0f, 6.0f, -10.0f, 0.62f, 0.74f, 1.4f,
                                       juce::Colour (0xFF4C4942), juce::Colour (0xFF262420),
                                       juce::Colour (0xFF121110), Colour::scaleTick, 620.0f };
-    inline const KnobVariant knob76 { 76.0f, 2.5f, 30.0f, 7.0f, -11.0f, 0.64f, 0.76f, 24.0f, 1.3f,
+    inline const KnobVariant knob76 { 76.0f, 2.5f, 30.0f, 7.0f, -11.0f, 0.64f, 0.76f, 1.3f,
                                       juce::Colour (0xFF514E46), juce::Colour (0xFF282621),
                                       juce::Colour (0xFF121110), Colour::scaleTick, 660.0f };
-    inline const KnobVariant knob82 { 82.0f, 3.0f, 32.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
+    inline const KnobVariant knob82 { 82.0f, 3.0f, 32.0f, 7.0f, -11.0f, 0.64f, 0.76f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
                                       juce::Colour (0xFF131210), Colour::scaleTick, 620.0f };
-    inline const KnobVariant knob84 { 84.0f, 3.0f, 33.0f, 7.0f, -11.0f, 0.64f, 0.76f, 22.5f, 1.2f,
+    inline const KnobVariant knob84 { 84.0f, 3.0f, 33.0f, 7.0f, -11.0f, 0.64f, 0.76f, 1.2f,
                                       juce::Colour (0xFF55524A), juce::Colour (0xFF2A2823),
                                       juce::Colour (0xFF131210), Colour::scaleTick, 620.0f };
 

@@ -222,6 +222,19 @@ void ProgramHeader::showProgramMenu()
         menu.addItem ((int) i + 1, manager.displayLabelFor (id), true, id == current);
     }
 
+    /*  **The USER section is always shown, with a placeholder when the bank is empty.** An absent
+        section is ambiguous between "nothing saved yet" and "this plugin does not do that", and the
+        player cannot tell which without saving something to find out. Reflect-84 had it first.
+
+        Added disabled, so this is the one row in the menu that takes drawPopupMenuItem's inactive
+        path - which is why that path had to clear the 3:1 state floor before this could ship. */
+    if (! userHeaderDone)
+    {
+        menu.addSeparator();
+        menu.addSectionHeader ("User");
+        menu.addItem (-1, Text::emDash() + " none saved " + Text::emDash(), false, false);
+    }
+
     const juce::Component::SafePointer<ProgramHeader> safeThis { this };
 
     // The list hangs off the LCD and has to read as an extension of it, so it takes the glass's
@@ -539,8 +552,12 @@ void ProgramHeader::paint (juce::Graphics& g)
         // outside both banks, so either word would name a bank it is not in.
         const bool onInit = ! namingMode && (displayedId.bank == ProgramBank::init
                                               || displayedId.bank == ProgramBank::unresolved);
-        const bool showUser = namingMode || displayedId.bank == ProgramBank::user;
-        const auto tagText = onInit ? Text::emDash() : juce::String (showUser ? "USER" : "FACT");
+        /*  **NAME while typing, not USER.** The Program is not in the user bank until STORE
+            commits it, and if the user cancels it never will be - so USER there names a thing that
+            does not exist yet. Elmer had this right first; it is the suite standard now. */
+        const auto tagText = namingMode ? juce::String ("NAME")
+                           : onInit     ? Text::emDash()
+                           : juce::String (displayedId.bank == ProgramBank::user ? "USER" : "FACT");
 
         const juce::Rectangle<float> tag { display.getX(), display.getY(), Layout::bankTagW, display.getHeight() };
 

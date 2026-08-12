@@ -115,6 +115,10 @@ void PanelControls::mouseDown (const juce::MouseEvent& e)
     if (hit == nullptr)
         return;
 
+    // Which parameter this click changes, for the LCD. Set inside the switch and announced once
+    // at the end, so a control cannot be added that changes a parameter and forgets to report it.
+    juce::String touched;
+
     switch (hit->region)
     {
         case Region::syncSwitch:
@@ -123,16 +127,25 @@ void PanelControls::mouseDown (const juce::MouseEvent& e)
                 p->beginChangeGesture();
                 p->setValueNotifyingHost (boolParam (ParamIDs::sync) ? 0.0f : 1.0f);
                 p->endChangeGesture();
+                touched = ParamIDs::sync;
             }
             break;
 
-        case Region::division:  setChoice (ParamIDs::noteDivision, hit->index); break;
-        case Region::stereo:    setChoice (ParamIDs::stereoMode, hit->index); break;
+        case Region::division:
+            setChoice (ParamIDs::noteDivision, hit->index);
+            touched = ParamIDs::noteDivision;
+            break;
+
+        case Region::stereo:
+            setChoice (ParamIDs::stereoMode, hit->index);
+            touched = ParamIDs::stereoMode;
+            break;
 
         case Region::character:
             if (hit->index != displayedCharacter)
             {
                 setChoice (ParamIDs::character, hit->index);
+                touched = ParamIDs::character;
 
                 // The panel physically re-sets itself: every dial snaps to minimum and sweeps back
                 // up to its new value. design/README.md calls this the moment that sells the
@@ -145,6 +158,9 @@ void PanelControls::mouseDown (const juce::MouseEvent& e)
         case Region::none:
             break;
     }
+
+    if (touched.isNotEmpty() && onParameterTouched != nullptr)
+        onParameterTouched (touched);
 
     repaint();
 }

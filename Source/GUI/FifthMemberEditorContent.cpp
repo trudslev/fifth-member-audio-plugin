@@ -3,6 +3,7 @@
 #include "../PluginProcessor.h"
 
 #include <cmath>
+#include <utility>
 
 using namespace FifthMemberTheme;
 
@@ -170,6 +171,18 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
 
     controls.onCharacterChanged = [this] { beginRearmSweep(); };
 
+    // Switches announce themselves in the LCD like the knobs do. No isMouseButtonDown guard is
+    // needed here and none would work: this fires from PanelControls' own mouseDown, so it is a
+    // direct user action by construction - automation and Program recall never reach it.
+    controls.onParameterTouched = [this] (const juce::String& paramID)
+    {
+        if (auto* param = processorRef.apvts.getParameter (paramID))
+        {
+            programHeader.showParameter (*param);
+            programHeader.releaseParameter();
+        }
+    };
+
     lastFrameMs = juce::Time::getMillisecondCounter();
     startTimerHz (Layout::animationHz);
 }
@@ -268,6 +281,18 @@ void FifthMemberEditorContent::timerCallback()
             beginRearmSweep();
     }
 
+    /*  A Program landed since the last frame, so the drawn pointers jump to their new values
+        rather than travelling to them. Polled here rather than pushed from the manager because the
+        editor already ticks every frame and a Program can arrive from the host, the dropdown or a
+        session restore - three paths that would each need wiring, and any one of them missed would
+        slew silently. */
+    if (const auto current = processorRef.getProgramManager().getCurrentProgramId();
+        ! (current == lastAppliedProgram))
+    {
+        lastAppliedProgram = current;
+        snapDisplayNextFrame = true;
+    }
+
     const auto slewFor = [dt] (float settleMs)
     {
         // CHORUS-60's law: 1 - 0.002^(dt/settle). Time-based, so travel takes the same wall time
@@ -276,12 +301,17 @@ void FifthMemberEditorContent::timerCallback()
         return 1.0f - std::pow (Layout::slewRemainderAtSettle, dt / settleMs);
     };
 
-    const auto advance = [] (FifthMemberKnob& knob, float& display, float slew, bool forceMinimum)
+    const bool snap = std::exchange (snapDisplayNextFrame, false);
+
+    const auto advance = [snap] (FifthMemberKnob& knob, float& display, float slew, bool forceMinimum)
     {
         const float target = (float) knob.valueToProportionOfLength (knob.getValue());
 
         if (forceMinimum)
             display = 0.0f;
+        else if (snap)
+            display = target;                    // Program recall: the value changed, so the
+                                                 // pointer is simply there
         else if (knob.isMouseButtonDown())
             display = target;                    // track the pointer 1:1; slewing under the user's
                                                  // own hand reads as lag, not as motion

@@ -48,6 +48,15 @@ public:
     /** Fired when the Delay Character changes, so the editor can run the re-arm sweep. */
     std::function<void()> onCharacterChanged;
 
+    /** **Every control that changes a parameter reports it to the LCD, switches included.**
+        BRAND.md's rule, and the reason it is a rule rather than a judgement: deciding which
+        controls are "self-explanatory" is harder to apply consistently than deciding none are -
+        and a switch is often the LEAST obvious thing on a panel, because turning a knob shows you
+        its own printed scale while flipping a switch shows you nothing.
+
+        All four of this component's controls raise it. The editor wires it to the header. */
+    std::function<void (const juce::String&)> onParameterTouched;
+
     /** One row of a dial's permanently-printed label stack. */
     struct DialLabel
     {

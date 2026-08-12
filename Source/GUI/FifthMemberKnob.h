@@ -51,6 +51,9 @@ public:
 
     void paint (juce::Graphics& g) override;
 
+    /** Shift gives a 4x fine drag - suite-wide behaviour, not this casting's. */
+    void mouseDown (const juce::MouseEvent& e) override;
+
     /** Draw at a rotation other than the parameter's own, so the knob can slew instead of
         snapping. Negative returns it to following the parameter directly. */
     void setDisplayProportion (float proportion) noexcept;

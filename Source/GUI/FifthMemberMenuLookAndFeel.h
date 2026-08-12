@@ -117,7 +117,14 @@ public:
                                          FifthMemberTheme::Font::mono (headerTextSize), headerTracking,
                                          r.withTrimmedLeft ((float) tickColumn),
                                          juce::Justification::left,
-                                         juce::Colour (0xFF93A894).withAlpha (0.70f));
+                                         // **Opaque.** BRAND.md permits opacity to express STATE and
+                                         // forbids it for HIERARCHY, and a section header is
+                                         // hierarchy - it is not disabled, inactive or
+                                         // not-current. The 9px size and the wider tracking against
+                                         // the rows' 15px already carry the distinction; the .70
+                                         // was doing the same job twice, the second time by the
+                                         // mechanism the brand book rules out.
+                                         juce::Colour (0xFF93A894));
 
         g.setColour (rule);
         g.fillRect (r.reduced (5.0f, 0.0f).withHeight (1.0f).withY (r.getBottom() - 1.0f));

@@ -80,6 +80,22 @@ private:
 
     int boundCharacter = -1;
     int rearmFramesRemaining = 0;
+
+    /** **Program recall SNAPS the drawn pointer; it does not slew.** BRAND.md carries this beside
+        the Program conventions, and the reasoning is the distinction between the two things that
+        move a knob here:
+
+        - **On recall the parameter's VALUE changes.** An animating pointer then shows a value that
+          is not current for the length of the animation, which is the one thing a pointer is for.
+          Either the value ramps too or neither does; snapping is simpler and is what four castings
+          already did.
+        - **On a dial-mode change the BINDING changes** - the knob stops meaning Mod Rate and starts
+          meaning Wow. No single current value is being misreported, and the travel is what tells
+          you the knob now means something else. That slew survives, deliberately.
+
+        Different mechanism, different answer. Do not "tidy" these into one behaviour. */
+    ProgramId lastAppliedProgram {};
+    bool snapDisplayNextFrame = true;
     juce::uint32 lastFrameMs = 0;
 
     void bindDials (int character);

@@ -9,10 +9,21 @@ FifthMemberKnob::FifthMemberKnob (Layout::KnobSize size)
     setRotaryParameters (juce::degreesToRadians (Layout::knobArcStartDegrees),
                          juce::degreesToRadians (Layout::knobArcEndDegrees), true);
 
-    // The design's figure: 190 px of vertical travel spans the full parameter range.
+    // The suite figure: 190 px of vertical travel spans the full parameter range.
     setMouseDragSensitivity (Layout::knobDragPixels);
     setVelocityBasedMode (false);
     setMouseCursor (juce::MouseCursor::UpDownResizeCursor);
+}
+
+void FifthMemberKnob::mouseDown (const juce::MouseEvent& e)
+{
+    // Sensitivity has to be settled BEFORE Slider::mouseDown records its drag anchor: JUCE measures
+    // the drag from that anchor and scales by the current sensitivity, so changing it part-way
+    // through a drag rescales the distance already travelled and the value jumps.
+    setMouseDragSensitivity (e.mods.isShiftDown() ? Layout::knobFineDragPixels
+                                                  : Layout::knobDragPixels);
+
+    juce::Slider::mouseDown (e);
 }
 
 void FifthMemberKnob::setCentrePosition (juce::Point<float> centre)
