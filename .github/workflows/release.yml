@@ -22,15 +22,33 @@ permissions:
   contents: write
 
 env:
-  # The three name axes. They are NOT interchangeable, and assuming they are is the single easiest
+  # The four name axes. They are NOT interchangeable, and assuming they are is the single easiest
   # way to break one of these workflows when copying it to another plugin:
   #   CMAKE_TARGET  - the CMake target, and therefore the <target>_artefacts/ directory name
   #   PRODUCT_NAME  - JUCE's PRODUCT_NAME, and therefore the bundle filenames on disk
+  #   ARCHIVE_STEM  - the release archive names, which must contain NO SPACE (see below)
   #   TEST_TARGET   - the console-app target holding the DSP suite
   # They diverge whenever the brand name isn't a legal CMake identifier: Fifth Member builds from
   # target FifthMember but produces "Fifth Member.vst3".
+  #
+  # **ARCHIVE_STEM exists because a space cannot survive a download URL.** The archives used to be
+  # named from PRODUCT_NAME, which made this plugin's macOS bundle
+  # "Fifth Member-1.0.0-macos-bundles.tar.gz" - and the suite installer builds its download URL by
+  # interpolating that name straight into a github.com path. Python raises InvalidURL on it before
+  # any request is made ("URL can't contain control characters ... found at least ' '"), so the
+  # failure is not a 404 you could diagnose from a server response; it is a client-side exception
+  # naming a character.
+  #
+  # Measured rather than assumed - the URL was constructed and handed to urlopen. Fifth Member is
+  # the only casting whose product name contains a space, so this would have broken exactly one
+  # plugin's download at the suite's first release and nowhere earlier.
+  #
+  # The stem is PRODUCT_NAME with spaces removed, which is what installer/common/manifest.py's
+  # artifact_name() computes; tools/validate_manifest.py compares the two so they cannot drift.
+  # BUNDLE filenames keep the space - JUCE produces "Fifth Member.vst3" and that must not change.
   CMAKE_TARGET: FifthMember
   PRODUCT_NAME: Fifth Member
+  ARCHIVE_STEM: FifthMember
   TEST_TARGET: FifthMemberTests
 
 jobs:
@@ -148,7 +166,7 @@ jobs:
       - name: Archive bundles
         run: |
           set -euo pipefail
-          NAME="${PRODUCT_NAME}-${{ needs.version.outputs.version }}-macos-bundles.tar.gz"
+          NAME="${ARCHIVE_STEM}-${{ needs.version.outputs.version }}-macos-bundles.tar.gz"
           tar czf "$NAME" -C "$STAGE" .
           echo "ARCHIVE=$NAME" >> "$GITHUB_ENV"
 
@@ -186,7 +204,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-bundles
-          path: ${{ env.PRODUCT_NAME }}-${{ needs.version.outputs.version }}-macos-bundles.tar.gz
+          path: ${{ env.ARCHIVE_STEM }}-${{ needs.version.outputs.version }}-macos-bundles.tar.gz
           retention-days: 14
 
   build-windows:
@@ -231,13 +249,13 @@ jobs:
       - name: Archive bundles
         shell: pwsh
         run: |
-          $name = "${env:PRODUCT_NAME}-${{ needs.version.outputs.version }}-windows-bundles.zip"
+          $name = "${env:ARCHIVE_STEM}-${{ needs.version.outputs.version }}-windows-bundles.zip"
           Compress-Archive -Path "${env:STAGE}\*" -DestinationPath $name
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows-bundles
-          path: ${{ env.PRODUCT_NAME }}-${{ needs.version.outputs.version }}-windows-bundles.zip
+          path: ${{ env.ARCHIVE_STEM }}-${{ needs.version.outputs.version }}-windows-bundles.zip
           retention-days: 14
 
   build-linux:
@@ -287,12 +305,12 @@ jobs:
           echo "STAGE=$STAGE" >> "$GITHUB_ENV"
 
       - name: Archive bundles
-        run: tar czf "${PRODUCT_NAME}-${{ needs.version.outputs.version }}-linux-bundles.tar.gz" -C "$STAGE" .
+        run: tar czf "${ARCHIVE_STEM}-${{ needs.version.outputs.version }}-linux-bundles.tar.gz" -C "$STAGE" .
 
       - uses: actions/upload-artifact@v4
         with:
           name: linux-bundles
-          path: ${{ env.PRODUCT_NAME }}-${{ needs.version.outputs.version }}-linux-bundles.tar.gz
+          path: ${{ env.ARCHIVE_STEM }}-${{ needs.version.outputs.version }}-linux-bundles.tar.gz
           retention-days: 14
 
   publish:
