@@ -107,11 +107,13 @@ void ProgramHeader::timerCallback()
 {
     bool needsRepaint = refreshFromProcessor();
 
-    // The live readout reverts on its own clock rather than a second timer (section 6.3).
-    if (readoutRevertAtMs != 0 && juce::Time::getMillisecondCounter() >= readoutRevertAtMs)
+    // The live readout reverts on its own clock rather than a second timer (section 6.3). The
+    // deadline is core's; polling it from a timer this component already runs is the local choice,
+    // and the two castings that use a one-shot juce::Timer instead read the same deadline.
+    if (const bool showing = readout.isShowing (juce::Time::getMillisecondCounter());
+        showing != readoutWasShowing)
     {
-        readoutRevertAtMs = 0;
-        liveReadout.clear();
+        readoutWasShowing = showing;
         needsRepaint = true;
     }
 
@@ -315,8 +317,10 @@ void ProgramHeader::showProgramMenu()
 
 void ProgramHeader::enterNamingMode()
 {
-    liveReadout.clear();
-    readoutRevertAtMs = 0;
+    // The glass belongs to the name field until it commits or cancels, so a knob moved just before
+    // SAVE must not reappear over a half-typed name. suppress() cancels rather than hides.
+    readout.suppress();
+    readoutWasShowing = false;
 
     namingMode = true;
     typedName.clear();
@@ -483,8 +487,9 @@ void ProgramHeader::paintMeters (juce::Graphics& g)
 //==============================================================================
 juce::String ProgramHeader::currentLcdString() const
 {
-    if (liveReadout.isNotEmpty())
-        return liveReadout;
+    if (const auto takeover = readout.textAt (juce::Time::getMillisecondCounter());
+        takeover.isNotEmpty())
+        return takeover;
 
     // A trailing " *" while the loaded Program has been edited, matching every other casting. It
     // clears on store, on delete and on loading another Program - all three reset displayedIsModified
@@ -507,30 +512,27 @@ void ProgramHeader::showParameter (const juce::RangedAudioParameter& param)
     if (namingMode)
         return;   // the glass belongs to the name field until it commits or cancels
 
-    // Straight through the parameter's own name and JUCE's own text conversion, so the LCD and the
-    // host never disagree about what a control reads. Section 6.3's examples set the shape:
-    // "FEEDBACK: 62 %", "TIME: 375 ms", "OUTPUT TRIM: +2.5 dB".
-    const auto name = param.getName (Layout::lcdCharacterBudget).toUpperCase();
-    // Name, value, unit - section 6.3's "FEEDBACK: 62 %", "TIME: 375 ms". The label is joined here
-    // rather than baked into the value text so JUCE's own generic editor does not double it.
-    const auto unit = param.getLabel();
-    const auto text = name + ": " + param.getCurrentValueAsText()
-                    + (unit.isEmpty() ? juce::String() : " " + unit);
+    // **Straight through nf::describeParameter**, which is straight through the parameter's own
+    // name and JUCE's own text conversion - so the LCD and the host cannot disagree about what a
+    // control reads. Section 6.3's examples set the shape and are unchanged: "FEEDBACK: 62 %",
+    // "TIME: 375 ms", "OUTPUT TRIM: +2.5 dB". The label is joined by core rather than baked into
+    // the value text, so JUCE's own generic editor does not double it.
+    const auto text = nf::describeParameter (param, readoutFormat());
+    const auto now = juce::Time::getMillisecondCounter();
 
-    if (text != liveReadout)
-    {
-        liveReadout = text;
+    // Repaint only on a CHANGE. This fires on every value change through a drag, which is what
+    // keeps the readout live - Reflect-84 wired only onDragStart and its LCD froze at the value the
+    // knob held when it was grabbed.
+    if (text != readout.textAt (now))
         repaint();
-    }
 
-    readoutRevertAtMs = 0;
+    readout.show (text);
+    readoutWasShowing = true;
 }
 
 void ProgramHeader::releaseParameter()
 {
-    if (liveReadout.isNotEmpty())
-        readoutRevertAtMs = juce::Time::getMillisecondCounter()
-                                + (juce::uint32) Layout::lcdReadoutHoldMs;
+    readout.release (juce::Time::getMillisecondCounter());
 }
 
 void ProgramHeader::paint (juce::Graphics& g)
