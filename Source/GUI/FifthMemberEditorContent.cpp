@@ -129,8 +129,15 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
         // single ring that always matches, so they keep the plain form.
         static const Layout::KnobScale dialPercent = Layout::scaleOf (Layout::percentFullMarks,
                                                                        0.0f, 100.0f, 1.0f);
+        // **The Hz ring's taper comes from the parameter's own range, not from a transcribed
+        // constant.** It used to read `0.1f, 5.0f, 0.4090339496f` - which is setSkewForCentre(1.0)
+        // on 0.1..5.0 evaluated by hand. Correct, unexplained, and silently wrong the moment the
+        // range moved: the ring would have gone on legending the old taper while the pointer
+        // followed the new one, and nothing would look broken.
+        static const auto modRate = modRateRange();
         static const Layout::KnobScale dialHz      = Layout::scaleOf (Layout::modRateMarks,
-                                                                       0.1f, 5.0f, 0.4090339496f);
+                                                                       modRate.start, modRate.end,
+                                                                       modRate.skew);
         static const Layout::KnobScale dialPlain   = Layout::baked (Layout::scaleOf (Layout::percentFullMarks));
         dial->setScale (i == 0 ? &dialPercent : &dialPlain);
         if (i == 0)

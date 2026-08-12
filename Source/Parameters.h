@@ -281,6 +281,29 @@ namespace LegacyMigration
 }
 
 //==============================================================================
+/** **Mod Rate's range, named because TWO things need it and they must not diverge.**
+
+    The parameter uses it, and dial 1's outer Hz ring is legended against it - that ring's numerals
+    are printed at angles derived from this taper, so a ring built from a different one points at
+    values the pointer never reaches. BRAND.md makes the printed scale a correctness requirement,
+    and this is the shape of getting it wrong.
+
+    It used to be built inline here and the ring carried the resulting skew as the literal
+    `0.4090339496f`, transcribed. That number is `setSkewForCentre(1.0f)` on 0.1..5.0 evaluated by
+    hand: correct, unexplained, and silently wrong the moment the range moved. `Tests/`
+    now asserts the ring against this range via nf::printedScaleDefects, so the two cannot part
+    company without a build failing.
+
+    **1 Hz sits at 12 o'clock**, which is what the skew centre buys and why it is 1.0 rather than
+    the arithmetic midpoint of 2.55.
+*/
+inline juce::NormalisableRange<float> modRateRange()
+{
+    juce::NormalisableRange<float> range { 0.1f, 5.0f, 0.01f };
+    range.setSkewForCentre (1.0f);
+    return range;
+}
+
 inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberParameterLayout()
 {
     using Range = juce::NormalisableRange<float>;
@@ -357,14 +380,10 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
     addFloat (ParamIDs::flutter,  "Flutter",         Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::flutter,  "%");
     addFloat (ParamIDs::genLoss,  "Generation Loss", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::genLoss,  "%");
 
-    {
-        Range range { 0.1f, 5.0f, 0.01f };
-        range.setSkewForCentre (1.0f);
-        params.push_back (std::make_unique<juce::AudioParameterFloat> (
-            juce::ParameterID { ParamIDs::modRate, 1 }, "Mod Rate", range, ParamDefaults::modRate,
-            Attributes().withLabel ("Hz")
-                        .withStringFromValueFunction ([] (float v, int) { return juce::String (v, 2); })));
-    }
+    params.push_back (std::make_unique<juce::AudioParameterFloat> (
+        juce::ParameterID { ParamIDs::modRate, 1 }, "Mod Rate", modRateRange(), ParamDefaults::modRate,
+        Attributes().withLabel ("Hz")
+                    .withStringFromValueFunction ([] (float v, int) { return juce::String (v, 2); })));
 
     addFloat (ParamIDs::modDepth, "Mod Depth",      Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::modDepth, "%");
     addFloat (ParamIDs::degrade,  "Repeat Degrade", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::degrade,  "%");

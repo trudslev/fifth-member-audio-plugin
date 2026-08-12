@@ -1,6 +1,10 @@
 #include "../Source/Parameters.h"
 #include "../Source/GUI/FifthMemberTheme.h"
+#include <nf/PrintedScale.h>
+
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#include <vector>
 
 /**
     The printed scales are the panel's only at-rest value reference, so a mark that names an angle
@@ -39,9 +43,11 @@ public:
                           { -135.00f, -50.89f, -21.63f, 0.00f, 33.22f, 59.45f, 101.24f, 135.00f },
                           "DAMPING");
 
-            const auto modRateRange = [] { juce::NormalisableRange<float> r { 0.1f, 5.0f, 0.01f };
-                                            r.setSkewForCentre (1.0f); return r; }();
-            checkAngles (modRateRange, modRateMarks, (int) std::size (modRateMarks),
+            // **The range comes from Parameters.h, not from a third copy built here.** It used to be
+            // rebuilt inline, which made this test agree with itself: the parameter, dial 1's Hz
+            // ring and this assertion each carried their own 0.1/5.0/centre-1.0, and a change to
+            // any one of them left the other two quietly legending the old taper.
+            checkAngles (modRateRange(), modRateMarks, (int) std::size (modRateMarks),
                           { -135.00f, -70.13f, -38.11f, 0.00f, 26.74f, 48.26f, 82.86f, 110.93f, 135.00f },
                           "MOD RATE");
         }
@@ -93,9 +99,45 @@ public:
             inRange (percentFullMarks,   (int) std::size (percentFullMarks),   0.0f, 100.0f, "percent");
             inRange (percentSparseMarks, (int) std::size (percentSparseMarks), 0.0f, 100.0f, "percent sparse");
         }
+
+        beginTest ("Every ring passes the suite's shared printed-scale check");
+        {
+            // The cases above assert this panel's rings against the handoff's PUBLISHED angles,
+            // which also checks the transcription. This one asserts them against the parameter's own
+            // range through nf::printedScaleDefects - the check every casting runs, which is what
+            // catches a taper moving out from under a ring rather than a figure being mistyped.
+            //
+            // Both are worth having and they fail for different reasons: the first says "the spec
+            // and the build disagree", this one says "the ring and the control disagree".
+            checkShared (modRateRange(), modRateMarks, (int) std::size (modRateMarks), "MOD RATE");
+
+            juce::NormalisableRange<float> percent { 0.0f, 100.0f, 0.1f };
+            checkShared (percent, percentFullMarks, (int) std::size (percentFullMarks), "percent");
+
+            juce::NormalisableRange<float> feedback { 0.0f, 110.0f, 0.1f };
+            checkShared (feedback, feedbackMarks, (int) std::size (feedbackMarks), "FEEDBACK");
+
+            juce::NormalisableRange<float> trim { -24.0f, 24.0f, 0.1f };
+            checkShared (trim, trimMarks, (int) std::size (trimMarks), "OUTPUT TRIM");
+        }
     }
 
 private:
+    /** Runs the suite's shared check over one ring and reports every defect by name. */
+    void checkShared (const juce::NormalisableRange<float>& range,
+                      const FifthMemberTheme::Layout::ScaleMark* marks, int count,
+                      const juce::String& ringName)
+    {
+        std::vector<nf::PrintedMark> printed;
+
+        for (int i = 0; i < count; ++i)
+            printed.push_back ({ marks[i].value,
+                                 angleOf (range, marks[i].value) });
+
+        for (const auto& defect : nf::printedScaleDefects (range, printed))
+            expect (false, ringName + ": " + defect);
+    }
+
     static float angleOf (const juce::NormalisableRange<float>& r, float value)
     {
         using namespace FifthMemberTheme::Layout;
