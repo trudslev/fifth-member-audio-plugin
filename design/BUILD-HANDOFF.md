@@ -56,6 +56,7 @@ The other five dials keep their rings in the plate — none of them changes ink.
 | SAVE·STORE / DELETE·CANCEL button faces | vector, per §1.3 — face never changes |
 | The four Program-button legends | text, lit or dark per §1.3.1 |
 | Sync switch | vector, per §1.4 |
+| SYNC ON / OFF caption | text, per §8.2 — state-dependent, so not baked |
 | REPEATS LIVE lamp | vector, accent, 1.6s pulse |
 | Dial 1's two scale rings (ticks, minors, numerals) | vector + text, per §4.5 — `bakedInPlate = false` |
 | Delay Character multi-label stack text (3 stacks) | text, lit `#e7e1d4` / unlit `#615c54` per selected mode, per §4.5 |

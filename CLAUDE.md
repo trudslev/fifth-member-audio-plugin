@@ -390,6 +390,17 @@ passes while proving nothing.
 - **`GUI-SPEC.md` §2 says the header row "sits on 32px" and BUILD-HANDOFF says 34px. Both are
   right** — 32 is the content box, 34 the border box, and 34 is the figure the suite holds constant.
   Read §2 alone and you build the band a border short.
+- **The SYNC caption is drawn live and is NOT in the plate, as of the 2026-08-12 re-cut.** It was
+  in both for one revision, and the two renderings landed a sub-pixel apart, so `SYNC ON` came out
+  as `SYNC OON` and was unreadable. GUI-SPEC §8.2 lists the role as `SYNC ON / OFF` — state
+  dependent, so runtime is right and the plate was wrong to carry it; BUILD-HANDOFF §1.2's own
+  `data-plate="off"` attribute is the mechanism that should have suppressed it in the cut.
+
+  The re-cut re-rendered the whole plate, not just that slot, so it was checked rather than trusted:
+  the LCD and IN well edges are pixel-identical, and the substantive differences cluster in the
+  scribble strip at y 880..920 — Permanent Marker's jitter is procedural, so it re-rolls on every
+  render. Geometry unmoved, caption gone.
+
 - **The plate is delivered and integrated.** `design/plate/fifth-member-plate-2x.png`, 2480 x 1862.
   `PanelBackground` is a blit now; the ~500 lines that rasterised the fascia, wear, ears, screws,
   tape elements, section frames and silkscreen are gone with it. Every ring except dial 1's two is
