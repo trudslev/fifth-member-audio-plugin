@@ -5,6 +5,7 @@ target_sources(FifthMemberTests PRIVATE
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
     ReadoutConformanceTests.cpp
+    MenuMetricsTests.cpp
     FactoryProgramsTests.cpp
     TimingEngineTests.cpp
     DelayCoreTests.cpp
