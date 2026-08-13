@@ -1,6 +1,7 @@
 juce_add_console_app(FifthMemberTests PRODUCT_NAME "FifthMemberTests")
 
 target_sources(FifthMemberTests PRIVATE
+    RealtimeSafetyTests.cpp
     TestMain.cpp
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
@@ -43,6 +44,9 @@ target_compile_definitions(FifthMemberTests PRIVATE
 # the alternative was a second copy of every mark angle in the test, which is exactly the drift the
 # tables exist to prevent.
 target_link_libraries(FifthMemberTests PRIVATE
+    # The bug sweep's measurement drivers. TEST target only — never the plugin, which must not
+    # carry an operator new override. See nf/testing/ProcessorHarness.h.
+    nf::testing
     FifthMemberBinaryData
     # ProgramManager.cpp is compiled into both targets and calls into core, so both link it.
     nf::core
