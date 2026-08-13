@@ -12,7 +12,22 @@ target_sources(FifthMemberTests PRIVATE
     ../Source/DSP/TimingEngine.cpp
     ../Source/DSP/DelayCore.cpp
     ../Source/DSP/CharacterEngine.cpp
-    ../Source/DSP/ProgramManager.cpp)
+    ../Source/DSP/ProgramManager.cpp
+    # **The REAL processor and the REAL editor, not stand-ins.** Everything above this line is what
+    # core does not own at the DSP layer; everything below it is the wiring and the panel, which no
+    # test could reach while this target compiled DSP alone.
+    #
+    # That gap was not theoretical. Reflect-84 shipped the stale-replay guard with ZERO call sites
+    # for its disarm, and no suite could have seen it: the defect lived in an editor .cpp that was
+    # not compiled into anything a test could run.
+    ../Source/PluginProcessor.cpp
+    ../Source/PluginEditor.cpp
+    ../Source/GUI/FifthMemberEditorContent.cpp
+    ../Source/GUI/ProgramHeader.cpp
+    ../Source/GUI/PanelControls.cpp
+    ../Source/GUI/PanelBackground.cpp
+    ../Source/GUI/FifthMemberKnob.cpp
+    ../Source/GUI/RepeatTimelineScope.cpp)
 
 # NF_COMPANY_NAME/NF_PRODUCT_NAME come from the parent CMakeLists and must match what the plugin
 # target gets - ProgramManager.cpp is compiled into both and builds the user-Programs path from
