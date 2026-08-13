@@ -147,6 +147,19 @@ void RepeatTimelineScope::paintReadoutStrip (juce::Graphics& g, juce::Rectangle<
     const bool sync = processorRef.apvts.getRawParameterValue (ParamIDs::sync)->load() > 0.5f;
     const float delayMs = processorRef.getDelayMs();
 
+    // **OPEN RULING — this .toUpperCase() is the last display-site re-casing in the suite, and it
+    // is left standing on purpose rather than exempted.** BRAND.md says case belongs at the source,
+    // and the disagreement it hides is already real: this strip prints PING-PONG while the PROGRAM
+    // LCD prints "Ping-Pong" for the same parameter, in the same typeface, on the same panel.
+    //
+    // It cannot be closed the way the others were, because the two sites want opposite things and
+    // whichever is authored, one of them visibly changes:
+    //   - author "MONO"/"STEREO"/"PING-PONG" -> this strip is unchanged, the LCD moves to caps;
+    //   - delete this call and keep the authored case -> the LCD is unchanged, this strip reads
+    //     "Ping-Pong" beside FB and ms / DIV, which are caps.
+    // Neither is byte-identical, so it is a second sanctioned exception rather than a mechanical
+    // fix, and it belongs to the chief designer. Recorded in the root CLAUDE.md; do not silently
+    // pick one.
     const juce::String stereoText = stereo != nullptr ? stereo->getCurrentChoiceName().toUpperCase() : "STEREO";
 
     const juce::String descriptor = modeDescriptor() + " " + dot + " " + stereoText

@@ -341,10 +341,10 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
 
     // --- TIMING --------------------------------------------------------------
     params.push_back (std::make_unique<juce::AudioParameterBool> (
-        juce::ParameterID { ParamIDs::sync, 1 }, "Sync", ParamDefaults::sync));
+        juce::ParameterID { ParamIDs::sync, 1 }, "SYNC", ParamDefaults::sync));
 
     params.push_back (std::make_unique<juce::AudioParameterChoice> (
-        juce::ParameterID { ParamIDs::noteDivision, 1 }, "Note Division",
+        juce::ParameterID { ParamIDs::noteDivision, 1 }, "NOTE DIVISION",
         juce::StringArray { "1/4", "1/8.", "1/8", "1/8T", "1/16" }, ParamDefaults::noteDivision));
 
     {
@@ -357,36 +357,36 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
         // formats one decimal below 10 ms and whole milliseconds above.
         Range range { Timing::minDelayMs, Timing::maxDelayMs, 0.0f };
         range.setSkewForCentre (375.0f);
-        addFloat (ParamIDs::timeMs, "Time", range, ParamDefaults::timeMs, "ms");
+        addFloat (ParamIDs::timeMs, "TIME", range, ParamDefaults::timeMs, "ms");
     }
 
     // --- REPEATS -------------------------------------------------------------
     // Above 100% is deliberate: it is what makes the delay self-oscillate. DelayCore carries an
     // always-on soft ceiling so that stays musical rather than numeric.
-    addFloat (ParamIDs::feedback, "Feedback", Range { 0.0f, 110.0f, 0.1f }, ParamDefaults::feedback, "%");
+    addFloat (ParamIDs::feedback, "FEEDBACK", Range { 0.0f, 110.0f, 0.1f }, ParamDefaults::feedback, "%");
 
     params.push_back (std::make_unique<juce::AudioParameterChoice> (
-        juce::ParameterID { ParamIDs::stereoMode, 1 }, "Stereo Mode",
+        juce::ParameterID { ParamIDs::stereoMode, 1 }, "STEREO MODE",
         juce::StringArray { "Mono", "Stereo", "Ping-Pong" }, ParamDefaults::stereoMode));
 
-    addFloat (ParamIDs::crossFeed, "Cross-Feed", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::crossFeed, "%");
+    addFloat (ParamIDs::crossFeed, "CROSS-FEED", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::crossFeed, "%");
 
     // --- DELAY CHARACTER -----------------------------------------------------
     params.push_back (std::make_unique<juce::AudioParameterChoice> (
-        juce::ParameterID { ParamIDs::character, 1 }, "Delay Character",
+        juce::ParameterID { ParamIDs::character, 1 }, "DELAY CHARACTER",
         juce::StringArray { "Tape", "BBD", "Digital" }, ParamDefaults::character));
 
-    addFloat (ParamIDs::wow,      "Wow",             Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::wow,      "%");
-    addFloat (ParamIDs::flutter,  "Flutter",         Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::flutter,  "%");
-    addFloat (ParamIDs::genLoss,  "Generation Loss", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::genLoss,  "%");
+    addFloat (ParamIDs::wow,      "WOW",             Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::wow,      "%");
+    addFloat (ParamIDs::flutter,  "FLUTTER",         Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::flutter,  "%");
+    addFloat (ParamIDs::genLoss,  "GENERATION LOSS", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::genLoss,  "%");
 
     params.push_back (std::make_unique<juce::AudioParameterFloat> (
-        juce::ParameterID { ParamIDs::modRate, 1 }, "Mod Rate", modRateRange(), ParamDefaults::modRate,
+        juce::ParameterID { ParamIDs::modRate, 1 }, "MOD RATE", modRateRange(), ParamDefaults::modRate,
         Attributes().withLabel ("Hz")
                     .withStringFromValueFunction ([] (float v, int) { return juce::String (v, 2); })));
 
-    addFloat (ParamIDs::modDepth, "Mod Depth",      Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::modDepth, "%");
-    addFloat (ParamIDs::degrade,  "Repeat Degrade", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::degrade,  "%");
+    addFloat (ParamIDs::modDepth, "MOD DEPTH",      Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::modDepth, "%");
+    addFloat (ParamIDs::degrade,  "REPEAT DEGRADE", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::degrade,  "%");
 
     // --- CHARACTER, ALL MODES ------------------------------------------------
     {
@@ -398,16 +398,16 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout createFifthMemberPara
         // Reads in kHz across its whole 1-16 kHz range, so the unit is in the text and the label is
         // left empty - "6.0 kHz", never "6000 Hz", which is what the panel prints beside it.
         params.push_back (std::make_unique<juce::AudioParameterFloat> (
-            juce::ParameterID { ParamIDs::damping, 1 }, "Damping", range, ParamDefaults::dampingHz,
+            juce::ParameterID { ParamIDs::damping, 1 }, "DAMPING", range, ParamDefaults::dampingHz,
             Attributes().withStringFromValueFunction ([] (float v, int)
                                                        { return juce::String (v / 1000.0f, 1) + " kHz"; })));
     }
 
-    addFloat (ParamIDs::saturation, "Saturation", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::saturation, "%");
+    addFloat (ParamIDs::saturation, "SATURATION", Range { 0.0f, 100.0f, 0.1f }, ParamDefaults::saturation, "%");
 
     // --- OUTPUT --------------------------------------------------------------
-    addFloat (ParamIDs::mix,        "Mix",         Range { 0.0f, 100.0f, 0.1f },   ParamDefaults::mix,        "%");
-    addFloat (ParamIDs::outputTrim, "Output Trim", Range { -24.0f, 24.0f, 0.1f },  ParamDefaults::outputTrim, "dB");
+    addFloat (ParamIDs::mix,        "MIX",         Range { 0.0f, 100.0f, 0.1f },   ParamDefaults::mix,        "%");
+    addFloat (ParamIDs::outputTrim, "OUTPUT TRIM", Range { -24.0f, 24.0f, 0.1f },  ParamDefaults::outputTrim, "dB");
 
     // New parameters are APPENDED below this line, never inserted above it - saved Programs and
     // host automation lanes are keyed by position as well as by ID.
