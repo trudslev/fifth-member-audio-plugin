@@ -308,6 +308,7 @@ What came from core, and what deliberately did not:
 | `nf::UserProgramStore` — scanning, sorting, naming (`TAKE n`), collision, save, delete | **What a Program contains** — the active-path filter and the schema attribute |
 | `nf::ParameterSnapshot` — the dirty baseline, keyed by parameter ID | **Which parameters it compares** — `currentActivePath()`, recomputed per call |
 | `nf::ProgramId` / `nf::ProgramBank` / `programDisplayLabel` | The Factory bank, and resolving a slug to its position |
+| `nf::UserEditGate` — the stale-replay guard, and `connectUserEdit`'s drag-guarded disarm | Which controls announce, and that the announcement names the parameter |
 
 The split is the point: core owns files and names, this repo owns meaning. It is what lets Fifth
 Member's filtered serialisation and the other five castings' `replaceState` model share one store.

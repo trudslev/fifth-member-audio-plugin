@@ -173,7 +173,7 @@ void FifthMemberAudioProcessor::setCurrentProgram (int index)
         return;
 
     // The stale-replay guard, disarmed by this call whether or not it is honoured.
-    if (justRestoredState.exchange (false, std::memory_order_relaxed) && index == getCurrentProgram())
+    if (userEdits.consumeRestore() && index == getCurrentProgram())
         return;
 
     programManager.requestProgramChange (ProgramManager::factoryIdAt (index));
@@ -257,7 +257,7 @@ void FifthMemberAudioProcessor::setStateInformation (const void* data, int sizeI
     programManager.setCurrentProgramWithoutApplying (restored);
 
     // **Armed AFTER replaceState**, or the restore's own writes would disarm it.
-    justRestoredState.store (true, std::memory_order_relaxed);
+    userEdits.armRestore();
 }
 
 //==============================================================================
