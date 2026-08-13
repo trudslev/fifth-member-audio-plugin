@@ -333,6 +333,34 @@ lists**. `Tests/TestMain.cpp` creates a `ScopedJuceInitialiser_GUI`: without a M
 `AsyncUpdater::triggerAsyncUpdate()` silently clears its own pending flag and every Program test
 passes while proving nothing.
 
+### The Program list's group caption
+
+**Sized from its own type plus padding, never derived from the row height.** The construction is
+`nf::captionHeight (font, topPadding, bottomPadding)` — 3px above and 4px below, the suite's adopted
+default — and it comes out **19px** here, from Share Tech Mono at 11px through `withPointHeight`.
+
+**The construction is the rule, not the number.** Writing 19 as a literal would break silently at
+the first change of font, size or font construction, which is a change nobody would think to check a
+caption against. It is also how this caption came to inherit JUCE's `rowHeight + rowHeight / 2` in
+the first place — a caption half again *taller* than a row, which is a menu convention rather than a
+panel one.
+
+`Tests/MenuMetricsTests.cpp` asserts the construction rather than the number, and logs the line
+box rather than pinning it — the castings do not all build fonts the same way, so asserting one
+ratio here would fail on a casting whose caption is correctly a different size.
+
+### Case belongs at the source
+
+`nf::ReadoutFormat::ValueCase` is deleted from core (2026-08-13). **A panel label reads in caps
+because it is authored in caps in `Parameters.h`**, not because the readout upper-cased it on the
+way out — the panel and the host's automation lane read the same parameter, so any re-casing in
+between makes one of them lie about the other. Every parameter name here is authored in caps for
+that reason, and `Tests/ReadoutConformanceTests.cpp` asserts it off `getName()`.
+
+The rule is in `../BRAND.md` beside the unit rule; the suite-wide record is in the root
+`../CLAUDE.md`. **The choice strings are deliberately NOT all caps** — this casting prints its
+values as authored, and the rule is that case is decided at the source, not that everything is caps.
+
 ## Status
 
 - **DSP**: complete, no stubs. Delay tables, filter cutoffs and character ranges are a
