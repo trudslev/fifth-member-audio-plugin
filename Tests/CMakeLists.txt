@@ -2,6 +2,7 @@ juce_add_console_app(FifthMemberTests PRODUCT_NAME "FifthMemberTests")
 
 target_sources(FifthMemberTests PRIVATE
     RealtimeSafetyTests.cpp
+    NumericalRobustnessTests.cpp
     TestMain.cpp
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
