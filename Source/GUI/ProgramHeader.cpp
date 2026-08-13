@@ -212,13 +212,13 @@ void ProgramHeader::showProgramMenu()
         if (id.bank == ProgramBank::factory && ! std::exchange (factoryHeaderDone, true))
         {
             menu.addSeparator();
-            menu.addSectionHeader ("Factory");
+            menu.addSectionHeader ("FACTORY");
         }
 
         if (id.bank == ProgramBank::user && ! std::exchange (userHeaderDone, true))
         {
             menu.addSeparator();
-            menu.addSectionHeader ("User");
+            menu.addSectionHeader ("USER");
         }
 
         menu.addItem ((int) i + 1, manager.displayLabelFor (id), true, id == current);
@@ -233,7 +233,7 @@ void ProgramHeader::showProgramMenu()
     if (! userHeaderDone)
     {
         menu.addSeparator();
-        menu.addSectionHeader ("User");
+        menu.addSectionHeader ("USER");
         menu.addItem (-1, Text::emDash() + " none saved " + Text::emDash(), false, false);
     }
 
