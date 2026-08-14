@@ -5,6 +5,7 @@ target_sources(FifthMemberTests PRIVATE
     NumericalRobustnessTests.cpp
     InvarianceTests.cpp
     AutomationLatencyTests.cpp
+    ChannelLayoutTests.cpp
     TestMain.cpp
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
