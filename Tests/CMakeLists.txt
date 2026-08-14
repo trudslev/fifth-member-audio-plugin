@@ -4,6 +4,7 @@ target_sources(FifthMemberTests PRIVATE
     RealtimeSafetyTests.cpp
     NumericalRobustnessTests.cpp
     InvarianceTests.cpp
+    AutomationLatencyTests.cpp
     TestMain.cpp
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
