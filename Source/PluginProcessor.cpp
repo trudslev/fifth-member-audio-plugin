@@ -1,6 +1,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <nf/BlockChunking.h>
+
 #include <cmath>
 
 FifthMemberAudioProcessor::FifthMemberAudioProcessor()
@@ -92,12 +94,31 @@ void FifthMemberAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     delayParams.character.modDepthPercent = rawParam (ParamIDs::modDepth)->load();
     delayParams.character.degradePercent  = rawParam (ParamIDs::degrade)->load();
 
+    // **The over-delivery policy.** dryBuffer.setSize grows when a host sends more samples than it
+    // declared, which is a heap allocation on the audio thread. Chunking removes it: no span is
+    // longer than the prepared size, so there is nothing left to grow.
+    //
+    // **THE BUS QUESTION, ASKED HERE RATHER THAN INHERITED FROM GATECRASHER.** Gatecrasher had to
+    // move its getBusBuffer calls inside the loop, because asking once outside hands every span the
+    // whole block's length and quietly undoes the chunking while every assertion still passes.
+    // **That does not arise here, and for a stated reason rather than because nobody looked:** this
+    // casting has plain stereo in and out with no second bus, so there is no getBusBuffer call
+    // anywhere in processBlock. Its channel count comes from getTotalNumInput/OutputChannels — the
+    // processor, not the buffer — which is span-invariant by construction.
+    //
+    // ScopedNoDenormals, the unused-channel clear and the parameter reads all stay OUTSIDE. The
+    // guard is scoped; the clear operates on the whole buffer; the parameter reads are per block by
+    // design, and moving them in would be a behaviour change smuggled in with a safety fix.
+    nf::processInChunks (buffer, getBlockSize(), [&] (juce::AudioBuffer<float>& span)
+    {
+    const int numSamples = span.getNumSamples();
+
     dryBuffer.setSize (numChannels, numSamples, false, false, true);
 
     for (int ch = 0; ch < numChannels; ++ch)
-        dryBuffer.copyFrom (ch, 0, buffer, ch, 0, numSamples);
+        dryBuffer.copyFrom (ch, 0, span, ch, 0, numSamples);
 
-    delayCore.process (buffer, delayParams);
+    delayCore.process (span, delayParams);
 
     mixSmoothed.setTargetValue (mix01);
     trimSmoothed.setTargetValue (trimGain);
@@ -107,7 +128,7 @@ void FifthMemberAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        out[(size_t) ch] = buffer.getWritePointer (ch);
+        out[(size_t) ch] = span.getWritePointer (ch);
         dry[(size_t) ch] = dryBuffer.getReadPointer (ch);
     }
 
@@ -157,7 +178,8 @@ void FifthMemberAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     };
 
     smoothDb (inputMeterDb, peakDb (dryBuffer));
-    smoothDb (outputMeterDb, peakDb (buffer));
+    smoothDb (outputMeterDb, peakDb (span));
+    });
 }
 
 //==============================================================================
