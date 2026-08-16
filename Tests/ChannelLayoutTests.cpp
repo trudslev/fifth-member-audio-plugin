@@ -107,6 +107,114 @@ public:
             expect (report.stateRoundTripMismatch.isEmpty(),
                     "a state round trip did not come back identical: " + report.stateRoundTripMismatch);
         }
+
+        beginTest ("Reset clears the delay's tail — WITH FEEDBACK ENGAGED, which defaults cannot show");
+        {
+            /*  **This row read 0.000 twice and proved nothing both times.** Stage 1c implemented
+                `AudioProcessor::reset()` across all six castings, and the before-and-after for this
+                one was 0.000 -> 0.000. It looked like a clean result and was a coincidence: a delay
+                at the default feedback has no tail to leave behind, so `reset()` had nothing to
+                clear and any implementation would have scored identically — including none at all.
+
+                **Ask which line makes a clean row correct, not which line agrees with it.** At
+                defaults there was no such line. With feedback engaged there is: `DelayCore::reset`
+                has to clear the delay line, and a tail exists to prove it did.
+
+                **Both figures come from the same construction**, rather than one from
+                `exerciseLifecycle` and one from here — `LifecycleReport` carries only the after
+                figure, and a before figure measured a different way is a comparison between two
+                fixtures rather than two states.
+
+                **The property, not the value.** What is asserted is that what survives is a small
+                fraction of what was there — not a magnitude. A figure would need retuning whenever
+                the factory Programs or the feedback law moved, and retuning an assertion is how a
+                defect gets absorbed. */
+            constexpr double fs = 48000.0;
+            constexpr int blockSize = 512;
+            constexpr int driveBlocks = 32;
+            constexpr int tailBlocks = 16;
+
+            const auto tailEnergy = [] (bool resetBetween)
+            {
+                FifthMemberAudioProcessor p;
+
+                const auto setP = [&p] (const juce::String& id, float value)
+                {
+                    if (auto* q = dynamic_cast<juce::RangedAudioParameter*> (p.apvts.getParameter (id)))
+                        q->setValueNotifyingHost (q->getNormalisableRange().convertTo0to1 (value));
+                };
+
+                setP (ParamIDs::sync, 0.0f);
+                setP (ParamIDs::timeMs, 300.0f);
+                setP (ParamIDs::feedback, 95.0f);   // a long tail, well short of self-oscillation
+                setP (ParamIDs::mix, 100.0f);
+
+                p.setRateAndBufferSizeDetails (fs, blockSize);
+                p.prepareToPlay (fs, blockSize);
+                p.reset();
+
+                juce::AudioBuffer<float> buffer (2, blockSize);
+                juce::MidiBuffer midi;
+
+                juce::Random r (99);
+                for (int b = 0; b < driveBlocks; ++b)
+                {
+                    for (int ch = 0; ch < 2; ++ch)
+                        for (int i = 0; i < blockSize; ++i)
+                            buffer.setSample (ch, i, r.nextFloat() * 2.0f - 1.0f);
+
+                    midi.clear();
+                    p.processBlock (buffer, midi);
+                }
+
+                if (resetBetween)
+                    p.reset();
+
+                double energy = 0.0;
+                for (int b = 0; b < tailBlocks; ++b)
+                {
+                    buffer.clear();                 // silence in: whatever comes out is the tail
+                    midi.clear();
+                    p.processBlock (buffer, midi);
+
+                    for (int ch = 0; ch < 2; ++ch)
+                        for (int i = 0; i < blockSize; ++i)
+                            energy += (double) buffer.getSample (ch, i) * buffer.getSample (ch, i);
+                }
+
+                return energy;
+            };
+
+            const auto ringing = tailEnergy (false);
+            const auto afterReset = tailEnergy (true);
+
+            logMessage ("  feedback 95%: tail energy " + juce::String (ringing, 6)
+                            + ", after reset() " + juce::String (afterReset, 9));
+
+            expectGreaterThan (ringing, 1.0,
+                               "**THERE IS NO TAIL TO CLEAR.** With feedback at 95 % this plugin left "
+                               "almost nothing ringing, so a clean reset row below is the same "
+                               "coincidence the default arm was — the arm is not driving what it "
+                               "claims to drive, and every figure beside it is about nothing");
+
+            expectLessThan (afterReset, ringing * 0.01,
+                            "reset() left the delay line's tail in place. A host locates the "
+                            "transport and the previous passage bleeds across the cut, which is the "
+                            "whole of what a reset owes.");
+
+            /*  **The assertion above is shown able to fail by the arm beside it.** This row went
+                green without ever going red — stage 1c had already implemented `reset()` correctly,
+                so the work stage 3 owed here was the PIN, not a fix. That is a weaker position than
+                green -> red -> green, and it is only worth anything if the pin can fail.
+
+                It can, and the demonstration is free: `ringing` is the identical fixture with the
+                `reset()` call omitted, which is exactly what the defect would look like. Running it
+                through the same threshold must NOT pass. */
+            expect (! (ringing < ringing * 0.01),
+                    "**THE RESET ASSERTION CANNOT FAIL.** The same fixture with reset() omitted "
+                    "passed the threshold the reset arm is judged by, so a clean row above is a "
+                    "comparison that reports clean whatever reset does");
+        }
     }
 };
 
