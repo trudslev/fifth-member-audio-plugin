@@ -87,6 +87,20 @@ public:
     /** Safe from any thread; defers the apply to the message thread. */
     void requestProgramChange (const ProgramId& id);
 
+    /*  **The pending-program handshake, and it is public so a test can reach it.**
+
+        These two functions ARE the critical section: everything between taking `pendingLock` and
+        releasing it happens inside them, and nothing else touches `pendingProgram`. An allocation
+        sentinel is not lock-aware, so a probe around `requestProgramChange` cannot distinguish heap
+        work under the lock from heap work beside it — the totals are identical either way. Arming
+        it around a function that is exactly the locked region is the only honest way to assert the
+        property, and that is worth the two names on this class.
+
+        See their definitions for what moved out of the lock and why 0.12 us was never the argument. */
+    ProgramId exchangePendingProgram (ProgramId incoming);
+    bool takePendingProgram (ProgramId& out);
+
+
     /** Drops a deferred change. setStateInformation MUST call this before restoring, or a request
         that arrived just beforehand lands afterwards and overwrites the restored session. */
     void cancelPendingChange();
@@ -153,6 +167,7 @@ private:
     mutable juce::SpinLock currentIdLock;
     ProgramId currentId;
     juce::SpinLock pendingLock;
+
     bool hasPendingProgram = false;
     ProgramId pendingProgram;
 
