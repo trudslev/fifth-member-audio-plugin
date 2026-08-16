@@ -104,14 +104,16 @@ public:
                 `reset()`, render, `reset()`, render is a different question, and a host asks it on
                 every transport locate.
 
-                **MEASURED AND REPORTED, not asserted, and that is deliberate.**
-                `CharacterEngine::mod[ch].random` is seeded in `prepare` and nowhere else, so a host
-                `reset()` leaves both per-channel streams running — which is *predicted* to make this
-                differ. Whether that is a defect or the correct contract is an open ruling; the
-                argument that a cleared tail is what a reset owes, not a rewound hiss, decides what
-                `reset()` should do and settles nothing about what it does. **The measurement comes
-                first and the ruling follows it.** Chorus-60 asserts this row today because stage 0.5
-                put its seeding in `reset()`, and that asymmetry is what is being ruled on.
+                **RULED: a reset owes a cleared tail, not a rewound generator**, so this row asserts
+                that both per-channel streams DO continue. `CharacterEngine::mod[ch].random` is seeded
+                in `prepare` and nowhere else, and that is correct rather than merely current: a reset
+                is a transport event rather than an instantiation, and a rewound generator replays an
+                identical wobble on every lap of a loop. Bounce reproducibility is a *prepare*
+                property and the premise arm below is what pins it.
+
+                The measurement came before the ruling — all six driven through this driver, this
+                casting at 0.001057396 — and Chorus-60, the one exception, now seeds in `prepare`
+                alone like the rest.
 
                 **TAPE character with WOW and FLUTTER up, not defaults.** The generator feeds
                 `nextOffsetMs`, whose two draws return 0 in Digital and are scaled by wow/flutter
@@ -144,10 +146,10 @@ public:
                     "this processor is not reproducible across prepare, so its reset row means "
                     "nothing: " + r.acrossPrepare.describe());
 
-            logMessage (juce::String ("  => ") + (r.acrossReset.sampleExact
-                            ? "reset() restores the character streams — CONTRADICTS the prediction"
-                            : "reset() leaves the character streams running, as predicted from where "
-                              "they are seeded. Awaiting the ruling, not filed as a defect."));
+            expect (! r.acrossReset.sampleExact,
+                    "reset() rewound the character streams. RULED: a reset owes a cleared tail, not "
+                    "a rewound generator — CharacterEngine seeds mod[ch].random in prepare and must "
+                    "not also seed it in reset: " + r.acrossReset.describe());
         }
 
         beginTest ("Offline against real-time");
