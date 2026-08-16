@@ -13,7 +13,7 @@ namespace
 
     juce::String formatMeter (float db)
     {
-        return db <= -99.0f ? juce::String ("-99.0") : juce::String (db, 1);
+        return FifthMemberTheme::formatMeterDb (db);
     }
 }
 

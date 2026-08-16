@@ -7,6 +7,7 @@ target_sources(FifthMemberTests PRIVATE
     AutomationLatencyTests.cpp
     ChannelLayoutTests.cpp
     PendingProgramLockTests.cpp
+    MeterReadoutBudgetTests.cpp
     TestMain.cpp
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
