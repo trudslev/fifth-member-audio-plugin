@@ -54,6 +54,11 @@ public:
         so tests and the GUI can ask the same question the audio path asks. */
     static float delayMsFor (bool sync, int division, float timeMs, double bpm) noexcept;
 
+    /** The tempo `update` would use if no host supplied one — 120 until a host does, then the last
+        good figure. Exposed so `prepareToPlay` can seed DelayCore's smoothers with the delay the
+        first block will actually target, rather than a value that differs under SYNC. */
+    double fallbackBpm() const noexcept { return lastKnownBpm; }
+
 private:
     double sampleRate = 44100.0;
     double lastKnownBpm = 120.0;

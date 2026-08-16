@@ -31,7 +31,22 @@ void FifthMemberAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     };
 
     timingEngine.prepare (spec);
-    delayCore.prepare (spec);
+    /*  Prepared with the values its three smoothers should already be at, built the same way the
+        per-block params are. A session restore writes the APVTS before the host prepares. */
+    {
+        DelayCoreParams initial;
+        // **Through TimingEngine's own `delayMsFor`, which is what `processBlock` calls.** Under
+        // SYNC the figure depends on host tempo, which no prepare can know — the engine's retained
+        // fallback (120 BPM until a host says otherwise) is exactly what the first block will use
+        // too, so the two agree by construction rather than by luck.
+        initial.delayMs = TimingEngine::delayMsFor (rawParam (ParamIDs::sync)->load() > 0.5f,
+                                                    (int) rawParam (ParamIDs::noteDivision)->load(),
+                                                    rawParam (ParamIDs::timeMs)->load(),
+                                                    timingEngine.fallbackBpm());
+        initial.feedbackPercent = rawParam (ParamIDs::feedback)->load();
+        initial.crossFeedPercent = rawParam (ParamIDs::crossFeed)->load();
+        delayCore.prepare (spec, initial);
+    }
 
     dryBuffer.setSize (getTotalNumOutputChannels(), samplesPerBlock, false, false, true);
 

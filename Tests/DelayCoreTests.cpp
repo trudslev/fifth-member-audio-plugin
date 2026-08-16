@@ -106,7 +106,7 @@ public:
         beginTest ("an impulse produces a decaying train of repeats");
         {
             DelayCore core;
-            core.prepare ({ sr, blockSize, 2 });
+            core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
             const auto ir = burstResponse (core, baseParams(), 1.5);
 
@@ -137,7 +137,7 @@ public:
             // recirculation is another generation. If someone later moves them onto the output this
             // test fails, which is exactly what it is for.
             DelayCore core;
-            core.prepare ({ sr, blockSize, 2 });
+            core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
             auto params = baseParams();
             params.character.mode = (int) DelayCharacter::tape;
@@ -162,7 +162,7 @@ public:
             for (const int mode : { (int) DelayCharacter::bbd, (int) DelayCharacter::digital })
             {
                 DelayCore core;
-                core.prepare ({ sr, blockSize, 2 });
+                core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
                 auto params = baseParams();
                 params.character.mode = mode;
@@ -191,7 +191,7 @@ public:
             // and NOT the same thing as Stereo, which feeds each line from its own input channel.
             {
                 DelayCore core;
-                core.prepare ({ sr, blockSize, 2 });
+                core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
                 auto params = baseParams();
                 params.stereoMode = (int) StereoMode::pingPong;
@@ -202,7 +202,7 @@ public:
                 const auto left = burstResponse (core, params, 0.8, 0);
 
                 DelayCore core2;
-                core2.prepare ({ sr, blockSize, 2 });
+                core2.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
                 const auto right = burstResponse (core2, params, 0.8, 1);
 
                 const auto peakAt = [] (const std::vector<float>& sig, int repeat)
@@ -226,14 +226,14 @@ public:
 
             {
                 DelayCore core;
-                core.prepare ({ sr, blockSize, 2 });
+                core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
                 auto params = baseParams();
                 params.stereoMode = (int) StereoMode::pingPong;
                 params.crossFeedPercent = 0.0f;
 
                 DelayCore core2;
-                core2.prepare ({ sr, blockSize, 2 });
+                core2.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
                 const auto left = burstResponse (core, params, 0.8, 0);
                 const auto right = burstResponse (core2, params, 0.8, 1);
@@ -261,7 +261,7 @@ public:
         beginTest ("Mono is genuinely mono");
         {
             DelayCore core;
-            core.prepare ({ sr, blockSize, 2 });
+            core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
             auto params = baseParams();
             params.stereoMode = (int) StereoMode::mono;
@@ -298,7 +298,7 @@ public:
             for (const int mode : { 0, 1, 2 })
             {
                 DelayCore core;
-                core.prepare ({ sr, blockSize, 2 });
+                core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
                 auto params = baseParams();
                 params.feedbackPercent = 110.0f;
@@ -336,7 +336,7 @@ public:
         beginTest ("a character mode change does not click");
         {
             DelayCore core;
-            core.prepare ({ sr, blockSize, 2 });
+            core.prepare ({ sr, blockSize, 2 }, DelayCoreParams{});
 
             auto params = baseParams();
             params.character.genLossPercent = 60.0f;

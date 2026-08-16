@@ -46,11 +46,29 @@ struct DelayCoreParams
 class DelayCore
 {
 public:
-    void prepare (const juce::dsp::ProcessSpec& spec);
+    /*  **`initial` is where the three smoothers START, and `reset (rate, seconds)` does not set
+        one.** It is `setCurrentAndTargetValue (this->target)` internally — it sets the ramp LENGTH
+        and snaps to whatever target the smoother last held, zero on a constructed object. So delay
+        time, feedback and cross-feed all glided up from nothing across the first block of an
+        instance's first playback: a delay whose first repeat is at the wrong time, with the wrong
+        feedback, on the wrong side.
+
+        The whole `DelayCoreParams` rather than three floats, because that is what `process` already
+        takes — three separate arguments would be three chances for the caller to convert one
+        differently here than it does there. */
+    void prepare (const juce::dsp::ProcessSpec& spec, const DelayCoreParams& initial);
     void reset();
 
     /** Replaces the buffer's contents with the wet signal. The caller keeps its own dry copy. */
     void process (juce::AudioBuffer<float>& buffer, const DelayCoreParams& params);
+
+private:
+    // Shared by prepare and process so the two cannot clamp differently — see their definitions.
+    float delaySamplesFor (float delayMs) const noexcept;
+    static float feedbackGainFor (float feedbackPercent) noexcept;
+    static float crossGainFor (float crossFeedPercent) noexcept;
+
+public:
 
     /** Broadband loop gain currently being applied per recirculation - feedback times the character
         engine's own loss. Drives the scope's pulse decay, so the display tracks the real loop

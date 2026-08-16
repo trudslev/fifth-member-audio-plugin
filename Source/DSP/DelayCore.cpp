@@ -18,7 +18,30 @@ namespace
 }
 
 //==============================================================================
-void DelayCore::prepare (const juce::dsp::ProcessSpec& spec)
+/*  One conversion each, shared by `prepare` and `process`.
+
+    They were inline in `process` and nowhere else until `prepare` needed the same three values. Two
+    copies of a clamp is two chances to clamp differently, and the failure mode is specific: the
+    smoother would start at one value and be retargeted to another on the first block, which is the
+    very first-block difference this pair of functions exists to remove. */
+float DelayCore::delaySamplesFor (float delayMs) const noexcept
+{
+    return juce::jlimit (readMarginSamples,
+                         (float) line.getMaximumDelayInSamples() - readMarginSamples,
+                         delayMs * 0.001f * (float) sampleRate);
+}
+
+float DelayCore::feedbackGainFor (float feedbackPercent) noexcept
+{
+    return juce::jlimit (0.0f, 1.1f, feedbackPercent * 0.01f);   // >1 is self-oscillation, by design
+}
+
+float DelayCore::crossGainFor (float crossFeedPercent) noexcept
+{
+    return juce::jlimit (0.0f, 1.0f, crossFeedPercent * 0.01f);
+}
+
+void DelayCore::prepare (const juce::dsp::ProcessSpec& spec, const DelayCoreParams& initial)
 {
     sampleRate = spec.sampleRate;
 
@@ -39,6 +62,17 @@ void DelayCore::prepare (const juce::dsp::ProcessSpec& spec)
     delaySamplesSmoothed.reset (sampleRate, 0.06);
     feedbackSmoothed.reset (sampleRate, 0.02);
     crossFeedSmoothed.reset (sampleRate, 0.02);
+
+    /*  The values the first block should already be at, from the caller — never `getTargetValue()`,
+        which is exactly what the three resets above already did.
+
+        **Through the same three conversions `process` uses**, not re-derived here. Writing
+        `initial.delayMs * 0.001f * sampleRate` inline would skip the read-margin clamp, so a Program
+        at the very top of the Time range would start one clamp away from where the first block then
+        puts it — reintroducing a first-block difference from inside the fix for one. */
+    delaySamplesSmoothed.setCurrentAndTargetValue (delaySamplesFor (initial.delayMs));
+    feedbackSmoothed.setCurrentAndTargetValue (feedbackGainFor (initial.feedbackPercent));
+    crossFeedSmoothed.setCurrentAndTargetValue (crossGainFor (initial.crossFeedPercent));
 
     reset();
 }
@@ -80,15 +114,9 @@ void DelayCore::process (juce::AudioBuffer<float>& buffer, const DelayCoreParams
 
     dampingCoeff = onePoleCoeff (juce::jlimit (200.0f, 20000.0f, params.dampingHz), sampleRate);
 
-    const float feedback = juce::jlimit (0.0f, 1.1f, params.feedbackPercent * 0.01f);
-    const float cross = juce::jlimit (0.0f, 1.0f, params.crossFeedPercent * 0.01f);
-
-    const float targetSamples = juce::jlimit (readMarginSamples,
-                                              (float) line.getMaximumDelayInSamples() - readMarginSamples,
-                                              params.delayMs * 0.001f * (float) sampleRate);
-    delaySamplesSmoothed.setTargetValue (targetSamples);
-    feedbackSmoothed.setTargetValue (feedback);
-    crossFeedSmoothed.setTargetValue (cross);
+    delaySamplesSmoothed.setTargetValue (delaySamplesFor (params.delayMs));
+    feedbackSmoothed.setTargetValue (feedbackGainFor (params.feedbackPercent));
+    crossFeedSmoothed.setTargetValue (crossGainFor (params.crossFeedPercent));
 
     const float sat01 = juce::jlimit (0.0f, 1.0f, params.saturationPercent * 0.01f);
     const float drive = 1.0f + sat01 * 6.0f;
@@ -170,5 +198,8 @@ void DelayCore::process (juce::AudioBuffer<float>& buffer, const DelayCoreParams
         }
     }
 
-    perPassGain = juce::jlimit (0.0f, 1.5f, feedback * character.getPerPassGain());
+    // Read back off the smoother rather than from a local the conversion helpers replaced: this is
+    // the feedback the block actually ended on, which is what a per-pass gain should reflect.
+    perPassGain = juce::jlimit (0.0f, 1.5f,
+                                feedbackSmoothed.getCurrentValue() * character.getPerPassGain());
 }
