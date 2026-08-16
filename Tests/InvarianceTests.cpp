@@ -96,6 +96,60 @@ public:
                         "produced different output: " + r.describe());
         }
 
+        beginTest ("Reproducible across reset() ALONE, with the character generator driven");
+        {
+            /*  **A path nothing in this suite could reach until `nf::testing::renderBlocks` existed.**
+                `render` calls `prepareToPlay` on every invocation, so every premise check anywhere —
+                including this file's — is a *prepare* check by construction. Prepare once, then
+                `reset()`, render, `reset()`, render is a different question, and a host asks it on
+                every transport locate.
+
+                **MEASURED AND REPORTED, not asserted, and that is deliberate.**
+                `CharacterEngine::mod[ch].random` is seeded in `prepare` and nowhere else, so a host
+                `reset()` leaves both per-channel streams running — which is *predicted* to make this
+                differ. Whether that is a defect or the correct contract is an open ruling; the
+                argument that a cleared tail is what a reset owes, not a rewound hiss, decides what
+                `reset()` should do and settles nothing about what it does. **The measurement comes
+                first and the ruling follows it.** Chorus-60 asserts this row today because stage 0.5
+                put its seeding in `reset()`, and that asymmetry is what is being ruled on.
+
+                **TAPE character with WOW and FLUTTER up, not defaults.** The generator feeds
+                `nextOffsetMs`, whose two draws return 0 in Digital and are scaled by wow/flutter
+                depth in Tape — so at the wrong character or at zero depth this arm reports
+                reset-clean whatever `reset()` does. That is exactly how this casting's
+                energy-after-reset row came back 0.000 twice for a coincidence rather than a
+                property, and it is the second time the same trap has had to be stepped around. */
+            FifthMemberAudioProcessor processor;
+
+            const auto setP = [&processor] (const juce::String& id, float value)
+            {
+                if (auto* p = dynamic_cast<juce::RangedAudioParameter*> (processor.apvts.getParameter (id)))
+                    p->setValueNotifyingHost (p->getNormalisableRange().convertTo0to1 (value));
+            };
+
+            setP (ParamIDs::character, 0.0f);    // Tape — the one mode whose branch draws
+            setP (ParamIDs::wow, 100.0f);
+            setP (ParamIDs::flutter, 100.0f);
+            setP (ParamIDs::feedback, 60.0f);    // repeats compound, so the draws accumulate
+            setP (ParamIDs::mix, 100.0f);
+
+            nf::testing::RenderSpec spec;
+            spec.blockSize = 512;
+            spec.numBlocks = 16;
+
+            const auto r = nf::testing::reproducibleAcrossReset (processor, spec);
+            logMessage ("  " + r.describe());
+
+            expect (r.premiseHeld(),
+                    "this processor is not reproducible across prepare, so its reset row means "
+                    "nothing: " + r.acrossPrepare.describe());
+
+            logMessage (juce::String ("  => ") + (r.acrossReset.sampleExact
+                            ? "reset() restores the character streams — CONTRADICTS the prediction"
+                            : "reset() leaves the character streams running, as predicted from where "
+                              "they are seeded. Awaiting the ruling, not filed as a defect."));
+        }
+
         beginTest ("Offline against real-time");
         {
             FifthMemberAudioProcessor processor;
