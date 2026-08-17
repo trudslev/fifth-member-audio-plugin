@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Share+Tech+Mono&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #171716; }
+  a { color: #c9a05a; }
+  a:hover { color: #e2bd7c; }
+  @keyframes fmLive { 0%, 100% { opacity: 1; } 50% { opacity: .72; } }
+</style>
+</helmet>
+<div data-screen-label="Fifth Member DL-88" style="width: 1444px; height: 1012px; display: flex; align-items: stretch; background: #121210; position: relative; overflow: hidden; font-family: 'Barlow Condensed', sans-serif;">
+
+  <div data-plate="off" style="position: absolute; inset: 0; z-index: 9; pointer-events: none; background: #808080; mix-blend-mode: multiply; display: {{ bypassDisplay }};"></div>
+
+  <div style="width: 52px; position: relative; background: linear-gradient(90deg, #6f6b64, #b9b5ac 22%, #9d998f 52%, #7e7a73 78%, #63605a); box-shadow: inset -2px 0 6px rgba(0,0,0,.5);">
+    <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.05) 1px 3px);"></div>
+    <div style="position: absolute; left: 15px; top: 28px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 38% 30%, #cfcbc2, #6d6a63 70%, #46443f); box-shadow: inset 0 1px 1px rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.5);"></div>
+    <div style="position: absolute; left: 15px; bottom: 28px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 38% 30%, #cfcbc2, #6d6a63 70%, #46443f); box-shadow: inset 0 1px 1px rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.5);"></div>
+    <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .34em; color: rgba(24,22,19,.92);">RACK 4 · MON WORLD</div>
+  </div>
+
+  <div data-frame="panel" style="width: 1340px; box-sizing: border-box; padding: 16px; position: relative; background: linear-gradient(#1b1a18, #131211 58%, #0e0e0c); overflow: hidden;">
+    <div style="position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 1px, rgba(0,0,0,.02) 1px 4px), radial-gradient(70% 50% at 8% 4%, rgba(120,112,96,.16), rgba(0,0,0,0) 70%), radial-gradient(60% 45% at 96% 98%, rgba(120,112,96,.12), rgba(0,0,0,0) 70%);"></div>
+
+    <div style="position: relative; width: 1308px; height: 104px; box-sizing: border-box; background: linear-gradient(#211f1c, #171613 55%, #100f0d); border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07), inset 0 -3px 8px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.45);">
+
+      <div style="position: absolute; left: 22px; top: 14px; width: 303px; height: 84px;">
+        <div style="width: 268px; box-sizing: border-box; padding: 5px 17px 7px; transform: rotate(-1.2deg); background: linear-gradient(#d9d4c6, #bdb7a7 60%, #a8a293); clip-path: polygon(1% 6%, 99% 0%, 100% 92%, 60% 100%, 12% 96%, 0% 88%); box-shadow: 0 3px 7px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.5);">
+          <div style="font-family: 'Permanent Marker', cursive; font-size: 27px; line-height: 28px; letter-spacing: .005em; color: #151310; text-shadow: 0 1px 0 rgba(255,255,255,.25);">FIFTH MEMBER</div>
+        </div>
+      </div>
+      <div style="position: absolute; left: 22px; top: 62px; font-weight: 600; font-size: 13px; line-height: 17px; letter-spacing: .30em; color: #cfc6b4;">TEMPO-SYNCED DELAY</div>
+      <div style="position: absolute; left: 22px; top: 81px; font-weight: 500; font-size: 12px; line-height: 14px; letter-spacing: .30em; color: #cfc6b4;">MODEL DL-88 · STEREO</div>
+
+      <div style="position: absolute; left: 341px; top: 25px; font-weight: 600; font-size: 10px; line-height: 13px; letter-spacing: .24em; color: #cfc6b4;">{{ programCaption }}</div>
+
+      <div style="position: absolute; left: 341px; top: 45px; width: 641px; height: 34px;">
+        <div onClick="{{ onProgramClick }}" data-plate="blank" style="position: absolute; inset: 0; box-sizing: border-box; display: flex; align-items: stretch; background: linear-gradient(#071009, #040806); border-radius: 3px; box-shadow: inset 0 0 0 1px #2a2823, inset 0 2px 10px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.05); cursor: pointer; overflow: hidden;">
+          <div style="width: 72px; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; font-size: 17px; line-height: 20px; letter-spacing: .10em; text-indent: .10em; color: #cfd8cb; text-shadow: 0 0 9px rgba(180,210,185,.35);">{{ bankBadge }}</div>
+          <div style="width: 1px; margin: 7px 0; background: rgba(255,255,255,.09);"></div>
+          <div style="flex: 1; box-sizing: border-box; padding-right: 30px; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; font-size: 17px; line-height: 20px; letter-spacing: .10em; text-indent: .10em; color: #cfd8cb; text-shadow: 0 0 9px rgba(180,210,185,.35); white-space: nowrap; overflow: hidden;">{{ lcdText }}</div>
+          <svg viewBox="0 0 14 8" style="position: absolute; right: 16px; top: 50%; width: 14px; height: 8px; margin-top: -4px;"><path d="M1 1.6 L7 6.4 L13 1.6" fill="none" stroke="#a9bda9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </div>
+
+        <sc-if value="{{ listOpen }}" hint-placeholder-val="{{ false }}">
+          <div data-plate="off" style="position: absolute; left: 0; right: 0; top: 34px; z-index: 40; max-height: 210px; overflow: auto; background: #060d09; border: 1px solid #2c2b26; box-shadow: 0 18px 32px rgba(0,0,0,.75);">
+            <sc-for list="{{ bankList }}" as="p" hint-placeholder-count="6">
+              <div onClick="{{ p.onPick }}" style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 15px; line-height: 18px; letter-spacing: .10em; color: {{ p.color }}; border-bottom: 1px solid rgba(255,255,255,.05);">
+                <div style="flex: 1;">{{ p.label }}</div>
+                <div style="font-size: 12px; line-height: 15px; color: #93a894;">{{ p.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div onClick="{{ onSave }}" title="{{ saveTitle }}" data-plate="off" style="position: absolute; left: 990px; top: 45px; width: 62px; height: 34px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 1px; background: linear-gradient(#23282C, #14181B); border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45); cursor: {{ saveCursor }};">
+        <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .12em; text-indent: .12em; text-align: center; color: {{ legSave.color }}; text-shadow: {{ legSave.glow }};">SAVE</div>
+        <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .12em; text-indent: .12em; text-align: center; color: {{ legStore.color }}; text-shadow: {{ legStore.glow }};">STORE</div>
+      </div>
+      <div onClick="{{ onDelete }}" title="{{ deleteTitle }}" data-plate="off" style="position: absolute; left: 1060px; top: 45px; width: 70px; height: 34px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 1px; background: linear-gradient(#23282C, #14181B); border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45); cursor: {{ deleteCursor }};">
+        <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .12em; text-indent: .12em; text-align: center; color: {{ legDelete.color }}; text-shadow: {{ legDelete.glow }};">DELETE</div>
+        <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .12em; text-indent: .12em; text-align: center; color: {{ legCancel.color }}; text-shadow: {{ legCancel.glow }};">CANCEL</div>
+      </div>
+
+      <div style="position: absolute; left: 1148px; top: 25px; width: 64px; display: flex; align-items: baseline; justify-content: center; gap: 4px; font-weight: 600; font-size: 10px; line-height: 13px; color: #cfc6b4;"><div style="letter-spacing: .28em; text-indent: .28em;">IN</div><div style="letter-spacing: .02em;">dB</div></div>
+      <div data-plate="blank" style="position: absolute; left: 1148px; top: 45px; width: 64px; height: 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; font-size: 17px; line-height: 20px; color: #b9c3c8; background: #05080a; border-radius: 3px; box-shadow: inset 0 0 0 1px #2a2823, inset 0 2px 8px rgba(0,0,0,.85);">{{ inValue }}</div>
+      <div style="position: absolute; left: 1222px; top: 25px; width: 64px; display: flex; align-items: baseline; justify-content: center; gap: 4px; font-weight: 600; font-size: 10px; line-height: 13px; color: #cfc6b4;"><div style="letter-spacing: .28em; text-indent: .28em;">OUT</div><div style="letter-spacing: .02em;">dB</div></div>
+      <div data-plate="blank" style="position: absolute; left: 1222px; top: 45px; width: 64px; height: 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; font-size: 17px; line-height: 20px; color: #b9c3c8; background: #05080a; border-radius: 3px; box-shadow: inset 0 0 0 1px #2a2823, inset 0 2px 8px rgba(0,0,0,.85);">{{ outValue }}</div>
+    </div>
+
+    <div style="position: relative; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; height: 18px;">
+      <div style="display: flex; align-items: center; gap: 11px;">
+        <div data-plate="off" style="width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 38% 32%, #ffd7a6, #ff9d3c 68%, #7a4715); box-shadow: 0 0 10px #ff9d3c, 0 0 22px rgba(255,157,60,.45); animation: fmLive 1.6s ease-in-out infinite;"></div>
+        <div style="font-weight: 600; font-size: 12px; line-height: 14px; letter-spacing: .26em; text-indent: .26em; color: #c3bcae;">REPEATS LIVE</div>
+      </div>
+      <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .24em; text-indent: .24em; color: #b0aa9c;">REPEAT TIMELINE</div>
+    </div>
+
+    <div style="position: relative; margin-top: 8px; width: 1308px; height: 98px; box-sizing: border-box; border-radius: 2px; background: #04060a; box-shadow: inset 0 0 0 1px #23221e, inset 0 3px 14px rgba(0,0,0,.9); overflow: hidden;">
+      <div data-plate="blank" style="height: 23px; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 9px; border-bottom: 1px solid rgba(150,175,155,.13); font-family: 'Share Tech Mono', monospace; font-size: 11px; line-height: 13px; letter-spacing: .12em; color: #93a894; white-space: nowrap; overflow: hidden;">
+        <div>RPT ENV</div>
+        <div style="color: #a9bda9;">{{ scopeState }}</div>
+        <div style="flex: 1;"></div>
+        <div>{{ scopeSync }}</div>
+        <div>0 dB</div>
+      </div>
+      <svg viewBox="0 0 1306 73" preserveAspectRatio="none" data-plate="off" style="display: block; width: 1306px; height: 73px;">
+        <sc-for list="{{ scopeGrid }}" as="g" hint-placeholder-count="7">
+          <line x1="{{ g.x }}" y1="0" x2="{{ g.x }}" y2="73" stroke="rgba(150,175,155,.10)" stroke-width="1"></line>
+        </sc-for>
+        <line x1="0" y1="36.5" x2="1306" y2="36.5" stroke="rgba(150,175,155,.10)" stroke-width="1"></line>
+        <line x1="0" y1="64" x2="1306" y2="64" stroke="rgba(160,180,165,.22)" stroke-width="1"></line>
+        <sc-if value="{{ pingPong }}" hint-placeholder-val="{{ false }}">
+          <line x1="0" y1="36" x2="1306" y2="36" stroke="rgba(200,210,200,.16)" stroke-width="1" stroke-dasharray="3 4"></line>
+        </sc-if>
+        <sc-for list="{{ pulses }}" as="p" hint-placeholder-count="6">
+          <rect x="{{ p.gx }}" y="{{ p.top }}" width="{{ p.gw }}" height="{{ p.h }}" fill="rgba(190,200,190,.07)"></rect>
+        </sc-for>
+        <sc-for list="{{ pulses }}" as="p" hint-placeholder-count="6">
+          <line x1="{{ p.x }}" y1="64" x2="{{ p.x }}" y2="{{ p.top }}" stroke="#ff9d3c" stroke-width="{{ p.sw }}"></line>
+        </sc-for>
+        <sc-for list="{{ pulses }}" as="p" hint-placeholder-count="6">
+          <circle cx="{{ p.x }}" cy="{{ p.top }}" r="{{ p.r }}" fill="#ff9d3c"></circle>
+        </sc-for>
+      </svg>
+    </div>
+
+    <div style="position: relative; margin-top: 16px; display: flex; align-items: stretch; gap: 16px;">
+
+      <div style="width: 320px; box-sizing: border-box; padding: 12px 14px 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px #23221e; display: flex; flex-direction: column; align-items: center;">
+        <div style="align-self: flex-start; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .28em; text-indent: .28em; color: #b0aa9c;">TIMING</div>
+
+        <div style="margin-top: 12px; align-self: flex-start; display: flex; align-items: center; gap: 12px;">
+          <div onClick="{{ onSyncToggle }}" data-plate="off" style="position: relative; width: 52px; height: 24px; border-radius: 2px; background: #0b0a09; box-shadow: inset 0 0 0 1px #2b2924, inset 0 2px 5px rgba(0,0,0,.8); cursor: pointer;">
+            <div style="position: absolute; top: 2px; bottom: 2px; left: {{ syncThumb }}; width: 23px; border-radius: 1px; background: linear-gradient(#cfc9bb, #8d887d); box-shadow: 0 1px 3px rgba(0,0,0,.7); transition: left 180ms ease;"></div>
+          </div>
+          <div style="font-weight: 600; font-size: 12px; line-height: 14px; letter-spacing: .22em; text-indent: .22em; color: #b0aa9c;" data-plate="off">{{ syncLabel }}</div>
+        </div>
+
+        <div style="margin-top: 14px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
+          <div data-plate="off" style="width: 7px; height: 7px; border-radius: 50%; background: {{ divLed.bg }}; box-shadow: {{ divLed.glow }};"></div>
+          <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .24em; text-indent: .24em; color: #b0aa9c;">NOTE DIVISION</div>
+        </div>
+
+        <div style="margin-top: 8px; align-self: stretch; display: flex; gap: 5px;">
+          <sc-for list="{{ divisions }}" as="d" hint-placeholder-count="5">
+            <div onClick="{{ d.onPick }}" data-plate="off" style="flex: 1; height: 30px; display: flex; align-items: center; justify-content: center; gap: 5px; border-radius: 3px; cursor: pointer; background: {{ d.face }}; box-shadow: {{ d.shadow }};">
+              <div style="width: 6px; height: 6px; border-radius: 50%; flex: none; background: {{ d.ledBg }}; box-shadow: {{ d.ledGlow }};"></div>
+              <div style="font-family: 'Share Tech Mono', monospace; font-size: 12px; line-height: 14px; color: {{ d.color }};">{{ d.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <sc-for list="{{ timeKnob }}" as="k" hint-placeholder-count="1">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div style="position: relative; width: {{ k.w }}px; height: {{ k.h }}px;">
+                <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="4">
+                  <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tickTop }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tickTop }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.nums }}" as="m" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                </sc-for>
+                <div onPointerDown="{{ k.onDown }}" data-plate="off" style="position: absolute; left: {{ k.bodyOff }}px; top: {{ k.bodyTop }}px; width: {{ k.d }}px; height: {{ k.d }}px; border-radius: 50%; cursor: grab; background: {{ k.fill }}; box-shadow: {{ k.shadow }};">
+                  <div style="position: absolute; inset: 0; transform: {{ k.rot }};">
+                    <div style="position: absolute; left: calc(50% - {{ k.pw }}px); top: {{ k.ptop }}px; width: {{ k.pwFull }}px; height: {{ k.ph }}px; border-radius: 1px; background: {{ k.pgrad }};"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 2px; display: flex; align-items: center; gap: 7px;">
+                <div data-plate="off" style="width: 7px; height: 7px; border-radius: 50%; background: {{ k.ledBg }}; box-shadow: {{ k.ledGlow }};"></div>
+                <div style="font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: .20em; text-indent: .20em; color: #c3bcae;">{{ k.label }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex: 1; box-sizing: border-box; padding: 12px 14px 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px #23221e; display: flex; flex-direction: column; align-items: center;">
+        <div style="align-self: flex-start; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .28em; text-indent: .28em; color: #b0aa9c;">REPEATS</div>
+        <div style="margin-top: 8px; display: flex; align-items: flex-start; gap: 28px;">
+          <sc-for list="{{ repeatKnobs }}" as="k" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div style="position: relative; width: {{ k.w }}px; height: {{ k.h }}px;">
+                <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="2">
+                  <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tickTop }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tickTop }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.nums }}" as="m" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                </sc-for>
+                <div onPointerDown="{{ k.onDown }}" data-plate="off" style="position: absolute; left: {{ k.bodyOff }}px; top: {{ k.bodyTop }}px; width: {{ k.d }}px; height: {{ k.d }}px; border-radius: 50%; cursor: grab; background: {{ k.fill }}; box-shadow: {{ k.shadow }};">
+                  <div style="position: absolute; inset: 0; transform: {{ k.rot }};">
+                    <div style="position: absolute; left: calc(50% - {{ k.pw }}px); top: {{ k.ptop }}px; width: {{ k.pwFull }}px; height: {{ k.ph }}px; border-radius: 1px; background: {{ k.pgrad }};"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 2px; display: flex; align-items: center; gap: 7px;">
+                <div data-plate="off" style="width: 7px; height: 7px; border-radius: 50%; background: {{ k.ledBg }}; box-shadow: {{ k.ledGlow }}; display: {{ k.ledShow }};"></div>
+                <div style="font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: .20em; text-indent: .20em; color: #c3bcae;">{{ k.label }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top: 12px; align-self: flex-start; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .24em; text-indent: .24em; color: #b0aa9c;">STEREO MODE</div>
+        <div style="margin-top: 7px; align-self: stretch; display: flex; gap: 5px;">
+          <sc-for list="{{ stereoModes }}" as="s" hint-placeholder-count="3">
+            <div onClick="{{ s.onPick }}" data-plate="off" style="flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: 3px; cursor: pointer; background: {{ s.face }}; box-shadow: {{ s.shadow }};">
+              <div style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: {{ s.ledBg }}; box-shadow: {{ s.ledGlow }};"></div>
+              <div style="font-weight: 600; font-size: 12px; line-height: 14px; letter-spacing: .18em; text-indent: .18em; color: {{ s.color }};">{{ s.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width: 340px; box-sizing: border-box; padding: 12px 14px 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px #23221e; display: flex; flex-direction: column; align-items: center;">
+        <div style="align-self: flex-start; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .28em; text-indent: .28em; color: #b0aa9c;">OUTPUT</div>
+        <div style="margin-top: 8px; display: flex; align-items: flex-start; gap: 20px;">
+          <sc-for list="{{ outputKnobs }}" as="k" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div style="position: relative; width: {{ k.w }}px; height: {{ k.h }}px;">
+                <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="6">
+                  <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tickTop }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tickTop }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.nums }}" as="m" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                </sc-for>
+                <div onPointerDown="{{ k.onDown }}" data-plate="off" style="position: absolute; left: {{ k.bodyOff }}px; top: {{ k.bodyTop }}px; width: {{ k.d }}px; height: {{ k.d }}px; border-radius: 50%; cursor: grab; background: {{ k.fill }}; box-shadow: {{ k.shadow }};">
+                  <div style="position: absolute; inset: 0; transform: {{ k.rot }};">
+                    <div style="position: absolute; left: calc(50% - {{ k.pw }}px); top: {{ k.ptop }}px; width: {{ k.pwFull }}px; height: {{ k.ph }}px; border-radius: 1px; background: {{ k.pgrad }};"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 2px; font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: .20em; text-indent: .20em; color: #c3bcae;">{{ k.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="position: relative; margin-top: 16px; box-sizing: border-box; padding: 12px 16px 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px #23221e;">
+      <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .28em; text-indent: .28em; color: #b0aa9c;">DELAY CHARACTER</div>
+      <div style="margin-top: 10px; display: flex; align-items: flex-start; gap: 22px;">
+
+        <div style="width: 158px; display: flex; flex-direction: column; gap: 12px;">
+          <sc-for list="{{ characterModes }}" as="m" hint-placeholder-count="3">
+            <div onClick="{{ m.onPick }}" data-plate="off" style="height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; border-radius: 3px; cursor: pointer; background: {{ m.face }}; box-shadow: {{ m.shadow }};">
+              <div style="width: 10px; height: 10px; border-radius: 50%; flex: none; background: {{ m.ledBg }}; box-shadow: {{ m.ledGlow }};"></div>
+              <div style="font-weight: 600; font-size: 13px; line-height: 15px; letter-spacing: .24em; text-indent: .24em; color: {{ m.color }};">{{ m.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: center; gap: 24px;">
+          <sc-for list="{{ characterDials }}" as="k" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div data-plate="{{ k.plateRings }}" style="position: relative; width: {{ k.w }}px; height: 232px;">
+                <sc-for list="{{ k.minors2 }}" as="t" hint-placeholder-count="4">
+                  <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tick2Top }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tick2Origin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.ticks2 }}" as="t" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tick2Top }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tick2Origin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.nums2 }}" as="m" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                </sc-for>
+                <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="2">
+                  <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tickTop }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tickTop }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                </sc-for>
+                <sc-for list="{{ k.nums }}" as="m" hint-placeholder-count="5">
+                  <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                </sc-for>
+                <div onPointerDown="{{ k.onDown }}" data-plate="off" style="position: absolute; left: {{ k.bodyOff }}px; top: {{ k.bodyTop }}px; width: 76px; height: 76px; border-radius: 50%; cursor: grab; background: radial-gradient(circle at 38% 28%, #514e46, #282621 55%, #121110); box-shadow: inset 0 0 0 1px #090908, inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52);">
+                  <div style="position: absolute; inset: 0; transform: {{ k.rot }};">
+                    <div style="position: absolute; left: calc(50% - 1.25px); top: 7px; width: 2.5px; height: 30px; border-radius: 1px; background: linear-gradient(#f5f0e5, #b7b0a1);"></div>
+                  </div>
+                </div>
+              </div>
+              <div data-plate="off" style="margin-top: 8px; align-self: flex-start; display: flex; flex-direction: column; gap: 5px;">
+                <sc-for list="{{ k.stack }}" as="r" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; gap: 7px;">
+                    <div style="width: 6px; height: 6px; border-radius: 50%; flex: none; background: {{ r.ledBg }}; box-shadow: {{ r.ledGlow }};"></div>
+                    <div style="font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: .18em; text-indent: .18em; color: {{ r.color }};">{{ r.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="width: 300px; display: flex; flex-direction: column; align-items: center;">
+          <div style="align-self: flex-start; font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .24em; text-indent: .24em; color: #b0aa9c;">CHARACTER · ALL MODES</div>
+          <div style="margin-top: 10px; display: flex; gap: 24px;">
+            <sc-for list="{{ sharedKnobs }}" as="k" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="position: relative; width: {{ k.w }}px; height: {{ k.h }}px;">
+                  <sc-for list="{{ k.minors }}" as="t" hint-placeholder-count="5">
+                    <div style="position: absolute; left: {{ k.minorLeft }}px; top: {{ k.tickTop }}px; width: 1.5px; height: 5px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                  </sc-for>
+                  <sc-for list="{{ k.ticks }}" as="t" hint-placeholder-count="3">
+                    <div style="position: absolute; left: {{ k.tickLeft }}px; top: {{ k.tickTop }}px; width: 2px; height: 9px; background: {{ t.color }}; transform-origin: {{ k.tickOrigin }}; transform: {{ t.rot }};"></div>
+                  </sc-for>
+                  <sc-for list="{{ k.nums }}" as="m" hint-placeholder-count="3">
+                    <div style="position: absolute; left: {{ m.x }}px; top: {{ m.y }}px; transform: translate(-50%, -50%); font-weight: 600; font-size: 10px; line-height: 12px; letter-spacing: .06em; color: {{ m.color }}; white-space: nowrap;">{{ m.t }}</div>
+                  </sc-for>
+                  <div onPointerDown="{{ k.onDown }}" data-plate="off" style="position: absolute; left: {{ k.bodyOff }}px; top: {{ k.bodyTop }}px; width: {{ k.d }}px; height: {{ k.d }}px; border-radius: 50%; cursor: grab; background: {{ k.fill }}; box-shadow: {{ k.shadow }};">
+                    <div style="position: absolute; inset: 0; transform: {{ k.rot }};">
+                      <div style="position: absolute; left: calc(50% - {{ k.pw }}px); top: {{ k.ptop }}px; width: {{ k.pwFull }}px; height: {{ k.ph }}px; border-radius: 1px; background: {{ k.pgrad }};"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top: 2px; font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: .20em; text-indent: .20em; color: #c3bcae;">{{ k.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position: relative; margin-top: 14px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .26em; text-indent: .26em; color: #b0aa9c;">DL-88 · TOURING SPEC · 5U</div>
+      <div style="width: 236px; height: 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; transform: rotate(-1.1deg); background: linear-gradient(178deg, #f0ebdd, #e0dac9 58%, #cec8b7); clip-path: polygon(1.6% 0%, 0.4% 34%, 2.2% 68%, 0% 100%, 98.6% 100%, 100% 64%, 98% 32%, 99.4% 0%); box-shadow: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.55);">
+        <div style="font-family: 'Permanent Marker', cursive; font-size: 15px; line-height: 18px; letter-spacing: .01em; color: #23211c;">CH 4 — GTR / STAGE LEFT</div>
+      </div>
+      <div style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .26em; text-indent: .26em; color: #b0aa9c;">{{ footStamp }}</div>
+    </div>
+  </div>
+
+  <div style="width: 52px; position: relative; background: linear-gradient(90deg, #63605a, #7e7a73 22%, #9d998f 48%, #b9b5ac 78%, #6f6b64); box-shadow: inset 2px 0 6px rgba(0,0,0,.5);">
+    <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.05) 1px 3px);"></div>
+    <div style="position: absolute; left: 15px; top: 28px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 38% 30%, #cfcbc2, #6d6a63 70%, #46443f); box-shadow: inset 0 1px 1px rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.5);"></div>
+    <div style="position: absolute; left: 15px; bottom: 28px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 38% 30%, #cfcbc2, #6d6a63 70%, #46443f); box-shadow: inset 0 1px 1px rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.5);"></div>
+    <div style="position: absolute; left: 4px; top: 150px; width: 44px; box-sizing: border-box; padding: 6px 0; text-align: center; transform: rotate(1.4deg); background: linear-gradient(#e8e3d3, #cdc7b6); box-shadow: 0 2px 4px rgba(0,0,0,.45);">
+      <div style="font-family: 'Permanent Marker', cursive; font-size: 12px; line-height: 14px; color: #20201c;">DLY 4</div>
+    </div>
+    <div style="position: absolute; left: 8px; bottom: 48px; width: 36px; height: 252px; transform: rotate(1.6deg); background: linear-gradient(96deg, #efeadc, #ded8c8 55%, #cdc7b6); clip-path: polygon(0% 2%, 34% 0%, 66% 2.4%, 100% 0.6%, 100% 97%, 62% 100%, 30% 97.6%, 0% 99%); box-shadow: 0 2px 5px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.55);">
+      <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap; font-family: 'Permanent Marker', cursive; font-size: 14px; line-height: 16px; letter-spacing: .02em; color: #23211c;">HALDEN HALL · LOAD-IN 06</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1456,&quot;height&quot;:1020},&quot;plate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Export&quot;},&quot;bypassed&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;bpm&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:120,&quot;min&quot;:40,&quot;max&quot;:220,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;inValue&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;−99.0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Meters&quot;},&quot;outValue&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;−99.0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Meters&quot;},&quot;footStamp&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;SN 0417 · v1.1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Identity&quot;}}">
+// Two classes only (call 3). Fifth Member has no MODEL control, so it takes no
+// Ø104 signature: Ø76 primary and Ø56 standard, from five diameters.
+// Fifth Member's own tick law is kept: majors 2×9 spanning R+8→R+17, minors
+// 1.5×5 spanning R+12→R+17, numerals anchored by the edge facing the dial at R+21.
+const CLS = {
+  primary:  { d: 76, R: 38, w: 144, h: 144, C: 72, pw: 1.25, pwFull: 2.5, ph: 30, ptop: 7,
+              fill: 'radial-gradient(circle at 38% 28%, #514e46, #282621 55%, #121110)',
+              shadow: 'inset 0 0 0 1px #090908, inset 0 1px 1px rgba(255,255,255,.17), inset 0 -7px 14px rgba(0,0,0,.68), 0 7px 14px rgba(0,0,0,.52)',
+              pgrad: 'linear-gradient(#f5f0e5, #b7b0a1)' },
+  standard: { d: 56, R: 28, w: 124, h: 124, C: 62, pw: 1, pwFull: 2, ph: 24, ptop: 6,
+              fill: 'radial-gradient(circle at 38% 28%, #4c4942, #262420 55%, #121110)',
+              shadow: 'inset 0 0 0 1px #090908, inset 0 1px 1px rgba(255,255,255,.16), inset 0 -6px 12px rgba(0,0,0,.65), 0 6px 12px rgba(0,0,0,.50)',
+              pgrad: 'linear-gradient(#f4efe4, #b6afa1)' }
+};
+const LIT = { tick: '#b0aa9c', minor: '#8a857a', num: '#b0aa9c' };
+const DIM = { tick: '#5a564e', minor: '#4a463f', num: '#615c54' };
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = {
+      sync: true, div: 1, stereo: 2, mode: 1,
+      fb: 35, cross: 50, timeMs: 375, mix: 38, trim: 0,
+      wow: 40, modRate: 1.0, degrade: 15, flutter: 30, modDepth: 22, genLoss: 35,
+      damping: 4000, saturation: 24,
+      bank: 'FACT', factIdx: 0, userIdx: 0, user: [],
+      listOpen: false, naming: false, draft: '', dirty: false, live: null, phase: 0
+    };
+    this.FACT = ['YOU TOO?', 'SLAPBACK 66', 'CANYON WALL', 'HALF-STEP', 'GHOST NOTE', 'BUS TIRE DUB'];
+    this.DIVS = [
+      { label: '1/4', mult: 1 }, { label: '1/8.', mult: 0.75 }, { label: '1/8', mult: 0.5 },
+      { label: '1/8T', mult: 1 / 3 }, { label: '1/16', mult: 0.25 }
+    ];
+    this.STEREO = ['MONO', 'STEREO', 'PING-PONG'];
+    this.MODES = ['TAPE', 'BBD', 'DIGITAL'];
+    this.TIME_SKEW = 0.4135361469;
+    this.RATE_SKEW = 0.4090339496;
+    this.DAMP_SKEW = 0.4306765581;
+  }
+
+  // Plate export. The flags are only a contract until something reads them, so
+  // this is the reader: data-plate="off" drops a layer the plate omits,
+  // data-plate="blank" empties a well but keeps its glass. Runtime cannot be
+  // suppressed from outside the source — the scope repaints ~22×/s — so the
+  // suppression lives here and the loop is frozen while it is on.
+  get plate() { return this._plateOverride != null ? this._plateOverride : !!this.props.plate; }
+
+  applyPlate() {
+    const root = document.querySelector('[data-frame="panel"]');
+    if (!root) return;
+    const on = this.plate;
+    root.querySelectorAll('[data-plate="off"]').forEach(el => { el.style.visibility = on ? 'hidden' : ''; });
+    root.querySelectorAll('[data-plate="blank"]').forEach(el => {
+      el.style.color = on ? 'transparent' : '';
+      el.style.textShadow = on ? 'none' : '';
+      Array.prototype.forEach.call(el.children, c => { c.style.visibility = on ? 'hidden' : ''; });
+    });
+  }
+  componentDidUpdate() { this.applyPlate(); }
+
+  componentDidMount() {
+    // Export hook: the cutting pass sets this rather than the prop, so a capture
+    // never depends on host state.
+    window.__dl88Plate = (on) => { this._plateOverride = on; this.forceUpdate(); this.applyPlate(); };
+    this.applyPlate();
+    let last = performance.now();
+    const loop = (t) => {
+      if (!this.plate && t - last > 45) { last = t; this.setState(s => ({ phase: (s.phase + 0.02) % 1 })); }
+      this._raf = requestAnimationFrame(loop);
+    };
+    this._raf = requestAnimationFrame(loop);
+    this._onKey = (e) => {
+      if (!this.state.naming) return;
+      if (e.key === 'Enter') { e.preventDefault(); this.commitName(); return; }
+      if (e.key === 'Escape') { e.preventDefault(); this.setState({ naming: false, draft: '' }); return; }
+      if (e.key === 'Backspace') { e.preventDefault(); this.setState(s => ({ draft: s.draft.slice(0, -1) })); return; }
+      if (e.key.length === 1) { e.preventDefault(); this.setState(s => ({ draft: (s.draft + e.key.toUpperCase()).slice(0, this.cap) })); }
+    };
+    window.addEventListener('keydown', this._onKey);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); clearTimeout(this._liveT); window.removeEventListener('keydown', this._onKey); }
+
+  // Call 2: 641 cell − 72 bank − 1 divider − 30 chevron trim = 538.00 name area,
+  // 10.880 px/char at Share Tech Mono 17 / .10 em → budget 49, cap 47.
+  get cap() { return 47; }
+
+  get bypassed() { return !!this.props.bypassed; }
+  get bpm() { return this.props.bpm ?? 120; }
+
+  linF(v, min, max) { return Math.min(1, Math.max(0, (v - min) / (max - min))); }
+  skewF(v, min, max, sk) { return Math.pow(this.linF(v, min, max), sk); }
+  fromF(f, min, max, sk) { return min + (max - min) * (sk ? Math.pow(f, 1 / sk) : f); }
+
+  showLive(text) {
+    clearTimeout(this._liveT);
+    this.setState({ live: text, dirty: true });
+    this._liveT = setTimeout(() => this.setState({ live: null }), 900);
+  }
+
+  // 190px of travel for full range, per the casting's interaction section.
+  drag(key, e, min, max, sk, fmt, name) {
+    e.preventDefault();
+    const startY = e.clientY;
+    const start = sk ? this.skewF(this.state[key], min, max, sk) : this.linF(this.state[key], min, max);
+    const emit = (v) => this.showLive(name + ': ' + fmt(v));
+    emit(this.state[key]);
+    const move = (ev) => {
+      const f = Math.min(1, Math.max(0, start + (startY - ev.clientY) / 190 * (ev.shiftKey ? 0.25 : 1)));
+      const v = this.fromF(f, min, max, sk);
+      this.setState({ [key]: v }); emit(v);
+    };
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  // marks: [angle, printed|null]. Numerals anchored by the box edge facing the
+  // dial: r = R + 21 + halfWidth·|sinθ| + 5·|cosθ|.
+  ring(C, R, marks, ink, radiusOffset) {
+    const inner = R + (radiusOffset || 21);
+    const ticks = [], minors = [], nums = [];
+    marks.forEach(m => {
+      const a = m[0], rad = a * Math.PI / 180;
+      const entry = { rot: 'rotate(' + a.toFixed(2) + 'deg)', color: m[1] ? ink.tick : ink.minor };
+      (m[1] ? ticks : minors).push(entry);
+      if (!m[1]) return;
+      const half = 2.7 * String(m[1]).length;
+      const r = inner + half * Math.abs(Math.sin(rad)) + 5 * Math.abs(Math.cos(rad));
+      nums.push({ t: m[1], color: ink.num, x: (C + r * Math.sin(rad)).toFixed(1), y: (C - r * Math.cos(rad)).toFixed(1) });
+    });
+    return { ticks, minors, nums };
+  }
+
+  knob(cfg) {
+    const c = CLS[cfg.cls];
+    const C = cfg.C || c.C;
+    const f = cfg.skew ? this.skewF(this.state[cfg.key], cfg.min, cfg.max, cfg.skew) : this.linF(this.state[cfg.key], cfg.min, cfg.max);
+    const r = this.ring(C, c.R, cfg.marks, cfg.ink || LIT);
+    // dy shifts the whole ring down inside a taller registration box. On a mixed
+    // Ø76/Ø56 row both suite rules then hold at once: equal box heights put the
+    // labels on one line, and dy = (76−56)/2 puts the pivots on one Y.
+    const dy = cfg.dy || 0;
+    return Object.assign({
+      label: cfg.label, w: cfg.w || c.w, h: cfg.h || (c.h + dy), d: c.d,
+      bodyOff: C - c.d / 2, bodyTop: (cfg.bodyTop != null ? cfg.bodyTop : C - c.d / 2 + dy),
+      tickLeft: C - 1, minorLeft: C - 0.75, tickTop: C - (c.R + 17) + dy, tickOrigin: '50% ' + (c.R + 17) + 'px',
+      pw: c.pw, pwFull: c.pwFull, ph: c.ph, ptop: c.ptop, pgrad: c.pgrad, fill: c.fill, shadow: c.shadow,
+      rot: 'rotate(' + (-135 + f * 270).toFixed(1) + 'deg)',
+      ticks: r.ticks, minors: r.minors,
+      nums: dy ? r.nums.map(n => ({ t: n.t, color: n.color, x: n.x, y: (parseFloat(n.y) + dy).toFixed(1) })) : r.nums,
+      ticks2: [], minors2: [], nums2: [],
+      ledShow: 'none', ledBg: 'transparent', ledGlow: 'none',
+      onDown: (e) => this.drag(cfg.key, e, cfg.min, cfg.max, cfg.skew, cfg.fmt, cfg.lcd || cfg.label)
+    }, cfg.extra || {});
+  }
+
+  led(on, size) {
+    const g = size === 10 ? '0 0 10px rgba(240,236,220,.75), 0 0 22px rgba(230,224,205,.35)'
+      : size === 6 ? '0 0 7px rgba(240,236,220,.75), 0 0 15px rgba(230,224,205,.35)'
+        : '0 0 8px rgba(240,236,220,.75), 0 0 18px rgba(230,224,205,.35)';
+    return on
+      ? { bg: 'radial-gradient(circle at 35% 30%, #ffffff, #efe9d6 45%, #b9b09a)', glow: g }
+      : { bg: 'radial-gradient(circle at 35% 30%, ' + (size === 6 ? '#34322d, #171614' : '#3a3833, #191816') + ')', glow: 'inset 0 1px 2px rgba(0,0,0,.8)' };
+  }
+
+  legend(on) {
+    return on
+      ? { color: '#F4F8FA', glow: '0 0 7px rgba(244,248,250,.75)' }
+      : { color: '#9AA1A6', glow: 'none' };
+  }
+
+  progName() {
+    const s = this.state;
+    if (s.bank === 'FACT') return String(s.factIdx + 1).padStart(2, '0') + ' ' + this.FACT[s.factIdx];
+    if (!s.user.length) return '-- NO PROGRAM';
+    return s.user[s.userIdx];
+  }
+  seedName() {
+    const cur = this.progName().replace(/^\d\d\s+/, '').replace(/\s+\d+$/, '');
+    let n = 2;
+    while (this.state.user.indexOf(cur + ' ' + n) !== -1) n++;
+    return (cur + ' ' + n).slice(0, this.cap);
+  }
+  commitName() {
+    const name = (this.state.draft.trim() || this.seedName()).slice(0, this.cap);
+    this.setState(s => ({ user: s.user.concat([name]), bank: 'USER', userIdx: s.user.length, naming: false, draft: '', dirty: false, listOpen: false }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const pct = v => Math.round(v) + ' %';
+    const isUser = s.bank === 'USER' && s.user.length > 0;
+    const naming = s.naming;
+
+    const delayMs = s.sync ? (60000 / this.bpm) * this.DIVS[s.div].mult : s.timeMs;
+
+    // --- scope: repeat train, right to left over a 2600 ms window -------------
+    const PW = 1306, BASE = 64, SPAN = 73 - 17;
+    const loss = s.mode === 0 ? 1 - s.genLoss / 260 : s.mode === 1 ? 1 - s.modDepth / 420 : 1 - s.degrade / 300;
+    const pulses = [];
+    const off = s.phase * delayMs;
+    let amp = 1;
+    for (let n = 0; n < 40; n++) {
+      const age = n * delayMs + off;
+      if (age > 2600) break;
+      if (n > 0) amp = amp * (s.fb / 100) * loss;
+      if (amp < 0.03) amp = 1;
+      const h = SPAN * Math.min(1, Math.max(0.04, Math.pow(amp, 0.45)));
+      const x = PW * (1 - age / 2600);
+      pulses.push({
+        x: x.toFixed(1), top: (BASE - h).toFixed(1), h: h.toFixed(1),
+        gx: (x + 2).toFixed(1), gw: Math.max(8, PW * 0.014).toFixed(1),
+        sw: n === 0 ? 3 : 2.2, r: n === 0 ? 3.2 : 2.2
+      });
+    }
+
+    const modeName = ['TAPE ECHO · 3-HEAD', 'BBD BUCKET-BRIGADE', 'DIGITAL · 16-BIT'][s.mode];
+
+    // --- the three character dials -------------------------------------------
+    // Dial 1 keeps two concentric rings: percent inner, hertz outer. The ring
+    // that is not live dims — the same exception as the unlit label stacks.
+    const hzLive = s.mode === 1;
+    const pctMarks = [[-135, '0'], [-67.5, '25'], [0, '50'], [67.5, '75'], [135, '100']];
+    const hzMarks = [[-135, '0.1'], [-70.13, null], [-38.11, '0.5'], [0, '1'], [26.74, null], [48.26, '2'], [82.86, null], [110.93, null], [135, '5']];
+
+    const dial1Key = s.mode === 0 ? 'wow' : s.mode === 1 ? 'modRate' : 'degrade';
+    const dial1Cfg = s.mode === 1
+      ? { key: 'modRate', min: 0.1, max: 5, skew: this.RATE_SKEW, fmt: v => v.toFixed(2) + ' Hz', lcd: 'MOD RATE' }
+      : s.mode === 0 ? { key: 'wow', min: 0, max: 100, fmt: pct, lcd: 'WOW' }
+        : { key: 'degrade', min: 0, max: 100, fmt: pct, lcd: 'REPEAT DEGRADE' };
+
+    const dial1 = this.knob(Object.assign({}, dial1Cfg, {
+      cls: 'primary', label: '', C: 116, w: 232, marks: pctMarks, ink: hzLive ? DIM : LIT
+    }));
+    const outer = this.ring(116, 38, hzMarks, hzLive ? LIT : DIM, 57);
+    dial1.ticks2 = outer.ticks; dial1.minors2 = outer.minors; dial1.nums2 = outer.nums;
+    dial1.tick2Top = 116 - 91; dial1.tick2Origin = '50% 91px';
+    dial1.stack = [
+      { label: 'WOW', lit: s.mode === 0 }, { label: 'MOD RATE', lit: s.mode === 1 }, { label: 'REPEAT DEGRADE', lit: s.mode === 2 }
+    ].map(r => { const l = this.led(r.lit, 6); return { label: r.label, color: r.lit ? '#e7e1d4' : '#615c54', ledBg: l.bg, ledGlow: l.glow }; });
+
+    // Dials 2 and 3 register on dial 1's pivot: 144 wide, ring inset 44 from the top.
+    const dial2 = this.knob({ key: s.mode === 1 ? 'modDepth' : 'flutter', cls: 'primary', label: '', min: 0, max: 100, fmt: pct, lcd: s.mode === 1 ? 'MOD DEPTH' : 'FLUTTER', marks: pctMarks, C: 72, bodyTop: 44 + 34, w: 144 });
+    dial2.tickTop = 44 + (72 - 55); dial2.nums = dial2.nums.map(n => ({ ...n, y: (parseFloat(n.y) + 44).toFixed(1) }));
+    dial2.stack = [{ label: 'FLUTTER', lit: s.mode === 0 }, { label: 'MOD DEPTH', lit: s.mode === 1 }]
+      .map(r => { const l = this.led(r.lit, 6); return { label: r.label, color: r.lit ? '#e7e1d4' : '#615c54', ledBg: l.bg, ledGlow: l.glow }; });
+
+    const dial3 = this.knob({ key: 'genLoss', cls: 'primary', label: '', min: 0, max: 100, fmt: pct, lcd: 'GENERATION LOSS', marks: pctMarks, C: 72, bodyTop: 44 + 34, w: 144 });
+    dial3.tickTop = 44 + (72 - 55); dial3.nums = dial3.nums.map(n => ({ ...n, y: (parseFloat(n.y) + 44).toFixed(1) }));
+    dial3.stack = [{ label: 'GENERATION LOSS', lit: s.mode === 0 }]
+      .map(r => { const l = this.led(r.lit, 6); return { label: r.label, color: r.lit ? '#e7e1d4' : '#615c54', ledBg: l.bg, ledGlow: l.glow }; });
+
+    const timeLed = this.led(!s.sync, 7);
+    const crossLed = this.led(s.stereo === 2, 7);
+    const divLed = this.led(s.sync, 7);
+
+    const btn = (on) => ({
+      face: on ? 'linear-gradient(#2b2924, #171613)' : 'linear-gradient(#2b2924, #171613)',
+      shadow: on
+        ? 'inset 0 0 0 1px #0a0a08, inset 0 2px 6px rgba(0,0,0,.75), 0 1px 0 rgba(255,255,255,.10)'
+        : 'inset 0 0 0 1px #0a0a08, inset 0 1px 0 rgba(255,255,255,.13), 0 3px 6px rgba(0,0,0,.50)',
+      color: on ? '#f0eade' : '#b0aa9c'
+    });
+
+    // Plate mode also empties the live strings at render level, so a capture that
+    // re-renders the tree still comes out with empty wells.
+    const P = this.plate;
+    return {
+      bypassDisplay: (this.bypassed && !P) ? 'block' : 'none',
+      inValue: P ? '' : (this.props.inValue ?? '\u221299.0'),
+      outValue: P ? '' : (this.props.outValue ?? '\u221299.0'),
+      footStamp: this.props.footStamp ?? 'SN 0417 · v1.1',
+
+      programCaption: naming ? 'NAME PROGRAM' : 'PROGRAM',
+      bankBadge: naming ? 'NAME' : s.bank,
+      lcdText: P ? '' : naming ? s.draft + '\u258C' : (s.live || (this.progName() + (s.dirty ? ' *' : ''))),
+      listOpen: s.listOpen,
+      onProgramClick: () => { if (!naming) this.setState(st => ({ listOpen: !st.listOpen })); },
+      bankList: this.FACT.map((n, i) => ({
+        label: String(i + 1).padStart(2, '0') + ' ' + n, tag: 'FACT',
+        color: s.bank === 'FACT' && s.factIdx === i ? '#d7e2d6' : '#93a894',
+        onPick: () => this.setState({ bank: 'FACT', factIdx: i, listOpen: false, dirty: false })
+      })).concat(s.user.map((n, i) => ({
+        label: n, tag: 'USER',
+        color: s.bank === 'USER' && s.userIdx === i ? '#d7e2d6' : '#93a894',
+        onPick: () => this.setState({ bank: 'USER', userIdx: i, listOpen: false, dirty: false })
+      }))),
+
+      legSave: this.legend(!naming && s.dirty),
+      legStore: this.legend(naming),
+      legDelete: this.legend(!naming && isUser),
+      legCancel: this.legend(naming),
+      saveCursor: (naming || s.dirty) ? 'pointer' : 'default',
+      deleteCursor: (naming || isUser) ? 'pointer' : 'default',
+      saveTitle: naming ? 'Store under the typed name' : (s.dirty ? 'Save as a new User Program' : 'Nothing to save — Program is unmodified'),
+      deleteTitle: naming ? 'Cancel naming' : (isUser ? 'Delete this User Program' : 'Enabled only on a User Program'),
+      onSave: () => { if (naming) this.commitName(); else if (s.dirty) this.setState({ naming: true, draft: this.seedName(), listOpen: false, live: null }); },
+      onDelete: () => {
+        if (naming) { this.setState({ naming: false, draft: '' }); return; }
+        if (!isUser) return;
+        const user = s.user.slice(); user.splice(s.userIdx, 1);
+        this.setState({ user, userIdx: Math.max(0, s.userIdx - 1), bank: user.length ? 'USER' : 'FACT' });
+      },
+
+      scopeState: P ? '' : modeName + ' · ' + this.STEREO[s.stereo] + ' · FB ' + Math.round(s.fb) + '% · ' + Math.round(delayMs) + ' ms / DIV',
+      scopeSync: P ? '' : s.sync ? this.DIVS[s.div].label + ' · ' + this.bpm + ' BPM · ' + Math.round(delayMs) + ' ms' : 'FREE · ' + Math.round(delayMs) + ' ms',
+      scopeGrid: Array.from({ length: 7 }, (_, i) => ({ x: ((i + 1) * PW / 8).toFixed(1) })),
+      pulses: P ? [] : pulses, pingPong: !P && s.stereo === 2,
+
+      syncThumb: s.sync ? '27px' : '2px',
+      syncLabel: s.sync ? 'SYNC ON' : 'SYNC OFF',
+      onSyncToggle: () => this.setState({ sync: !s.sync, dirty: true }),
+      divLed,
+      divisions: this.DIVS.map((d, i) => {
+        const on = s.sync && s.div === i;
+        const b = btn(s.div === i);
+        const l = this.led(on, 6);
+        return { label: d.label, face: b.face, shadow: b.shadow, color: b.color, ledBg: l.bg, ledGlow: l.glow, onPick: () => this.setState({ div: i, dirty: true }) };
+      }),
+      stereoModes: this.STEREO.map((n, i) => {
+        const b = btn(s.stereo === i); const l = this.led(s.stereo === i, 7);
+        return { label: n, face: b.face, shadow: b.shadow, color: b.color, ledBg: l.bg, ledGlow: l.glow, onPick: () => this.setState({ stereo: i, dirty: true }) };
+      }),
+      characterModes: this.MODES.map((n, i) => {
+        const b = btn(s.mode === i); const l = this.led(s.mode === i, 10);
+        return { label: n, face: b.face, shadow: b.shadow, color: b.color, ledBg: l.bg, ledGlow: l.glow, onPick: () => this.setState({ mode: i, dirty: true }) };
+      }),
+
+      // Ø76 primary: TIME (promoted — five numerals kept on a skewed ring),
+      // FEEDBACK, MIX and the three character dials.
+      timeKnob: [Object.assign(this.knob({
+        key: 'timeMs', cls: 'primary', label: 'TIME', min: 1, max: 2000, skew: this.TIME_SKEW,
+        fmt: v => Math.round(v) + ' ms',
+        marks: [[-135, '1'], [-114.33, null], [-106.10, null], [-76.75, null], [-57.08, '100'], [-31, null], [0, '375'], [17.10, null], [67.67, '1K'], [104.70, null], [135, '2K']]
+      }), { ledBg: timeLed.bg, ledGlow: timeLed.glow, ledShow: 'block' })],
+
+      repeatKnobs: [
+        Object.assign(this.knob({
+          key: 'fb', cls: 'primary', label: 'FEEDBACK', min: 0, max: 110, fmt: pct,
+          marks: [[-135, '0'], [-73.64, '25'], [-12.27, '50'], [49.09, '75'], [110.45, '100'], [135, null]]
+        }), { ledShow: 'none' }),
+        Object.assign(this.knob({
+          key: 'cross', cls: 'standard', label: 'CROSS-FEED', min: 0, max: 100, fmt: pct, h: 144, dy: 10,
+          marks: [[-135, '0'], [-67.5, null], [0, '50'], [67.5, null], [135, '100']]
+        }), { ledBg: crossLed.bg, ledGlow: crossLed.glow, ledShow: 'block' })
+      ],
+
+      outputKnobs: [
+        this.knob({ key: 'mix', cls: 'primary', label: 'MIX', min: 0, max: 100, fmt: pct, marks: pctMarks }),
+        this.knob({
+          key: 'trim', cls: 'standard', label: 'OUTPUT TRIM', min: -24, max: 24, h: 144, dy: 10,
+          fmt: v => (v >= 0 ? '+' : '\u2212') + Math.abs(v).toFixed(1) + ' dB',
+          marks: [[-135, '\u221224'], [-101.25, null], [-67.5, null], [-33.75, null], [0, '0'], [33.75, null], [67.5, null], [101.25, null], [135, '+24']]
+        })
+      ],
+
+      // Dial 1's two rings change ink with the mode and are the one carve-out
+      // from the baked scales, so only its ring box carries the flag.
+      characterDials: [Object.assign({ plateRings: 'off' }, dial1), Object.assign({ plateRings: '' }, dial2), Object.assign({ plateRings: '' }, dial3)],
+
+      sharedKnobs: [
+        this.knob({
+          key: 'damping', cls: 'standard', label: 'DAMPING · Hz', min: 1000, max: 16000, skew: this.DAMP_SKEW,
+          fmt: v => (v / 1000).toFixed(1) + ' kHz',
+          marks: [[-135, '1K'], [-50.89, null], [-21.63, null], [0, '4K'], [33.22, null], [59.45, null], [101.24, null], [135, '16K']]
+        }),
+        this.knob({
+          key: 'saturation', cls: 'standard', label: 'SATURATION', min: 0, max: 100, fmt: pct,
+          marks: [[-135, '0'], [-67.5, null], [0, '50'], [67.5, null], [135, '100']]
+        })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
