@@ -14,6 +14,42 @@ spec documents are authoritative for values.** `design/README.md` is the earlier
 superseded wherever they disagree. **Errors in those documents that this build corrects are listed
 below; do not "fix" the code back to match them.**
 
+## RESUME POINT — the header has a measured baseline, and it is what a panel move fails against
+
+**Verified `ed3688a` on 2026-08-17: this casting's header draws exactly where its own constants say.**
+Not read — captured from the Release standalone and measured off the pixels.
+
+Why it is written here rather than left in a session report: the value of a baseline is entirely in
+being read by whoever moves the panel next, and a figure that lives somewhere the mover does not
+open is worth nothing.
+
+**What was measured**, band at y 53, height 34, canvas 1240 x 931:
+
+| Element | Constants | Measured |
+|---|---|---|
+| LCD | `lcdX` 368, `lcdW` 449 -> 368..817 | 368.5 .. 815.5 |
+| SAVE | `saveX` 827, `saveW` 68 -> 827..895 | 827.5 .. 847.0 (glyph-broken) |
+| DELETE | `deleteX` 902 -> 902..970 | 902.0 .. 976.5 |
+| meter wells | — | 1003.5 .. 1078.0, 1090.5 .. 1164.0 |
+
+**What this is NOT.** This casting references `nf::HeaderGeometry` **nowhere**, so it is on its own
+canvas and its own layout, and none of the figures above is expected to match the shared part. The
+baseline says *internally consistent*, not *conformant*.
+
+**The defect it exists to catch** was found in Chorus-60 on 2026-08-17: that casting's header pass
+aliased its LCD to the shared part and left SAVE, DELETE and both meter wells as literals from the
+previous canvas — **29 px right and 29 px down** — and nothing could see it, because the plate baked
+those faces and the only symptom was text centred inside a box nobody drew. It surfaced the moment
+the material had to be painted from those rects.
+
+**So when this casting moves: alias every band figure in one edit, then re-measure against the table
+above.** A rect that moves and a rect that does not are indistinguishable in a diff and obvious in a
+measurement. And note that **a literal which happens to agree with core is indistinguishable from an
+alias by reading** — Reflect-84 held four such literals, one of them 2 px off §4's shared descriptor
+anchor, in the casting whose editor had been declared conformant.
+
+---
+
 ## Commands
 
 Fifth Member builds on macOS (AU + VST3 + Standalone), Windows (VST3 + Standalone) and Linux
