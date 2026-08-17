@@ -387,7 +387,7 @@ changelog is a gap by construction, not an omission.
 | Call | State |
 |---|---|
 | **5** — code-drawn, cached, no filmstrips | **already conformed and already argued.** Five diameters × 128 frames × 3 scales is 1,920 frames and ~60 MB for a body whose specular does not rotate. `setBufferedToImage` is the build's to add. |
-| **6** — plates export at 3× | **conformed on scale, invalidated on base.** A 3× plate exists at 3720 × 2793 — 3× the superseded 1240 × 931 canvas. See §10. |
+| **6** — plates export at 3× | **conformed this bundle.** The plate is 4020 × 3036 against the current 1340 × 1012 frame, cut from the panel with the source-side plate flags in place. The old 3720 × 2793 was 3× of a canvas that no longer exists — correct ratio, superseded base. |
 | **7** — Barlow Condensed panel lettering | **already conformed** throughout, with the wordmark outside the call and note values in the casting's mono. |
 | **4's floor** | **already conformed** — every functional string was already ≥ 11 px with numerals at 10. |
 | **Tick law** | **already conformed.** Majors 2 × 9, minors 1.5 × 5 from a common R+17 tip, numerals anchored by the edge facing the dial — the suite's rule reached independently, before it was written down. |
@@ -421,15 +421,42 @@ changelog is a gap by construction, not an omission.
 
 ### Outstanding
 
-- **The plate must be re-cut at 3× against the new frame: 4020 × 3036** (`handoff/MANIFEST.md`
-  row 7). The existing 3720 × 2793 is 3× of a canvas that no longer exists — correct ratio,
-  superseded base. **It also has to carry §10.8's two ink changes**, since the plate bakes panel
-  typography including the model line: the panel and its plate would otherwise disagree on the
-  one figure this round fixed twice.
-- **Drop `plate/buttons/01–04`** from the bundle — superseded by the shared Program cap.
+- ~~The plate must be re-cut at 3× against the new frame~~ — **cut, 4020 × 3036** from the current
+  1340 × 1012 frame, carrying §10.8's two ink changes, because this plate bakes panel typography
+  including the model line. The old 3720 × 2793 was 3× of a canvas that no longer exists — correct
+  ratio, superseded base. **The two 52 px rack ears are outside the frame**: the cut was taken from
+  the 1444-wide window and cropped at x 156, so the ears and the two tapes on them stay drawn.
+- ~~Drop `plate/buttons/01–04`~~ — **not in the bundle**, superseded by the shared Program cap.
 - Wire both meter wells and the scope to real signal.
 - By-ear tuning of the six factory Programs; names are authored, values are not final.
 - Confirm the three skews and dial 1's per-mode bindings against the build's parameter table.
 - **`shared/HEADER-PART.md` revision 3** — three figure items waiting on build answers; its
   fourth, the propagation process, is written and does not wait.
 - **`shared/BRAND-AMENDMENT-BYPASS.md`** — two one-line changes here if adopted (§7.3).
+
+---
+
+## 11 · Plate flags — the mechanism, now implemented
+
+**The plate cannot be cut by suppressing runtime layers from outside the source.** This panel
+repaints ~22 times a second for the scope, so anything hidden by a capture-time pass is repainted
+before or during the capture. The flags are therefore a prerequisite for §6's conformance, not a
+convenience.
+
+| Flag | On | Effect in plate mode |
+|---|---|---|
+| `data-plate="off"` | layers the plate omits — bypass multiply, Program list, SAVE / DELETE caps, all LEDs, the sync switch and its state caption, division · stereo · character buttons, all five knob bodies and pointers, the three Delay Character label stacks, **dial 1's ring box only** | hidden |
+| `data-plate="blank"` | wells whose contents the plate drops — the LCD cell, the IN and OUT wells, the scope's readout strip | the glass, bezel and rule stay; the contents go |
+
+**36 `off` layers and 3 `blank` wells**, read by `applyPlate()` in the logic class, which also
+freezes the scope loop while the flag is on. **Plate mode empties the live strings at render level
+as well** — `scopeState`, `scopeSync`, `lcdText`, `inValue`, `outValue` and the pulse list — so a
+capture that re-renders the tree still comes out with empty wells rather than repainted readouts.
+
+**Only dial 1 carries the ring flag.** Its two rings change ink with the mode and are the asset-format
+carve-out from the baked scales; dials 2 and 3 keep their rings in the plate, which is why the flag
+is a per-dial value rather than a rule about the character row.
+
+**A specified mechanism that was never implemented reads identically to one that was, right up
+until it is used.** These flags were in this casting's handoff before they were in its source, and
+nothing surfaced that until a cut was attempted. The reader now lives beside them.
