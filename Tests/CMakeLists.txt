@@ -12,6 +12,7 @@ target_sources(FifthMemberTests PRIVATE
     ProgramModelTests.cpp
     PrintedScaleTests.cpp
     ReadoutConformanceTests.cpp
+    EditorWiringTests.cpp
     MenuMetricsTests.cpp
     FactoryProgramsTests.cpp
     TimingEngineTests.cpp
