@@ -9,15 +9,15 @@
   },
   "session": { "closedInstances": 24, "openInstances": 4, "coreFraction": 0.500000 },
   "cells": [
-    { "blockSize": 64, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.004085 },
-    { "blockSize": 64, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.239992 },
-    { "blockSize": 128, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.003778 },
-    { "blockSize": 128, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.206366 },
-    { "blockSize": 512, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.003701 },
-    { "blockSize": 512, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.209973 },
-    { "blockSize": 128, "sampleRate": 44100, "editorOpen": false, "coreFraction": 0.003569 },
-    { "blockSize": 128, "sampleRate": 44100, "editorOpen": true, "coreFraction": 0.214439 },
-    { "blockSize": 128, "sampleRate": 96000, "editorOpen": false, "coreFraction": 0.007543 },
-    { "blockSize": 128, "sampleRate": 96000, "editorOpen": true, "coreFraction": 0.210304 }
+    { "blockSize": 64, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.004073 },
+    { "blockSize": 64, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.311210 },
+    { "blockSize": 128, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.003822 },
+    { "blockSize": 128, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.252991 },
+    { "blockSize": 512, "sampleRate": 48000, "editorOpen": false, "coreFraction": 0.003778 },
+    { "blockSize": 512, "sampleRate": 48000, "editorOpen": true, "coreFraction": 0.258249 },
+    { "blockSize": 128, "sampleRate": 44100, "editorOpen": false, "coreFraction": 0.003501 },
+    { "blockSize": 128, "sampleRate": 44100, "editorOpen": true, "coreFraction": 0.258107 },
+    { "blockSize": 128, "sampleRate": 96000, "editorOpen": false, "coreFraction": 0.007636 },
+    { "blockSize": 128, "sampleRate": 96000, "editorOpen": true, "coreFraction": 0.257467 }
   ]
 }
