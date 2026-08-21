@@ -45,28 +45,75 @@ public:
     void runTest() override
     {
 
-        beginTest ("This panel is on its OWN canvas — structurally absent from the shared part");
+        beginTest ("The WINDOW is wider than the frame, and the frame is the shared part's");
         {
-            /*  **Absent by construction, not clean.** Fifth Member does not reference
-                `nf::HeaderGeometry` anywhere: it is 1240 x 931 and its band is its own. So there is
-                no alias here for a partial migration to be partial OF, and the defect the three
-                aliased castings guard against cannot exist yet.
+            /*  **This arm has inverted, and the note it replaces described a panel that no longer
+                exists.** It read: *"Absent by construction, not clean. Fifth Member does not
+                reference `nf::HeaderGeometry` anywhere: it is 1240 x 931 and its band is its
+                own... It becomes possible the moment this panel is moved onto the shared part."*
 
-                It becomes possible the moment this panel is moved onto the shared part, and the
-                header-geometry sweep's finding is what that costs: **Chorus-60's pass aliased its
-                LCD and left four other band figures as literals from the previous canvas**, which
-                nothing could see because the plate baked their faces.
+                That moment is this commit.
 
-                What this arm buys meanwhile is a measured baseline. The canvas is asserted against
-                its own constants so that a panel move which shifts one rect and not another has
-                something to fail against — the same thing this casting's CLAUDE.md resume point
-                records from a Release capture. */
+                **This is the one casting whose window is wider than the shared frame**, and §1 is
+                explicit that call 1 is stated as the FRAME for exactly this reason: full-height
+                rack ears flank the fascia, 52 px each side, and they carry three of the panel's
+                five identity marks. A 1308-wide block at x 16 inside a 1340 window leaves zero for
+                ears. **Named cost: this window is 104 px wider than the other five.**
+
+                So there are two width claims here and they are different claims. The frame is
+                core's and must equal it; the window is this casting's and is the frame plus two
+                ears. Asserting only the window would let the frame drift; asserting only the frame
+                would not notice an ear going missing. */
             namespace L = FifthMemberTheme::Layout;
 
-            expectEquals ((int) L::canvasWidth, 1240);
-            expectEquals ((int) L::canvasHeight, 931);
+            expectEquals ((int) L::frameWidth, nf::HeaderGeometry::canvasWidth);
+            expectEquals ((int) L::canvasWidth, 1444);
+            expectEquals ((int) L::canvasHeight, 1012);
 
-            expectNotEquals ((int) L::canvasWidth, 0);
+            expectEquals ((int) (L::frameWidth + L::earWidth * 2.0f), (int) L::canvasWidth,
+                          "the window is the frame plus two ears, and one of the three has moved");
+            expectEquals ((int) L::frameX, (int) L::earWidth,
+                          "the frame starts where the left ear ends");
+        }
+
+        beginTest ("Every header cell is core's, and the nameplate lands on the shared anchor");
+        {
+            /*  A literal that happens to agree with core is indistinguishable from an alias by
+                READING, which is how Chorus-60's header pass left SAVE, DELETE and both meter wells
+                29 px right and 29 px down of where they belonged — invisible for as long as the
+                plate baked their faces. Every cell is compared, and each is offset by `frameX`
+                because `nf::HeaderGeometry` speaks frame-local.
+
+                What it cannot do is prove provenance: a derivation and a literal agree until the
+                shared figure moves. This catches **divergence**, which is the only window in which
+                the two are different at all. */
+            namespace L = FifthMemberTheme::Layout;
+            using H = nf::HeaderGeometry;      // a struct of constants, not a namespace
+
+            expectEquals ((int) L::lcdX,      (int) L::frameX + H::lcdX);
+            expectEquals ((int) L::lcdW,      H::lcdW);
+            expectEquals ((int) L::headerRowY, H::bandY);
+            expectEquals ((int) L::headerRowH, H::bandH);
+            expectEquals ((int) L::saveX,     (int) L::frameX + H::saveX);
+            expectEquals ((int) L::saveW,     H::saveW);
+            expectEquals ((int) L::deleteX,   (int) L::frameX + H::deleteX);
+            expectEquals ((int) L::deleteW,   H::deleteW);
+            expectEquals ((int) L::meterInX,  (int) L::frameX + H::inWellX);
+            expectEquals ((int) L::meterOutX, (int) L::frameX + H::outWellX);
+            expectEquals ((int) L::meterBoxW, H::meterWellW);
+            expectEquals ((int) L::nameplateX, (int) L::frameX + H::nameplateX);
+            expectEquals ((int) L::nameplateY, H::nameplateY);
+
+            /*  §4's shared descriptor anchor, and this casting's row of
+                `design-asks/header-nameplate-offsets.md` answering itself the way TapeRot's did.
+                Core records the PUBLISHED stack as `30 + 34 + 9 = 73`, five short. The delivered
+                prototype draws the tape's bounding box at 268.8 x 45.6 rotated -1.2 deg, which is a
+                **268.2 x 40** strip — and 30 + 40 + 8 is 78 exactly. The published height was
+                measured on something other than the tape. */
+            expectEquals ((int) L::taglineY1, H::descriptorY);
+            expect (nf::HeaderGeometry::landsOnDescriptorAnchor ((int) L::nameplateY,
+                                                                 (int) L::nameplateH, 8),
+                    "the nameplate stack no longer lands the descriptor on the shared anchor");
         }
 
         beginTest ("The real editor constructs, lays out and tears down");

@@ -23,7 +23,9 @@ Why it is written here rather than left in a session report: the value of a base
 being read by whoever moves the panel next, and a figure that lives somewhere the mover does not
 open is worth nothing.
 
-**What was measured**, band at y 53, height 34, canvas 1240 x 931:
+**What was measured**, band at y 53, height 34, canvas 1240 x 931 — **the pre-rewrite panel**,
+kept as the baseline it was taken as. The window is 1444 x 1012 on a 1340 frame and the band is
+the shared part's at y 61 as of 2026-08-21; see the canvas section below:
 
 | Element | Constants | Measured |
 |---|---|---|
@@ -183,7 +185,96 @@ Feedback reaches 110 % by design and Program 11 (`HOWL`) ships at 105 %, so `Del
 always-on soft ceiling **independent of the Saturation control**. Without it, self-oscillation at
 Saturation 0 % has nothing bounding it.
 
+### THE CANVAS MOVED 2026-08-21 — 1240 × 931 → a **1444 × 1012 window on a 1340 frame**
+
+**Read this before any figure below it.** Fifth Member was one of two castings never rebuilt to the
+harmonisation spec; the shipping panel was the old design, not a stale binary. Everything in the GUI
+section that follows was written against 1240 × 931 and its absolute coordinates have moved.
+
+**This is the one casting whose WINDOW is wider than the shared frame, and §1 states call 1 as the
+FRAME for exactly that reason.** Full-height rack ears flank the fascia — 52 px each side, outside
+the frame — and they carry three of the panel's five identity marks: the **RACK 4 · MON WORLD**
+stencil, the **DLY 4** cable tape and the **HALDEN HALL · LOAD-IN 06** tape. A 1308-wide block at
+x 16 inside a 1340 window leaves zero for ears.
+
+The alternative was 16 px bezels, which would have removed those three marks to protect a window
+dimension — inverting the round's scope, where the header is the part and body layout is the
+casting's. **Named cost: this window is 104 px wider than the other five.** Right at 1444 against
+1340; it would not have been at 960.
+
+| | |
+|---|---|
+| Window | **1444 × 1012** — `Layout::canvasWidth/canvasHeight` |
+| Frame | **1340** at x **52** — `Layout::frameWidth` is `nf::HeaderGeometry::canvasWidth`, aliased |
+| Ears | 52 each side, full height, **drawn** — `PanelBackground::paintEar` |
+| Header block | frame-local 16, 16, 1308 × 104 — the shared part |
+
+**Every absolute coordinate in `Layout` has `frameX` folded in, once.** `nf::HeaderGeometry` speaks
+frame-local, so anything taken from it lands 52 px right here. A frame-local number added later
+lands on top of the left ear — the bug the pre-existing version of that comment already warned
+about, and which a wider frame does not change.
+
+#### The plate is the FRAME, not the window — and it stopped carrying the ears
+
+`design/plate/fifth-member-plate-3x.png` is **4020 × 3036 = 1340 × 1012**, blitted at (`frameX`, 0).
+The 2× cut it replaces was 2480 × 1862 = 1240 × 931 and its own manifest read *"the fascia and its
+wear, **the rack ears and screws**, the nameplate…"* — the re-cut drops the ears, because a plate
+covering the window would have to be 1444 wide and would then disagree with every other casting's
+1340.
+
+**Verified against the prototype before anything was built on it**, by scanning the plate for its
+own edges rather than trusting the coordinates: the scope well steps at frame-local **160.00** and
+**258.00**, its readout rule at **183.00**, and the control-band top at **274.00** — every one the
+prototype's figure to the pixel. That check is what made deriving the layout from the prototype safe.
+
+#### The nameplate stack answered its row of an open ask
+
+`design-asks/header-nameplate-offsets.md` recorded this casting's published §4 stack as
+`30 + 34 + 9 = 73`, **five short** of the shared descriptor anchor at 78. The delivered prototype
+draws the tape's bounding box at 268.8 × 45.6 rotated −1.2°, which is a **268.2 × 40** strip —
+and **30 + 40 + 8 = 78 exactly**. The published height was measured on something other than the
+tape. Pinned by `static_assert`; §4's row wants 34 → 40.
+
+TapeRot's row answered itself the same way on the same day, from its wordmark cut. Two of the three
+open rows closed by measuring the delivered artwork rather than by a ruling.
+
+#### The Program legends were never moved onto the shared part, and `check_contrast` had been saying so
+
+Two roles had been failing since whenever they drifted — `legendLit` stated 13.98 against a measured
+**12.52**, `legendDark` stated 3.48-3.66 against **3.12-3.37**. Neither was a floor breach, which is
+why nobody noticed: the panel looked right and only the stated figure was wrong.
+
+**The cause was not drift.** 13.98 is `#f2ece0` against the header **block** `#211f1c` — a real
+measurement, taken against the wrong ground, with the wrong ground named in the annotation beside
+it. The legend sits on the button face, not on the block.
+
+§6 gives this role as `#f4f8fa` on cap `#23282c` at **13.93** and idle `#9aa1a6` at **5.68** — the
+shared part's inks, which Gatecrasher already carries. Both are now those, and SAVE and DELETE stop
+having *different* faces from each other (`#2a2823` against `#242219`), a distinction the shared
+part does not make and which made two buttons in one row read as two components.
+
+`legendDark` had been sitting at **3.12 against a 3.0 floor**. It is 5.68 now.
+
+#### What this pass did NOT re-derive
+
+The band interiors were re-derived from the prototype — section boxes, knob pivots, button rows,
+LEDs, the foot row — and verified by capture. **Individual figures inside `PanelControls` that the
+plate bakes were not re-measured against the plate**, because §11's flag list says the plate carries
+them and the build does not draw them. If something printed looks wrong, check whether the build is
+drawing it at all before moving a constant: on this casting **redrawing something the plate carries
+double-prints it at a one-pixel offset**, which is visible, and that is the failure mode a plate
+keeps.
+
+**The panel cannot be shown at 100 % on a 1440 × 932 display** — 1012 plus window chrome exceeds it,
+so a capture at full size is silently clipped by the screen rather than by the code. Capture at
+1155 × 810 (0.8×) to see the foot row. That cost one wrong diagnosis before it was noticed.
+
+---
+
 ### GUI (`Source/GUI/`)
+
+**Every absolute coordinate in this section predates 2026-08-21 and has moved.** The section above
+is the current geometry; this remains for its reasoning, which is unaffected.
 
 Entirely vector, with the static layers baked once into a `juce::Image` at construction. The
 prototype is 100 % CSS with zero images, zero SVG and no assets at all — unlike Gatecrasher and

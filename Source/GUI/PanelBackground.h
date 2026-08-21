@@ -3,22 +3,27 @@
 #include "FifthMemberTheme.h"
 
 /**
-    The panel plate, blitted.
+    The rack ears, drawn, and the panel plate blitted over the frame between them.
 
-    Everything static is in `design/plate/fifth-member-plate-2x.png` as of revision 2 - the fascia
-    and its wear, the rack ears and screws, the nameplate and the three other tape elements, the
-    section frames and their labels, every panel label, and every printed tick and numeral. Build
-    handoff section 1 is the manifest and it cuts both ways: **redrawing something the plate carries
-    double-prints it at a one-pixel offset, and baking something live freezes it.**
+    **The plate is the FRAME, not the window.** `design/plate/fifth-member-plate-3x.png` is
+    4020 × 3036 — 1340 × 1012 at 1× — which is the shared coordinate frame; this casting's window is
+    1444 because §1's rack ears sit outside it, 52 px each side. So the plate blits at
+    (`frameX`, 0) and the ears are painted either side. A blit at (0, 0) puts the whole panel under
+    the left ear.
 
-    This class used to rasterise all of that procedurally into a juce::Image at construction, because
-    the prototype was 100 % CSS with no assets at all and there was nothing to blit. That is what the
-    plate replaced; roughly 500 lines of fascia gradients, corner wears, scuff angles, screw slots
-    and silkscreen went with it. If something static looks wrong now, it is wrong in the plate and
-    gets re-cut from `Chorus-60`-style prototype source, not patched here.
+    **That is a change from the 2× plate, which baked the ears with everything else.** Its own
+    manifest read "the fascia and its wear, **the rack ears and screws**, the nameplate…"; the
+    re-cut drops them, because a plate covering the window would have to be 1444 wide and would
+    then disagree with every other casting's 1340.
 
-    2x only. A 1:1 blit to a Retina display resolves the fascia's 3px brush and the ears' 2px one to
-    a flat wash and the metal stops reading as metal - which is why the old bake ran at 2x too.
+    What the plate still carries is §11's list read backwards: everything except the layers it
+    flags `off` and the wells it flags `blank`. Build-handoff section 1 is the manifest and it cuts
+    both ways — **redrawing something the plate carries double-prints it at a one-pixel offset, and
+    baking something live freezes it.** If something static looks wrong, it is wrong in the plate
+    and gets re-cut, not patched here.
+
+    3× now, not 2×. A 1:1 blit to a Retina display resolves the fascia's 3 px brush and the ears'
+    2 px one to a flat wash and the metal stops reading as metal.
 */
 class PanelBackground final : public juce::Component
 {
@@ -28,5 +33,8 @@ public:
     void paint (juce::Graphics& g) override;
 
 private:
+    void paintEar (juce::Graphics&, juce::Rectangle<float> ear, bool mirrored) const;
+    void paintEarMarks (juce::Graphics&) const;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanelBackground)
 };

@@ -65,7 +65,13 @@ FetchContent_MakeAvailable(NeonFoundryCore)
 # in design/plate/ unembedded.
 juce_add_binary_data(FifthMemberBinaryData
     SOURCES
-        design/plate/fifth-member-plate-2x.png
+        # **The @3x plate, and it is 4020 x 3036 = 1340 x 1012 — the FRAME, not the window.**
+        # The rack ears are chassis drawn at runtime either side of it, which is what lets §1 state
+        # call 1 as the frame while this casting's window is 1444. Blitted at (52, 0); a blit at
+        # (0, 0) would put the whole panel under the left ear.
+        #
+        # It replaces the 2x cut at 2480 x 1862 = 1240 x 931, which was the pre-harmonisation canvas.
+        design/plate/fifth-member-plate-3x.png
         design/fonts/barlow-condensed/BarlowCondensed-Medium.ttf
         design/fonts/barlow-condensed/BarlowCondensed-SemiBold.ttf
         design/fonts/barlow-condensed/BarlowCondensed-Bold.ttf
