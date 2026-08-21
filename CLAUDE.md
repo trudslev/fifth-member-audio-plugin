@@ -14,6 +14,28 @@ spec documents are authoritative for values.** `design/README.md` is the earlier
 superseded wherever they disagree. **Errors in those documents that this build corrects are listed
 below; do not "fix" the code back to match them.**
 
+## RESUME POINT — capture this casting at 1155 x 810, never at 100 %
+
+**The panel is 1012 tall and this machine's display is 1440 x 932 logical.** 1012 plus the
+standalone's window chrome does not fit, so macOS silently shrinks the window and a capture asked
+for at 1444 x 1012 comes back **clipped by the screen rather than by the code** — the foot row and
+the bottom of DELAY CHARACTER simply are not in the image.
+
+Nothing in the capture says so. `capture_panel.py` reports the window size it asked for, the image
+is the right pixel dimensions, and the panel just ends early. That cost one wrong diagnosis on
+2026-08-21: the missing foot row was read as the editor being sized short, and the code was searched
+before the display was.
+
+    python3 ../tools/capture_panel.py \
+        "build/FifthMember_artefacts/Release/Standalone/Fifth Member.app" 1155 810 out.png
+
+0.8x fits with room, and the aspect is locked so nothing distorts. **Check
+`system_profiler SPDisplaysDataType` before believing a full-size capture of any casting** — this is
+the tallest of the six and the only one that cannot be shown whole here, but a taller display makes
+the trap disappear rather than the rule wrong.
+
+---
+
 ## RESUME POINT — the header has a measured baseline, and it is what a panel move fails against
 
 **Verified `ed3688a` on 2026-08-17: this casting's header draws exactly where its own constants say.**
