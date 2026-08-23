@@ -810,7 +810,20 @@ inline constexpr float nameplateTextSize = 27.0f;
     inline constexpr float footWindowTextY = 965.1f;
     inline constexpr float footSpecX = 68.0f;
     inline constexpr float footTextY = 969.5f;
-    inline constexpr float footSerialRight = 1376.0f;   // right-aligned: 1075.5 + 90.5
+    /*  **§12's drawn stamp, measured off the ink the plate used to carry.** Change set 32 cut it:
+        the baked ink spanned plate px x 3706…3961 / y 2919…2942, which is canvas
+        **x 1287.3…1372.3 / y 973.0…980.7**. Those bounds are what this draw reproduces, so the
+        string lands exactly where the artwork had it.
+
+        `footSerialRight` read 1376.0 with a comment deriving it from `1075.5 + 90.5`, which is
+        1166 - a figure that agreed with neither the comment nor the plate, and had no consumer to
+        notice. It and four neighbours were fossils of the stamp before it was baked. */
+    inline constexpr float footStampInkRight  = 1372.3f;
+    inline constexpr float footStampInkTop    = 973.0f;
+    inline constexpr float footStampInkBottom = 980.7f;
+    inline constexpr float footStampCssPx     = 11.0f;
+    inline constexpr float footStampLineBox   = 13.0f;
+    inline constexpr float footStampTrackingEm = 0.26f;
 
     /** Section 9. The foot used to read "BYPASS · v…", borrowed from Chorus-60 where the footer is a
         live readout that flips between ENGAGED and BYPASS. Fifth Member has no bypass parameter and

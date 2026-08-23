@@ -449,7 +449,7 @@ convenience.
 | `data-plate="off"` | layers the plate omits — bypass multiply, Program list, SAVE / DELETE caps, all LEDs, the sync switch and its state caption, division · stereo · character buttons, all five knob bodies and pointers, the three Delay Character label stacks, **dial 1's ring box only**, **and the foot stamp — see §12** | hidden |
 | `data-plate="blank"` | wells whose contents the plate drops — the LCD cell, the IN and OUT wells, the scope's readout strip | the glass, bezel and rule stay; the contents go |
 
-**37 `off` layers and 3 `blank` wells**, read by `applyPlate()` in the logic class, which also
+**37 `off` layers and 4 `blank` wells** — LCD cell, IN well, OUT well, scope readout strip, read by `applyPlate()` in the logic class, which also
 freezes the scope loop while the flag is on. **Plate mode empties the live strings at render level
 as well** — `scopeState`, `scopeSync`, `lcdText`, `inValue`, `outValue` and the pulse list — so a
 capture that re-renders the tree still comes out with empty wells rather than repainted readouts.
@@ -468,10 +468,26 @@ nothing surfaced that until a cut was attempted. The reader now lives beside the
 ## 12 · The foot stamp is drawn, not baked
 
 **The whole stamp comes off the plate — serial and version both.** `data-plate="off"` on the stamp
-element; it is the **37th** `off` layer and the only one added since §11 was written. **No bitmap was
-edited:** this casting's plate is exported from this prototype through the §11 mechanism, so removing
-ink from the plate is a flag, and the surface behind it continues through by construction. There is no
-plate asset in the bundle to cut.
+element; it is the **37th** `off` layer and the only one added since §11 was written. **The plate was re-cut, and the claim that it did not need to be was wrong.** §12 as first written
+said *"there is no plate asset in the bundle to cut"*. **The bundle delivers
+`plate/fifth-member-plate-3x.png`** — one of this casting's six files — and it was byte-identical
+across change sets 29 and 30, still carrying `SN 0417 · v1.1`. **Flagging the prototype without
+re-exporting the plate would have double-printed** the drawn `v1.0.0` over the baked `v1.1`.
+
+**The §11 mechanism means no bitmap needs hand-*authoring*, not that no bitmap ships.** A generated
+asset still has to be regenerated and delivered. The true clause — a flag is the edit — carried a
+false one, which is this file's own recurring finding arriving from the other side.
+
+**Cut, change set 32:** the stamp's ink measured at plate px **x 3706…3961, y 2919…2942** (canvas 1×:
+x 1287.3…1372.3, y 973.0…980.7) and removed from a box of **x 3698…3969, y 2913…2948**. The foot
+surface is a **vertical pinstripe over a vertical gradient**, so the patch was taken **per column from
+a clean band 40 px above** — same x, so the stripe phase is preserved exactly; nearby y, so the
+gradient error is under one step. Verified at zero light pixels across x 3600…4020 / y 2900…2960. **The
+surface continues by construction, as §12 said — no fill was invented.** The spec line
+`DL-88 · TOURING SPEC · 5U` is untouched at the left end of the row.
+
+**Only the 3× plate is delivered**, so only the 3× plate was cut. The 1× and 2× copies in the source
+tree still carry the ink and want the same treatment before either ships.
 
 | | |
 |---|---|

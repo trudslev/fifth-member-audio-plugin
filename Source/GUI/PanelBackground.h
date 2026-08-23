@@ -35,6 +35,7 @@ public:
 private:
     void paintEar (juce::Graphics&, juce::Rectangle<float> ear, bool mirrored) const;
     void paintEarMarks (juce::Graphics&) const;
+    void paintFootStamp (juce::Graphics&) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanelBackground)
 };

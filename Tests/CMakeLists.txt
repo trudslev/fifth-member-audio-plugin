@@ -60,7 +60,14 @@ target_compile_definitions(FifthMemberTests PRIVATE
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     NF_COMPANY_NAME="${FIFTHMEMBER_COMPANY_NAME}"
-    NF_PRODUCT_NAME="${FIFTHMEMBER_PRODUCT_NAME}")
+    NF_PRODUCT_NAME="${FIFTHMEMBER_PRODUCT_NAME}"
+    # **This target compiles the GUI sources, so it needs the panel's defines too.** §12's foot
+    # stamp reads NF_VERSION, and the build broke here rather than in the plugin - the same shape
+    # as the root CLAUDE.md's "link it into every target that compiles the calling file". Both
+    # version strings are defined even though only one is read today, because the next panel
+    # element to want the short form should not break this target a second time.
+    NF_VERSION_SHORT="${FIFTHMEMBER_VERSION_SHORT}"
+    NF_VERSION="${PROJECT_VERSION}")
 
 # FifthMemberBinaryData is linked so the tests can include FifthMemberTheme.h, which pulls in
 # BinaryData.h for the embedded fonts. PrintedScaleTests asserts the mark tables that live there -
