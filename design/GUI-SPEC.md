@@ -330,7 +330,7 @@ delivered button-state PNGs (`plate/buttons/01–04`) are therefore superseded a
 **Fifth Member had no disengaged state at all.** It now has one, host-driven, with no on-panel
 control and **no printed BYPASS anywhere** — the foot strip previously carried `BYPASS · v1.0`
 borrowed from Chorus-60, where the footer is live; with no state behind it, it permanently
-announced that a unit passing audio was bypassed. It reads `SN 0417 · v1.1`.
+announced that a unit passing audio was bypassed. It reads `SN 0417 · v1.0.0` and **is drawn, not baked — see §12.**
 
 Treatment: **0.50 `#808080` multiply**, pointers unmoved, scope frozen, REPEATS LIVE out, no
 caption, no desaturation, floors suspended.
@@ -364,7 +364,8 @@ except printed numerals at 10, which sit exactly on the floor.
 | Program legend | Barlow Condensed 600 | 11 / 13 | .12 em | see 7.1 |
 | LCD · meter value | Share Tech Mono | 17 / 20 | .10 em | `#cfd8cb` / `#b9c3c8` |
 | Scope readout | Share Tech Mono | 11 / 13 | .12 em | `#93a894` / `#a9bda9` |
-| Foot strip | Barlow Condensed 600 | 11 / 13 | .26 em | `#b0aa9c` |
+| Foot strip — spec line, **baked** | Barlow Condensed 600 | 11 / 13 | .26 em | `#b0aa9c` |
+| Foot strip — stamp, **drawn** | Barlow Condensed 600 | 11 / 13 | .26 em | `#b0aa9c` |
 | Tape lettering | Permanent Marker | 27 / 15 / 14 / 12 | — | `#23211c` |
 | RACK 4 stencil | Barlow Condensed 600 | 11 / 13 | .34 em | `rgba(24,22,19,.92)` |
 
@@ -445,10 +446,10 @@ convenience.
 
 | Flag | On | Effect in plate mode |
 |---|---|---|
-| `data-plate="off"` | layers the plate omits — bypass multiply, Program list, SAVE / DELETE caps, all LEDs, the sync switch and its state caption, division · stereo · character buttons, all five knob bodies and pointers, the three Delay Character label stacks, **dial 1's ring box only** | hidden |
+| `data-plate="off"` | layers the plate omits — bypass multiply, Program list, SAVE / DELETE caps, all LEDs, the sync switch and its state caption, division · stereo · character buttons, all five knob bodies and pointers, the three Delay Character label stacks, **dial 1's ring box only**, **and the foot stamp — see §12** | hidden |
 | `data-plate="blank"` | wells whose contents the plate drops — the LCD cell, the IN and OUT wells, the scope's readout strip | the glass, bezel and rule stay; the contents go |
 
-**36 `off` layers and 3 `blank` wells**, read by `applyPlate()` in the logic class, which also
+**37 `off` layers and 3 `blank` wells**, read by `applyPlate()` in the logic class, which also
 freezes the scope loop while the flag is on. **Plate mode empties the live strings at render level
 as well** — `scopeState`, `scopeSync`, `lcdText`, `inValue`, `outValue` and the pulse list — so a
 capture that re-renders the tree still comes out with empty wells rather than repainted readouts.
@@ -460,3 +461,42 @@ is a per-dial value rather than a rule about the character row.
 **A specified mechanism that was never implemented reads identically to one that was, right up
 until it is used.** These flags were in this casting's handoff before they were in its source, and
 nothing surfaced that until a cut was attempted. The reader now lives beside them.
+
+
+---
+
+## 12 · The foot stamp is drawn, not baked
+
+**The whole stamp comes off the plate — serial and version both.** `data-plate="off"` on the stamp
+element; it is the **37th** `off` layer and the only one added since §11 was written. **No bitmap was
+edited:** this casting's plate is exported from this prototype through the §11 mechanism, so removing
+ink from the plate is a flag, and the surface behind it continues through by construction. There is no
+plate asset in the bundle to cut.
+
+| | |
+|---|---|
+| String | `SN 0417 · v<major.minor.patch>` |
+| Serial | **0417**, unchanged — it moves from artwork to a drawn string and keeps its value |
+| Separator | ` · ` — U+00B7 with a space either side |
+| Position | foot row, right end of a `space-between` row; the spec line `DL-88 · TOURING SPEC · 5U` holds the left end and **stays baked** |
+| Face | Barlow Condensed 600 |
+| Size / line box | **11 / 13** |
+| Tracking | **.26 em**, paired with `text-indent` — see `../shared/HEADER-PART.md` |
+| Ink | `#b0aa9c`, **7.52:1** on the foot ground (§6, functional) |
+
+**Two reasons, and either alone is sufficient.**
+
+**It cannot reflow.** The stamp is one string and the version is variable width — `1.1`, `1.10` and
+`1.2.1` are three different widths — so the serial's position depends on the version's length. **Baked
+ink cannot reflow**, so a baked stamp is correct for exactly one version string and wrong for the next
+one.
+
+**And it has to be clickable.** `../shared/ABOUT-PART.md` §2 opens the About box from the version stamp
+promoted to a recessed tab. **A baked stamp can only be a hit region over a bitmap** — which is the
+objection that ruled out the wordmark as the affordance in the first place, and it applies here
+unchanged. The stamp is drawn on all six castings for this reason; **Fifth Member was the only one
+where it was not.**
+
+**The version now reads `1.0.0`**, semver per `ABOUT-PART.md` §1, correcting a panel that printed
+`v1.1` against a build at `1.0.0` — **a baked figure disagreeing with the binary it shipped in**, which
+is the cost of the first reason arriving before anyone needed the second.
