@@ -74,7 +74,6 @@ juce_add_binary_data(FifthMemberBinaryData
         design/plate/fifth-member-plate-3x.png
         design/fonts/barlow-condensed/BarlowCondensed-Medium.ttf
         design/fonts/barlow-condensed/BarlowCondensed-SemiBold.ttf
-        design/fonts/barlow-condensed/BarlowCondensed-Bold.ttf
         design/fonts/share-tech-mono/ShareTechMono-Regular.ttf
         design/fonts/permanent-marker/PermanentMarker-Regular.ttf)
 

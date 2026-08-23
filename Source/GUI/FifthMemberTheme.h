@@ -253,13 +253,6 @@ namespace Font
         return t;
     }
 
-    inline juce::Typeface::Ptr barlowBold()
-    {
-        static const juce::Typeface::Ptr t = juce::Typeface::createSystemTypefaceFor (
-            BinaryData::BarlowCondensedBold_ttf, (size_t) BinaryData::BarlowCondensedBold_ttfSize);
-        return t;
-    }
-
     inline juce::Typeface::Ptr shareTechMono()
     {
         static const juce::Typeface::Ptr t = juce::Typeface::createSystemTypefaceFor (
@@ -287,7 +280,15 @@ namespace Font
 
     inline juce::Font label (float cssPx)  { return of (barlowSemiBold(), cssPx); }
     inline juce::Font labelMedium (float cssPx) { return of (barlowMedium(), cssPx); }
-    inline juce::Font labelBold (float cssPx) { return of (barlowBold(), cssPx); }
+    /*  **No `labelBold`, and no Barlow Condensed Bold embedded.** The delivered prototype declares
+        one `font-weight: 500` site and 34 at 600 — and **zero at 700**. The face was embedded and
+        wrapped in a builder nothing called: bytes in a shipped binary carrying an OFL obligation
+        for no drawing site, the same shape as Special Elite one section above.
+
+        `labelMedium` STAYS even though it also has no caller, and the difference is the whole
+        point: §8 asks for the 500 weight, so that one is a MISSING WIRE — the build is short a
+        role — where Bold was a stray. Removing it would leave the panel unable to satisfy its own
+        spec. `tools/check_font_sets.py` reports the two separately for that reason. */
     inline juce::Font mono (float cssPx)   { return of (shareTechMono(), cssPx); }
     inline juce::Font marker (float cssPx) { return of (permanentMarker(), cssPx); }
     /*  **There is no `stencil` builder, and the RACK 4 stencil is why the absence needs saying.**
