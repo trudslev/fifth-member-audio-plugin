@@ -486,8 +486,22 @@ gradient error is under one step. Verified at zero light pixels across x 3600…
 surface continues by construction, as §12 said — no fill was invented.** The spec line
 `DL-88 · TOURING SPEC · 5U` is untouched at the left end of the row.
 
-**Only the 3× plate is delivered**, so only the 3× plate was cut. The 1× and 2× copies in the source
-tree still carry the ink and want the same treatment before either ships.
+**One plate exists and one ships: the 4020 × 3036 3×.** The source tree's older set — 1240 × 931 at
+1× / 2× / 3×, its 3× being **3720 × 2793** — is **deleted**, not re-cut. It was a whole superseded
+generation: cut before the frame widened, **covering the ears** where the current plate is the inner
+1340 × 1012 only, with the tape label in a different position. **Not one artwork at three scales.**
+Call 6 retires the 1× and 2× sizes in any case.
+
+**The vintage was legible in the ink and nobody read it:** the old 3× baked `SN 0417 · v1.0` where the
+delivered 3× baked `v1.1`. **A set named @1×/@2×/@3× asserts three renditions of one cut**, and these
+were two cuts at two times under one naming scheme — which is what let a stale plate sit beside a
+current one without either looking wrong.
+
+**And two of them were patched before being questioned, which was the error worth recording.** The 1×
+and 2× had their stamps removed on the assumption that a delivered-looking asset needed maintaining.
+**Editing a stale asset makes it look maintained** — an obviously old file gets questioned, a
+freshly-edited old file gets used. Nothing was delivered from them and nothing referenced them, so the
+damage was nil; what the edit destroyed was the signal that would have prompted the question.
 
 | | |
 |---|---|
@@ -516,3 +530,41 @@ where it was not.**
 **The version now reads `1.0.0`**, semver per `ABOUT-PART.md` §1, correcting a panel that printed
 `v1.1` against a build at `1.0.0` — **a baked figure disagreeing with the binary it shipped in**, which
 is the cost of the first reason arriving before anyone needed the second.
+
+---
+
+## 13 · The About part — this casting's material
+
+**Shared contract: `../shared/ABOUT-PART.md` revision 2.** Nothing here restates its geometry; these
+are the five figures that are **this casting's** and the two coordinates that depend on its canvas.
+**Fitted in the prototype, change set 38.**
+
+### 13.1 The tab
+
+| | |
+|---|---|
+| Placement | **in flow**, not absolute — see `../shared/ABOUT-PART.md` §2d. Nominal right edge **1302** · bottom edge **992** (canvas height 1012 − 20), height **24**, width shrink-to-fit on padding 10 |
+| Well face | `#1f1d18 → #282520` |
+| Ink | `#e4dfd0` — **11.46:1** on the well's lighter stop |
+| Face | Share Tech Mono **10 / 13**, this casting's own mono |
+| Hover | well one step lighter, ink to `#e2bd7c` |
+
+**The ink is measured against the well, not the fascia** — `../shared/CONTRAST-CEILING.md` §1: no ink
+reaches 7:1 on a ground of luminance 0.100–0.300, and a mid-value fascia is exactly that. The recess
+is a surface this casting chooses.
+
+### 13.2 The box
+
+| | |
+|---|---|
+| Position | **282, 236** — x from §4's law **plus this casting’s 52 px ear offset**, the one exception in the suite: its frame is 1340 inside a 1444 canvas, y = (1012 − 540) / 2 |
+| Surface | `#121210`, this casting's display glass — **a screen, not a plate** |
+| Body ink | `#f5f0e5` — **16.50:1** |
+| Dim ink | `#a9a291` — **7.38:1** |
+| Accent / links | `#e2bd7c` — **10.54:1** |
+| Repository | `github.com/trudslev/fifth-member-audio-plugin` |
+
+**Typeface credits, embedded faces only:** Barlow Condensed, Share Tech Mono and **Permanent Marker**, all under the SIL Open Font License.
+
+**The dim ink is the tight one across the suite** — TapeRot's 7.12 is the narrowest margin, so **no
+casting may darken its dim ink to taste.**

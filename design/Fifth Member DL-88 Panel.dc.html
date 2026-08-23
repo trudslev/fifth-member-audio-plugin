@@ -7,11 +7,13 @@
 </head>
 <body>
 <x-dc>
-<helmet>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Share+Tech+Mono&family=Permanent+Marker&display=swap" rel="stylesheet">
-<style>
+<helmet><style>
+
+  @font-face { font-family: 'Permanent Marker'; src: url('fonts/PermanentMarker-Regular.ttf') format('truetype'); font-display: block; }
+
+  @font-face { font-family: 'Barlow Condensed'; font-weight: 500; src: url('fonts/BarlowCondensed-Medium.ttf') format('truetype'); font-display: block; }
+  @font-face { font-family: 'Barlow Condensed'; font-weight: 600; src: url('fonts/BarlowCondensed-SemiBold.ttf') format('truetype'); font-display: block; }
+  @font-face { font-family: 'Share Tech Mono'; src: url('fonts/ShareTechMono-Regular.ttf') format('truetype'); font-display: block; }
   body { margin: 0; background: #171716; }
   a { color: #c9a05a; }
   a:hover { color: #e2bd7c; }
@@ -36,7 +38,7 @@
 
       <div style="position: absolute; left: 22px; top: 14px; width: 303px; height: 84px;">
         <div style="width: 268px; box-sizing: border-box; padding: 5px 17px 7px; transform: rotate(-1.2deg); background: linear-gradient(#d9d4c6, #bdb7a7 60%, #a8a293); clip-path: polygon(1% 6%, 99% 0%, 100% 92%, 60% 100%, 12% 96%, 0% 88%); box-shadow: 0 3px 7px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.5);">
-          <div style="font-family: 'Permanent Marker', cursive; font-size: 27px; line-height: 28px; letter-spacing: .005em; color: #151310; text-shadow: 0 1px 0 rgba(255,255,255,.25);">FIFTH MEMBER</div>
+          <div onClick="{{ aboutOpen }}" title="About" style="font-family: 'Permanent Marker', cursive; font-size: 27px; line-height: 28px; letter-spacing: .005em; color: #151310; text-shadow: 0 1px 0 rgba(255,255,255,.25);;cursor:help">FIFTH MEMBER</div>
         </div>
       </div>
       <div style="position: absolute; left: 22px; top: 62px; font-weight: 600; font-size: 13px; line-height: 17px; letter-spacing: .30em; color: #cfc6b4;">TEMPO-SYNCED DELAY</div>
@@ -324,7 +326,7 @@
       <div style="width: 236px; height: 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; transform: rotate(-1.1deg); background: linear-gradient(178deg, #f0ebdd, #e0dac9 58%, #cec8b7); clip-path: polygon(1.6% 0%, 0.4% 34%, 2.2% 68%, 0% 100%, 98.6% 100%, 100% 64%, 98% 32%, 99.4% 0%); box-shadow: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.55);">
         <div style="font-family: 'Permanent Marker', cursive; font-size: 15px; line-height: 18px; letter-spacing: .01em; color: #23211c;">CH 4 — GTR / STAGE LEFT</div>
       </div>
-      <div data-plate="off" style="font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .26em; text-indent: .26em; color: #b0aa9c;">{{ footStamp }}</div>
+      <div onClick="{{ aboutOpen }}" title="About" data-plate="off" style="display:inline-flex;align-items:center;height:24px;box-sizing:border-box;padding:0 10px;border-radius:2px;background:linear-gradient(180deg,#1f1d18,#282520);box-shadow:inset 0 0 0 1px #17150f, inset 0 1px 3px rgba(0,0,0,.55);cursor:help;font-weight: 600; font-size: 11px; line-height: 13px; letter-spacing: .26em; text-indent: .26em; color: #e4dfd0;" style-hover="background:linear-gradient(180deg,#282520,#312e28);color:#e2bd7c;">{{ footStamp }}</div>
     </div>
   </div>
 
@@ -339,7 +341,30 @@
       <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap; font-family: 'Permanent Marker', cursive; font-size: 14px; line-height: 16px; letter-spacing: .02em; color: #23211c;">HALDEN HALL · LOAD-IN 06</div>
     </div>
   </div>
+  <sc-if value="{{ aboutIsOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ aboutClose }}" style="position:absolute;inset:0;z-index:60;background:rgba(8,9,11,.72);cursor:default;"></div>
+    <div style="position:absolute;z-index:61;left:282px;top:236px;width:880px;height:540px;box-sizing:border-box;border-radius:3px;background:linear-gradient(#121210,#0c0c0a);box-shadow:inset 0 0 0 1px #2b2823, 0 24px 60px rgba(0,0,0,.7);">
+      <div style="position:absolute;left:40px;top:40px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:34px;line-height:40px;letter-spacing:.10em;color:#f5f0e5;">FIFTH MEMBER</div>
+      <div style="position:absolute;left:40px;top:84px;font-family:'Share Tech Mono',monospace;font-size:18px;line-height:24px;letter-spacing:.14em;color:#e2bd7c;">MODEL DL-88 &nbsp;&middot;&nbsp; VERSION 1.0.0</div>
+      <div style="position:absolute;left:40px;top:120px;width:800px;height:1px;background:rgba(242,245,246,.18);"></div>
+      <div style="position:absolute;left:40px;top:144px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:20px;line-height:26px;letter-spacing:.20em;color:#f5f0e5;">NEON FOUNDRY</div>
+      <div style="position:absolute;left:40px;top:174px;font-family:'Share Tech Mono',monospace;font-size:18px;line-height:24px;letter-spacing:.14em;color:#e2bd7c;">SUITE RELEASE 1.2.1</div>
+      <div style="position:absolute;left:40px;top:210px;width:800px;height:1px;background:rgba(242,245,246,.18);"></div>
+      <div style="position:absolute;left:40px;top:234px;width:150px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;line-height:24px;letter-spacing:.22em;color:#a9a291;">LICENCE</div>
+      <div style="position:absolute;left:200px;top:234px;font-family:'Share Tech Mono',monospace;font-size:18px;line-height:24px;letter-spacing:.10em;color:#f5f0e5;">AGPLv3 &nbsp;&middot;&nbsp; SOURCE AVAILABLE</div>
+      <div style="position:absolute;left:40px;top:270px;width:150px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;line-height:24px;letter-spacing:.22em;color:#a9a291;">REPOSITORY</div>
+      <a href="https://github.com/trudslev/fifth-member-audio-plugin" target="_blank" rel="noopener" style="position:absolute;left:200px;top:270px;font-family:'Share Tech Mono',monospace;font-size:18px;line-height:24px;letter-spacing:.10em;color:#e2bd7c;text-decoration:none;border-bottom:1px solid #e2bd7c80;" style-hover="color:#efd3a0;border-bottom-color:#efd3a0;">github.com/trudslev/fifth-member-audio-plugin</a>
+      <div style="position:absolute;left:40px;top:306px;width:150px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;line-height:24px;letter-spacing:.22em;color:#a9a291;">FOUNDRY</div>
+      <a href="https://neonfoundry.io" target="_blank" rel="noopener" style="position:absolute;left:200px;top:306px;font-family:'Share Tech Mono',monospace;font-size:18px;line-height:24px;letter-spacing:.10em;color:#e2bd7c;text-decoration:none;border-bottom:1px solid #e2bd7c80;" style-hover="color:#efd3a0;border-bottom-color:#efd3a0;">neonfoundry.io</a>
+      <div style="position:absolute;left:40px;top:342px;width:800px;height:1px;background:rgba(242,245,246,.18);"></div>
+      <div style="position:absolute;left:40px;top:366px;width:150px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;line-height:24px;letter-spacing:.22em;color:#a9a291;">TYPEFACES</div>
+      <div style="position:absolute;left:200px;top:366px;width:640px;font-family:'Barlow Condensed',sans-serif;font-weight:500;font-size:18px;line-height:24px;letter-spacing:.04em;color:#f5f0e5;text-wrap:pretty;">Barlow Condensed and Share Tech Mono under the SIL Open Font License, and Permanent Marker under the Apache License 2.0.</div>
+      <div style="position:absolute;left:40px;top:426px;width:800px;font-family:'Barlow Condensed',sans-serif;font-weight:500;font-size:16px;line-height:21px;letter-spacing:.04em;color:#a9a291;text-wrap:pretty;">Full licence text ships as THIRD-PARTY-LICENCES.txt in this bundle&rsquo;s Resources.</div>
+      <div onClick="{{ aboutClose }}" style="position:absolute;left:744px;top:470px;width:96px;height:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:3px;background:linear-gradient(180deg,#282520,#1f1d18);box-shadow:inset 0 0 0 1px #2b2823;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16px;line-height:20px;letter-spacing:.22em;text-indent:.22em;color:#f5f0e5;" style-hover="color:#e2bd7c;">CLOSE</div>
+    </div>
+  </sc-if>
 </div>
+
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1456,&quot;height&quot;:1020},&quot;plate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Export&quot;},&quot;bypassed&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;bpm&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:120,&quot;min&quot;:40,&quot;max&quot;:220,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;inValue&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;−99.0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Meters&quot;},&quot;outValue&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;−99.0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Meters&quot;},&quot;footStamp&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;SN 0417 · v1.0.0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Identity&quot;}}">
 // Two classes only (call 3). Fifth Member has no MODEL control, so it takes no
@@ -362,7 +387,7 @@ const DIM = { tick: '#5a564e', minor: '#4a463f', num: '#615c54' };
 class Component extends DCLogic {
   constructor(p) {
     super(p);
-    this.state = {
+    this.state = { aboutOpen: false,
       sync: true, div: 1, stereo: 2, mode: 1,
       fb: 35, cross: 50, timeMs: 375, mix: 38, trim: 0,
       wow: 40, modRate: 1.0, degrade: 15, flutter: 30, modDepth: 22, genLoss: 35,
@@ -403,6 +428,8 @@ class Component extends DCLogic {
   componentDidUpdate() { this.applyPlate(); }
 
   componentDidMount() {
+    this._esc = (e) => { if (e.key === 'Escape') this.setState({ aboutOpen: false }); };
+    window.addEventListener('keydown', this._esc);
     // Export hook: the cutting pass sets this rather than the prop, so a capture
     // never depends on host state.
     window.__dl88Plate = (on) => { this._plateOverride = on; this.forceUpdate(); this.applyPlate(); };
@@ -610,6 +637,9 @@ class Component extends DCLogic {
     // re-renders the tree still comes out with empty wells.
     const P = this.plate;
     return {
+      aboutIsOpen: !!this.state.aboutOpen,
+      aboutOpen: () => this.setState({ aboutOpen: true }),
+      aboutClose: () => this.setState({ aboutOpen: false }),
       bypassDisplay: (this.bypassed && !P) ? 'block' : 'none',
       inValue: P ? '' : (this.props.inValue ?? '\u221299.0'),
       outValue: P ? '' : (this.props.outValue ?? '\u221299.0'),
