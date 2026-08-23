@@ -119,10 +119,10 @@ void RepeatTimelineScope::paint (juce::Graphics& g)
     g.setColour (Colour::scopeBorder);
     g.drawRoundedRectangle (box, 2.0f, 1.0f);
 
-    const juce::Rectangle<float> strip { Layout::scopeInnerX, Layout::scopeInnerY,
-                                         Layout::scopeInnerW, Layout::readoutStripH };
-    const juce::Rectangle<float> plot { Layout::scopeInnerX, Layout::plotY,
-                                        Layout::scopeInnerW, Layout::plotH };
+    const juce::Rectangle<float> strip { Layout::stripX, Layout::stripY,
+                                         Layout::stripW, Layout::readoutStripH };
+    const juce::Rectangle<float> plot { Layout::plotX, Layout::plotY,
+                                        Layout::plotW, Layout::plotH };
 
     paintReadoutStrip (g, strip);
     paintPlot (g, plot);

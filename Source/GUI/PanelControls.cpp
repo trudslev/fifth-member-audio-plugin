@@ -291,15 +291,28 @@ void PanelControls::paintDivisionRow (juce::Graphics& g, bool, int division)
 
         Paint::drawButtonFace (g, r, selected, isHovered);
 
-        // The button's own lamp, plus the label - three redundant selection signals with no colour
-        // change, so it still reads on a dim stage.
-        const float ledX = r.getX() + 9.0f;
-        Paint::drawLed (g, { ledX, r.getCentreY() }, Layout::ledStandard - 1.0f, selected);
+        /*  The button's own lamp, plus the label - three redundant selection signals with no colour
+            change, so it still reads on a dim stage.
+
+            **The lamp and the label are ONE centred group, not a pinned lamp and a centred label.**
+            §5's button is `display:flex; justify-content:center; gap:5px` over a 6 px lamp and the
+            label, so the pair centres together and the lamp's x therefore depends on how wide the
+            label is: 1/4's lands at 93.97 and 1/8.'s at 150.13, 12.0 and 8.7 from their own button
+            edges. The old form pinned the lamp 9 px in and centred the label in what was left,
+            which is a different construction that happens to look similar on the narrowest label
+            and drifts on the rest. */
+        const juce::String label = Timing::divisionLabel (i);
+        const float labelW = Text::trackedWidth (label, font, 0.0f);
+        const float lampD  = Layout::ledStandard - 1.0f;
+        const float groupX = r.getCentreX() - (lampD + Layout::divisionLampGap + labelW) * 0.5f;
+
+        Paint::drawLed (g, { groupX + lampD * 0.5f, r.getCentreY() }, lampD, selected);
 
         g.setFont (font);
         g.setColour (selected ? Colour::labelBright : Colour::buttonLabelUnselected);
-        g.drawText (Timing::divisionLabel (i),
-                    r.withTrimmedLeft (16.0f), juce::Justification::centred, false);
+        g.drawText (label,
+                    r.withLeft (groupX + lampD + Layout::divisionLampGap),
+                    juce::Justification::centredLeft, false);
     }
 }
 

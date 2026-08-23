@@ -589,12 +589,41 @@ inline constexpr float nameplateTextSize = 27.0f;
         strip, in Share Tech Mono - the same face as the PROGRAM LCD - and never in the plot. That
         combination of placement and typeface is what makes changing text read as a screen rather
         than a printed label. */
-    inline constexpr float scopeInnerX = 68.0f;
-    inline constexpr float scopeInnerY = 183.0f;
-    inline constexpr float scopeInnerW = 1306.0f;
+    /*  **THE STRIP IS THE TOP OF THE WELL AND THE PLOT IS WHAT IS LEFT — and they were drawn at
+        the same y.** `scopeInnerY` and `plotY` both read **183**, so the readout strip was laid
+        over the plot rather than above it: the info line printed across the grid, and the rule the
+        strip draws at its own foot landed 23 px inside the plot.
+
+        Two constants holding one figure is what made it survive. Each is individually correct
+        about something — 183 IS where the plot starts — and nothing in either name says which of
+        them the strip is supposed to use. So the strip now derives from the well it sits at the
+        top of, the plot from the strip's height, and the assert below is the only thing that can
+        fail if a future edit moves one without the other.
+
+        The plot is 2 px SHORTER and 2 px narrower than the well and shares its left edge, which is
+        the prototype's own markup — `svg` at (68, 183) 1306 x 73 inside a well at (68, 160)
+        1308 x 98, so it ends at 256 against the well's 258 and at 1374 against its 1376. It is not
+        an inset: the left and top edges are flush and only the far ones are short.
+
+        **The first version of the second assert below said the plot reaches the well's foot, and
+        it fired.** That is the pair working — the figure was written from what the relationship
+        ought to be rather than from the markup, which is the same mistake in a check that the
+        strip's own y was in a constant. It asserts containment now, which is what is actually
+        true and is still enough to catch a strip height that grows past the plot. */
     inline constexpr float readoutStripH = 23.0f;
-    inline constexpr float plotY = 183.0f;
+
+    inline constexpr float stripX = scopeX;                     // the strip is the well's full width
+    inline constexpr float stripY = scopeY;                     // 160
+    inline constexpr float stripW = scopeW;                     // 1308
+
+    inline constexpr float plotX = 68.0f;
+    inline constexpr float plotY = stripY + readoutStripH;      // 183
+    inline constexpr float plotW = 1306.0f;
     inline constexpr float plotH = 73.0f;
+
+    static_assert (plotY == 183.0f, "the prototype's plot starts at 183; the strip must end there");
+    static_assert (plotY + plotH <= scopeY + scopeH, "the plot must fit inside the well");
+    static_assert (plotX + plotW <= scopeX + scopeW, "the plot must fit inside the well");
     inline constexpr float readoutTextSize = 11.0f;
     inline constexpr float readoutTracking = 0.12f;
     inline constexpr float readoutPadX = 9.0f;
@@ -634,7 +663,23 @@ inline constexpr float nameplateTextSize = 27.0f;
     inline constexpr float syncCaptionX = 146.0f;
     inline constexpr float syncCaptionY = 316.0f;
 
-    inline constexpr juce::Point<float> divisionLedCentre { 94.0f, 385.0f };
+    /*  **§5's NOTE DIVISION section lamp, beside its CAPTION — it was on the 1/4 BUTTON.**
+
+        The caption row is `display:flex; align-items:center; gap:8px` over a 7 px lamp and the
+        words, so the lamp sits at (82, 352) with its centre on the caption's own centre line at
+        355.5. This constant read (94, 385), which is the BUTTON ROW's centre line and 3 px from
+        the 1/4 button's own 6 px lamp at (91, 385).
+
+        **So two lamps overlapped on one button, and each state of `sync` made a different mess of
+        it.** Sync on: both lit, the section lamp's 7 px disc and glow sitting proud of the
+        button's 6 px one, which reads as the 1/4 lamp doubled. Sync off: the section lamp draws
+        UNLIT over the button's lamp at a 3 px offset, so a selected 1/4 came back as half a lit
+        LED with a dark crescent bitten out of it — which is what was reported, and is a precise
+        description of two circles 3 px apart.
+
+        Neither symptom is reachable by reading `paintDivisionRow`, because the second lamp is
+        drawn by `paintConditionalLeds` from a constant that names a different control. */
+    inline constexpr juce::Point<float> divisionLedCentre { 85.5f, 355.5f };
     inline constexpr float divisionLabelX = 97.0f;
     inline constexpr float divisionLabelY = 349.0f;
     inline constexpr float divisionButtonY = 370.0f;
@@ -642,6 +687,7 @@ inline constexpr float nameplateTextSize = 27.0f;
     inline constexpr float divisionButtonH = 30.0f;
     inline constexpr float divisionButtonPitch = 59.4f;
     inline constexpr float divisionButtonX0 = 82.0f;
+    inline constexpr float divisionLampGap = 5.0f;   // §5's `gap: 5px` between lamp and label
 
     inline constexpr juce::Point<float> timeKnobCentre { 228.0f, 486.0f };
     inline constexpr float timeLabelY = 535.45f;
