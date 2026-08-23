@@ -274,13 +274,6 @@ namespace Font
         return t;
     }
 
-    inline juce::Typeface::Ptr specialElite()
-    {
-        static const juce::Typeface::Ptr t = juce::Typeface::createSystemTypefaceFor (
-            BinaryData::SpecialEliteRegular_ttf, (size_t) BinaryData::SpecialEliteRegular_ttfSize);
-        return t;
-    }
-
     /** Builds a font whose em size equals the design's CSS px value.
 
         This is what `font-size: 12px` means, and it is NOT juce::Font::withHeight(), which sets
@@ -297,7 +290,17 @@ namespace Font
     inline juce::Font labelBold (float cssPx) { return of (barlowBold(), cssPx); }
     inline juce::Font mono (float cssPx)   { return of (shareTechMono(), cssPx); }
     inline juce::Font marker (float cssPx) { return of (permanentMarker(), cssPx); }
-    inline juce::Font stencil (float cssPx){ return of (specialElite(), cssPx); }
+    /*  **There is no `stencil` builder, and the RACK 4 stencil is why the absence needs saying.**
+        §1's left-ear mark is drawn with `label (11.0f)` at 3.74 tracking - Barlow Condensed
+        SemiBold - and that is CORRECT: the delivered prototype sets that element at
+        `font-weight: 600; font-size: 11px; letter-spacing: .34em` with **no font-family**, so it
+        inherits the panel's Barlow. 0.34 em x 11 px is 3.74 px exactly.
+
+        Special Elite was embedded and wrapped in a `stencil()` builder nothing ever called. The
+        NAME is what made it read as the face that mark is set in - the same shape as a calibration
+        constant named for its sample rather than for its role. No casting's §8 asks for the face
+        and no prototype declares it. Removed 2026-08-23: bytes in a shipped binary carrying an
+        Apache 2.0 obligation for no drawing site. */
 
     /** CSS letter-spacing is in em, so its pixel value scales with the font size. Every tracking
         figure in the design is quoted in em - always convert through here. */

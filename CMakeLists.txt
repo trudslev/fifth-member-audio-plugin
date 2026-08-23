@@ -76,8 +76,7 @@ juce_add_binary_data(FifthMemberBinaryData
         design/fonts/barlow-condensed/BarlowCondensed-SemiBold.ttf
         design/fonts/barlow-condensed/BarlowCondensed-Bold.ttf
         design/fonts/share-tech-mono/ShareTechMono-Regular.ttf
-        design/fonts/permanent-marker/PermanentMarker-Regular.ttf
-        design/fonts/special-elite/SpecialElite-Regular.ttf)
+        design/fonts/permanent-marker/PermanentMarker-Regular.ttf)
 
 # AU is Apple-only; Windows/Linux only ever build VST3 + Standalone. VST3_COPY_DIR/AU_COPY_DIR are
 # only set on Apple - leaving them unset elsewhere lets JUCE apply its own correct per-OS default
