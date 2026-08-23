@@ -291,38 +291,26 @@ namespace Font
         spec. `tools/check_font_sets.py` reports the two separately for that reason. */
     inline juce::Font mono (float cssPx)   { return of (shareTechMono(), cssPx); }
     inline juce::Font marker (float cssPx) { return of (permanentMarker(), cssPx); }
-    /*  **`stencil` is one of this casting's THREE VOICES, and it has no drawing site yet.**
+    /*  **No Special Elite here, and it was removed TWICE — the second time on better evidence.**
 
-        Removed on 2026-08-23 as an unused embed and **restored the same day**: the source README
-        specifies **two** Special Elite roles — the right-ear stencil at 11 px / **.22 em** /
-        `rgba(38,35,31,.55)`, and the recessed foot-label window at 11 px / .10 em / `#a09883` —
-        plus the plugin icon at 76 px. Its typographic rule is explicit: *anything applied by a
-        human with a marker or a stencil is in Permanent Marker or Special Elite. Three voices, no
-        exceptions.*
+        Nothing has ever drawn it. Counted per artefact: **zero** sites in `GUI-SPEC.md`, zero in
+        `BUILD-HANDOFF.md`, zero in the delivered `DL-88 Panel.dc.html`, zero in the build. The
+        superseded `Fifth Member.dc.html` mentions it **once**, in the Google Fonts `<link>` —
+        `&family=Special+Elite` — which is a declaration, not a drawing site.
 
-        **The removal's evidence was about the NEIGHBOUR.** §1's rotated ear text is
-        `label (11.0f)` at 3.74 tracking, and 0.34 em × 11 px = 3.74 exactly — which proves that
-        element is Barlow and says nothing about the stencil. The README puts BOTH on the same ear,
-        one sentence apart, at the same size and different tracking: `.34 em` Barlow rotated text,
-        `.22 em` Special Elite stencil. The exactness of the match is what made it read as
-        conclusive about the wrong element.
+        **That link IS the origin of the embed**, and it is the same mechanism that put four stray
+        Barlow weights across the suite, one level up: a `<link>` declares a FAMILY nobody owns,
+        sitting in the artefact a build reads for guidance, and the build followed it.
 
-        **Build and prototype agreed because both were short the same two roles**, and agreement
-        between two artefacts that lost the same thing is indistinguishable from correctness — which
-        is also why an arm reading from the binary cannot find it: the face has no reader because
-        nothing draws it in EITHER tree.
+        The face was briefly restored on a source README specifying a right-ear stencil and a
+        foot-label window. Those roles exist **in prose and in no artefact** — and the README's own
+        table marks the stencil icon that appeared to corroborate them as *"Rejected icon concept
+        1d. Context only"*. The shipped icon is a different concept and carries no font dependency
+        at all: outlined on export, never a live face.
 
-        So this is a WIRE, not a stray — the same case as `labelMedium` one line down, one
-        classification apart. The face stays embedded. The two roles are design work: the prototype
-        needs the ear stencil restored and the foot-label window re-voiced, and §8 needs both rows.
-        Do not delete this again on the strength of a zero-consumer count. */
-    inline juce::Typeface::Ptr specialElite()
-    {
-        static const juce::Typeface::Ptr t = juce::Typeface::createSystemTypefaceFor (
-            BinaryData::SpecialEliteRegular_ttf, (size_t) BinaryData::SpecialEliteRegular_ttfSize);
-        return t;
-    }
-
+        **A README is not a specification, and presence in prose is not implementation.** Whether
+        those two elements should exist is an open design question; neither embeds a font today. If
+        one is ever built, this is where the accessor goes back. */
 
     /** CSS letter-spacing is in em, so its pixel value scales with the font size. Every tracking
         figure in the design is quoted in em - always convert through here. */
