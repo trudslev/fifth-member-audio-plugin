@@ -75,6 +75,11 @@ Share Tech Mono  (Regular)
     This face carries a Reserved Font Name; see OFL 1.1 clause 3.
     Embedded as: ShareTechMono-Regular.ttf
 
+Special Elite  (Regular)
+    Copyright (c) 2010 by Brian J. Bonislawsky DBA Astigmatic (AOETI). All rights reserved. Available under the Apache 2.0 licence. http://www.apache.org/licenses/LICENSE-2.0.html
+    Licence: Apache License, Version 2.0  —  full text below under [APACHE-2.0]
+    Embedded as: SpecialElite-Regular.ttf
+
 ==============================================================================
 [APACHE-2.0]  APACHE LICENSE Version 2.0
 ==============================================================================

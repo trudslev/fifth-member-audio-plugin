@@ -291,17 +291,38 @@ namespace Font
         spec. `tools/check_font_sets.py` reports the two separately for that reason. */
     inline juce::Font mono (float cssPx)   { return of (shareTechMono(), cssPx); }
     inline juce::Font marker (float cssPx) { return of (permanentMarker(), cssPx); }
-    /*  **There is no `stencil` builder, and the RACK 4 stencil is why the absence needs saying.**
-        §1's left-ear mark is drawn with `label (11.0f)` at 3.74 tracking - Barlow Condensed
-        SemiBold - and that is CORRECT: the delivered prototype sets that element at
-        `font-weight: 600; font-size: 11px; letter-spacing: .34em` with **no font-family**, so it
-        inherits the panel's Barlow. 0.34 em x 11 px is 3.74 px exactly.
+    /*  **`stencil` is one of this casting's THREE VOICES, and it has no drawing site yet.**
 
-        Special Elite was embedded and wrapped in a `stencil()` builder nothing ever called. The
-        NAME is what made it read as the face that mark is set in - the same shape as a calibration
-        constant named for its sample rather than for its role. No casting's §8 asks for the face
-        and no prototype declares it. Removed 2026-08-23: bytes in a shipped binary carrying an
-        Apache 2.0 obligation for no drawing site. */
+        Removed on 2026-08-23 as an unused embed and **restored the same day**: the source README
+        specifies **two** Special Elite roles — the right-ear stencil at 11 px / **.22 em** /
+        `rgba(38,35,31,.55)`, and the recessed foot-label window at 11 px / .10 em / `#a09883` —
+        plus the plugin icon at 76 px. Its typographic rule is explicit: *anything applied by a
+        human with a marker or a stencil is in Permanent Marker or Special Elite. Three voices, no
+        exceptions.*
+
+        **The removal's evidence was about the NEIGHBOUR.** §1's rotated ear text is
+        `label (11.0f)` at 3.74 tracking, and 0.34 em × 11 px = 3.74 exactly — which proves that
+        element is Barlow and says nothing about the stencil. The README puts BOTH on the same ear,
+        one sentence apart, at the same size and different tracking: `.34 em` Barlow rotated text,
+        `.22 em` Special Elite stencil. The exactness of the match is what made it read as
+        conclusive about the wrong element.
+
+        **Build and prototype agreed because both were short the same two roles**, and agreement
+        between two artefacts that lost the same thing is indistinguishable from correctness — which
+        is also why an arm reading from the binary cannot find it: the face has no reader because
+        nothing draws it in EITHER tree.
+
+        So this is a WIRE, not a stray — the same case as `labelMedium` one line down, one
+        classification apart. The face stays embedded. The two roles are design work: the prototype
+        needs the ear stencil restored and the foot-label window re-voiced, and §8 needs both rows.
+        Do not delete this again on the strength of a zero-consumer count. */
+    inline juce::Typeface::Ptr specialElite()
+    {
+        static const juce::Typeface::Ptr t = juce::Typeface::createSystemTypefaceFor (
+            BinaryData::SpecialEliteRegular_ttf, (size_t) BinaryData::SpecialEliteRegular_ttfSize);
+        return t;
+    }
+
 
     /** CSS letter-spacing is in em, so its pixel value scales with the font size. Every tracking
         figure in the design is quoted in em - always convert through here. */
