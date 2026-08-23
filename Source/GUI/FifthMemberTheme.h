@@ -308,9 +308,14 @@ namespace Font
         1d. Context only"*. The shipped icon is a different concept and carries no font dependency
         at all: outlined on export, never a live face.
 
-        **A README is not a specification, and presence in prose is not implementation.** Whether
-        those two elements should exist is an open design question; neither embeds a font today. If
-        one is ever built, this is where the accessor goes back. */
+        **A README is not a specification, and presence in prose is not implementation.**
+
+        **RULED 2026-08-23: the prose is struck.** Neither element has existed in any artefact at
+        any point in this casting's life — not in the original prototype, not in the current one,
+        not in `GUI-SPEC.md`, not in `BUILD-HANDOFF.md`, not in the build. That is not a role that
+        was specified and dropped; it is one that was described and never designed. If either is
+        wanted, it is new design against the panel as it stands, and this is where the accessor
+        goes back. */
 
     /** CSS letter-spacing is in em, so its pixel value scales with the font size. Every tracking
         figure in the design is quoted in em - always convert through here. */
