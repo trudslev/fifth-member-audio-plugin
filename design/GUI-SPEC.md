@@ -543,7 +543,7 @@ are the five figures that are **this casting's** and the two coordinates that de
 
 | | |
 |---|---|
-| Placement | **in flow**, not absolute — see `../shared/ABOUT-PART.md` §2d. Nominal right edge **1302** · bottom edge **992** (canvas height 1012 − 20), height **24**, width shrink-to-fit on padding 10 |
+| Placement | **in flow**, not absolute — see `../shared/ABOUT-PART.md` §2 (the tab table). Nominal right edge **1302** · bottom edge **992** (canvas height 1012 − 20), height **24** — **`flex-shrink: 0` is required**, or the fixed-height column squeezes it to 19 — width shrink-to-fit on padding 10 |
 | Well face | `#1f1d18 → #282520` |
 | Ink | `#e4dfd0` — **11.46:1** on the well's lighter stop |
 | Face | Share Tech Mono **10 / 13**, this casting's own mono |
