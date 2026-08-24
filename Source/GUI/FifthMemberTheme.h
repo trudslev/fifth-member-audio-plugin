@@ -231,6 +231,48 @@ namespace Colour
     inline const juce::Colour scaleTickDim     { 0xFF5A564E };
     inline const juce::Colour scaleTickMinorDim{ 0xFF4A463F };
     inline const juce::Colour scaleNumeralDim  { 0xFF615C54 };
+
+    /*  `ABOUT-PART.md` §9.1 and §9.2, and every ratio here is the spec's own measured figure.
+
+        §9: **the box is this casting's display GLASS, not its fascia** — a screen, not a plate.
+        Glass is what these panels already use for dense small text at high contrast.
+
+        §9.2: **the tab's ink is measured against the WELL, not the fascia.** On a mid-value fascia
+        no ink reaches 7:1 at all — this casting's darkest fascia stop tops out at **3.16** — and
+        that is a property of the ground rather than of the ink. The recess is a surface the
+        casting chooses, so it is the one the ratio is taken against. */
+    inline const juce::Colour aboutGlass      { 0xFF121210 };   // §9.1
+    inline const juce::Colour aboutBody       { 0xFFF5F0E5 };   // 16.50 on glass
+    inline const juce::Colour aboutDim        { 0xFFA9A291 };   //  7.38 — the tight one; do not darken
+    inline const juce::Colour aboutAccent     { 0xFFE2BD7C };   // 10.54
+    inline const juce::Colour aboutRing       { 0xFF2B2823 };   // §9.1, glass lightened ~18 %
+
+    inline const juce::Colour aboutWellTop    { 0xFF1F1D18 };   // §9.2
+    inline const juce::Colour aboutWellBottom { 0xFF282520 };
+    inline const juce::Colour aboutWellInk    { 0xFFE4DFD0 };   // 11.46 on the well
+}
+
+//==============================================================================
+namespace Cursor
+{
+    /*  §2b: `help`, not `pointer`. `pointer` says *this acts*; `help` says *this explains
+        something*, and an About box explains. JUCE has no help cursor in `StandardCursorType`, so
+        the delivered 64 x 64 @2x asset is embedded and a cursor built from it.
+
+        **Hotspot (7, 4) in image pixels**, which is the arrow's tip — read off the artwork rather
+        than assumed at the origin, because a cursor whose hotspot is wrong is off by the distance
+        from the corner to the tip on every click. */
+    inline juce::MouseCursor help()
+    {
+        static const juce::MouseCursor c = []
+        {
+            const auto img = juce::ImageFileFormat::loadFrom (BinaryData::aboutcursor2x_png,
+                                                              (size_t) BinaryData::aboutcursor2x_pngSize);
+            return img.isValid() ? juce::MouseCursor (img, 7, 4, 2.0f)
+                                 : juce::MouseCursor (juce::MouseCursor::PointingHandCursor);
+        }();
+        return c;
+    }
 }
 
 //==============================================================================

@@ -8,6 +8,8 @@
 #include "ProgramHeader.h"
 #include "RepeatTimelineScope.h"
 
+#include <nf/AboutPart.h>
+
 #include <array>
 #include <memory>
 
@@ -77,6 +79,13 @@ private:
         area to be laid out in. Its bounds are what stop the list moving or overflowing - see the
         constructor. */
     juce::Component menuHost;
+
+    /*  `ABOUT-PART.md`. The tab, the wordmark hit region and the box itself all live in
+        `nf::AboutPart` — this casting supplies §9's materials and §1's five strings and nothing
+        else. Held once for six panels rather than six times. */
+    std::unique_ptr<nf::AboutTab> aboutTab;
+    std::unique_ptr<nf::AboutWordmarkHit> aboutWordmark;
+    std::unique_ptr<nf::AboutBox> aboutBox;
 
     int boundCharacter = -1;
     int rearmFramesRemaining = 0;

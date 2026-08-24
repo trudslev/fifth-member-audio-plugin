@@ -190,6 +190,72 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
         }
     };
 
+    /*  `ABOUT-PART.md`. §9's materials and §1's five strings are all this casting supplies.
+
+        **§4's law is FRAME-local and this is the one casting where that matters.** Its 1340 frame
+        sits inside a 1444 window behind two 52 px rack ears, so its box is at **282** and its tab's
+        right edge at **1354** — §4's 230 and §2's 1302 plus that offset. §4's own table row reads
+        "Canvas width is 1340 in every casting", which is true of the frame and false of this
+        window; §0 of the same document states the exception outright.
+
+        Note the arithmetic accident: (1444 − 880) / 2 is **also** 282, so a canvas-local reading
+        would agree about the box and disagree about the tab and the wordmark. Core asserts both,
+        so the coincidence cannot be mistaken for corroboration. */
+    {
+        constexpr int frameOriginX = (int) Layout::frameX;   // 52 — the left rack ear
+
+        const nf::AboutMaterials aboutMaterials {
+            Colour::aboutGlass, Colour::aboutBody, Colour::aboutDim, Colour::aboutAccent,
+            Colour::aboutRing,
+            Colour::aboutWellTop, Colour::aboutWellBottom, Colour::aboutWellInk,
+            Font::barlowSemiBold(), Font::barlowMedium(), Font::shareTechMono(),
+            Cursor::help()
+        };
+
+        /*  §9.3, as corrected in change set 40: **two licence families, not one.** Permanent Marker
+            is **Apache 2.0** by its own name table, and §8 asks for the faces this casting EMBEDS.
+            This casting's own §13.2 still reads "all under the SIL Open Font License" — the fourth
+            record of that face's licence to be wrong, and the shared spec is both newer and right.
+            A false licence attribution in a shipped credit is worse than a deviation from a
+            document, so the build follows §9.3. */
+        const nf::AboutContent aboutContent {
+            "FIFTH MEMBER", "DL-88",
+            NF_VERSION,                 // semver, from PROJECT_VERSION - never a literal
+            nf::suiteRelease,           // §1: a separate string, and neither derives from the other
+            "github.com/trudslev/fifth-member-audio-plugin",
+            "Barlow Condensed and Share Tech Mono under the SIL Open Font License, "
+            "and Permanent Marker under the Apache License 2.0."
+        };
+
+        aboutBox = std::make_unique<nf::AboutBox> (aboutMaterials, aboutContent, frameOriginX);
+
+        /*  §2, revision 3: the tab takes **the stamp's own face and size**. §8's foot-strip stamp
+            row gives Barlow Condensed 600 at 11 / 13 / .26 em, which is what `paintFootStamp` drew.
+            §13.1 says Share Tech Mono 10 / 13 and is stale — it predates revision 3, and revision 3
+            names §8 as the authority for exactly this, so the row both documents point at settles
+            it rather than the newer document winning by date. */
+        aboutTab = std::make_unique<nf::AboutTab> (aboutMaterials, Font::barlowSemiBold(),
+                                                   juce::String (Layout::footSerial) + " "
+                                                       + Text::middleDot() + " v" + juce::String (NF_VERSION),
+                                                   Layout::footStampCssPx, Layout::footStampTrackingEm);
+        aboutTab->onClick = [this] { aboutBox->open(); };
+
+        // §2a: the wordmark is the PRIMARY affordance. It draws nothing — PanelBackground already
+        // draws the nameplate; this only claims HeaderGeometry's zone, moved by the frame.
+        aboutWordmark = std::make_unique<nf::AboutWordmarkHit> (Cursor::help());
+        aboutWordmark->onClick = [this] { aboutBox->open(); };
+
+        /*  **Registered LAST, and that is not tidiness.** JUCE paints children in the order they
+            were added, so registering these beside their construction puts the tab under
+            `panelBackground` — drawn, correct, and invisible in a capture. */
+        aboutTab->layoutFor (getHeight(), frameOriginX);
+        aboutWordmark->setBounds (nf::AboutWordmarkHit::zone (frameOriginX));
+        aboutBox->setBounds (getLocalBounds());
+        addAndMakeVisible (*aboutWordmark);
+        addAndMakeVisible (*aboutTab);
+        addChildComponent (*aboutBox);
+    }
+
     lastFrameMs = juce::Time::getMillisecondCounter();
     startTimerHz (Layout::animationHz);
 }

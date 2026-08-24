@@ -18,6 +18,7 @@ target_sources(FifthMemberTests PRIVATE
     FactoryProgramsTests.cpp
     TimingEngineTests.cpp
     DelayCoreTests.cpp
+    AboutPartTests.cpp
     ../Source/DSP/TimingEngine.cpp
     ../Source/DSP/DelayCore.cpp
     ../Source/DSP/CharacterEngine.cpp

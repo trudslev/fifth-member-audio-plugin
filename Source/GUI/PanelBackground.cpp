@@ -149,47 +149,23 @@ void PanelBackground::paint (juce::Graphics& g)
     // here rather than in paintEar so a reader looking for the three marks §1 names finds them in
     // one place with §1's argument beside them.
     paintEarMarks (g);
-
-    paintFootStamp (g);
 }
 
-/*  **§12: the foot stamp is DRAWN, and the plate no longer carries it.**
+/*  **§12's foot stamp is no longer painted here: `ABOUT-PART.md` §2 PROMOTED it to a recessed
+    tab**, and the tab is `nf::AboutTab`, built in `FifthMemberEditorContent`.
 
-    `SN 0417 · v<major.minor.patch>` at the right end of the foot row. The spec line
-    `DL-88 · TOURING SPEC · 5U` holds the left end and **stays baked** — it is fixed width and is
-    not an affordance, so neither of §12's two reasons applies to it.
+    Drawing it in both places would double-print the same string in two positions. §12's own two
+    reasons for un-baking it are what made the promotion possible in the first place — a baked
+    stamp could only ever be a hit region over a bitmap, which is precisely the objection §2a had
+    to strike to make the wordmark an affordance — so this is §12 arriving at its own conclusion
+    rather than being overruled.
 
-    **Two reasons it cannot be baked, either sufficient.** The version is variable width — `1.1`,
-    `1.10` and `1.2.1` are three different widths — so the serial's position depends on the
-    version's length, and baked ink cannot reflow: a baked stamp is correct for exactly one version
-    string and wrong for the next. And `shared/ABOUT-PART.md` §2 opens the About box from this stamp
-    promoted to a recessed tab, where a baked stamp could only ever be a hit region over a bitmap —
-    the objection that ruled the wordmark out as the affordance.
+    **Change set 32's cut-out is still load-bearing and still verified**: the plate carries zero
+    light pixels across x 3600…4020 / y 2900…2960, so nothing is covering baked ink and nothing is
+    left showing where the stamp used to be. If a future plate re-bakes it, the tab will overlap
+    printed ink rather than quietly disagree with it — the louder failure, and the one to want.
 
-    **The version comes from `PROJECT_VERSION`, never a literal.** This casting printed a baked
-    `v1.1` against a binary at `1.0.0` for the whole life of the plate, which is what a figure in
-    artwork costs. `NF_VERSION_SHORT` exists too and is the wrong string here: §12 asks for the
-    patch field.
-
-    It draws AFTER the plate blit. Change set 32 cut the ink out — verified at zero light pixels
-    across plate x 3600…4020 / y 2900…2960 — so nothing is being covered. If a future plate ever
-    re-baked it this would double-print rather than quietly disagree, which is the louder failure
-    and the one to want. */
-void PanelBackground::paintFootStamp (juce::Graphics& g) const
-{
-    using namespace FifthMemberTheme;
-
-    const juce::String stamp = juce::String (Layout::footSerial) + " " + Text::middleDot()
-                             + " v" + juce::String (NF_VERSION);
-
-    // The line box is centred on the ink §12 measured off the plate, so the drawn string lands
-    // where the artwork had it rather than where a fresh layout would put it.
-    const float centreY = (Layout::footStampInkTop + Layout::footStampInkBottom) * 0.5f;
-    const juce::Rectangle<float> row { Layout::footStampInkRight - 400.0f,
-                                       centreY - Layout::footStampLineBox * 0.5f,
-                                       400.0f, Layout::footStampLineBox };
-
-    Text::drawTracked (g, stamp, Font::label (Layout::footStampCssPx),
-                       Font::trackingPx (Layout::footStampTrackingEm, Layout::footStampCssPx),
-                       row, juce::Justification::centredRight, Colour::panelText);
-}
+    `Layout::footStampInkRight` and its two neighbours are kept: they are the measured record of
+    where the artwork had the string, and §12's argument is what they document. They have no
+    consumer, which is exactly the fossil shape `tools/check_unused_constants.py` reports — noted
+    here so the next reader of that report has the answer without going looking. */
