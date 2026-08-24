@@ -75,7 +75,10 @@ juce_add_binary_data(FifthMemberBinaryData
         design/fonts/barlow-condensed/BarlowCondensed-Medium.ttf
         design/fonts/barlow-condensed/BarlowCondensed-SemiBold.ttf
         design/fonts/share-tech-mono/ShareTechMono-Regular.ttf
-        design/fonts/permanent-marker/PermanentMarker-Regular.ttf)
+        design/fonts/permanent-marker/PermanentMarker-Regular.ttf
+        # ABOUT-PART.md §2b's cursor. JUCE has no help cursor in StandardCursorType, so the
+        # delivered asset is embedded and a MouseCursor is built from it.
+        design/assets/about-cursor-2x.png)
 
 # AU is Apple-only; Windows/Linux only ever build VST3 + Standalone. VST3_COPY_DIR/AU_COPY_DIR are
 # only set on Apple - leaving them unset elsewhere lets JUCE apply its own correct per-OS default

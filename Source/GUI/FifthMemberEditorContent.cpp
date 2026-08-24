@@ -208,7 +208,8 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
             Colour::aboutGlass, Colour::aboutBody, Colour::aboutDim, Colour::aboutAccent,
             Colour::aboutRing,
             Colour::aboutWellTop, Colour::aboutWellBottom, Colour::aboutWellInk,
-            Font::barlowSemiBold(), Font::barlowMedium(), Font::shareTechMono()
+            Font::barlowSemiBold(), Font::barlowMedium(), Font::shareTechMono(),
+            Cursor::help()
         };
 
         /*  §9.3, as corrected in change set 40: **two licence families, not one.** Permanent Marker
@@ -241,7 +242,7 @@ FifthMemberEditorContent::FifthMemberEditorContent (FifthMemberAudioProcessor& p
 
         // §2a: the wordmark is the PRIMARY affordance. It draws nothing — PanelBackground already
         // draws the nameplate; this only claims HeaderGeometry's zone, moved by the frame.
-        aboutWordmark = std::make_unique<nf::AboutWordmarkHit>();
+        aboutWordmark = std::make_unique<nf::AboutWordmarkHit> (Cursor::help());
         aboutWordmark->onClick = [this] { aboutBox->open(); };
 
         /*  **Registered LAST, and that is not tidiness.** JUCE paints children in the order they
