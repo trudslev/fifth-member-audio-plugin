@@ -56,6 +56,7 @@ jobs:
     # Deliberately its own job ahead of the builds: a tag that disagrees with CMakeLists.txt should
     # fail in about fifteen seconds, not after three full plugin builds have run.
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       version: ${{ steps.v.outputs.version }}
       publish: ${{ steps.v.outputs.publish }}
@@ -92,6 +93,7 @@ jobs:
   build-macos:
     needs: version
     runs-on: macos-14
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -211,6 +213,7 @@ jobs:
   build-windows:
     needs: version
     runs-on: windows-latest
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v4
@@ -332,6 +335,7 @@ jobs:
     if: needs.version.outputs.publish == 'true'
     needs: [version, build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Download built bundles
