@@ -1,0 +1,18 @@
+{
+  "macos": {
+    "-Wdeprecated-declarations": 2,
+    "-Wshadow": 4,
+    "-Wshadow-uncaptured-local": 4
+  },
+  "linux": {
+    "-Wdeprecated-declarations": 1,
+    "-Wfloat-equal": 31,
+    "-Woverloaded-virtual": 26,
+    "-Wshadow": 11,
+    "-Wsign-conversion": 44
+  },
+  "windows": {
+    "C4457": 2,
+    "C4458": 7
+  }
+}
