@@ -7,7 +7,6 @@
   "linux": {
     "-Wdeprecated-declarations": 1,
     "-Wfloat-equal": 31,
-    "-Woverloaded-virtual": 26,
     "-Wshadow": 11,
     "-Wsign-conversion": 44
   },
