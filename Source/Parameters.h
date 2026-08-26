@@ -16,6 +16,21 @@
     specified that state model; this one's does not, and the factory bank is written in physical
     units throughout.
 */
+/*  **The APVTS tree type, held once because five castings agreed with it by accident.**
+
+    Every test host that builds this casting's real parameter layout also has to name the tree type,
+    and each one used to write the string again. Five castings write `PARAMETERS` in the processor
+    and `PARAMETERS` in the test, which is agreement rather than derivation — and Elmer, whose
+    processor writes `ELMER`, had a test host saying `PARAMETERS`. It was harmless only because that
+    suite performs no state round trip; nothing made it correct, a neighbouring value merely matched.
+
+    A fixture that models a producer's structure by hand passes by agreeing with its author. This is
+    the producer.  */
+namespace ParamIDs
+{
+    inline constexpr const char* stateTreeType = "PARAMETERS";
+}
+
 namespace ParamIDs
 {
     // TIMING
